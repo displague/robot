@@ -80,3 +80,16 @@ Produced: `docs/08-passive-balance-springs-compliance.md` (statue tipping margin
 length and foot ballast as the passive levers, why not a bladder, reaction wheel as a deferred
 option; the four places springs are used and why; the compliance inventory, the non-backdrivable
 lock and its three safeguards); D-015, D-016; README map row.
+
+## P-006 (2026-10-25) Readiness check for a full Blender assembly
+
+> Is the whole system ready to be assembled in blender and positioned, gravity and mobility
+> centered?
+
+Answered in chat: no. What exists is the kinematic rig (segments, joint limits, 50 DOF), one
+winch module and one finger. Missing for an assembly: a mass model attached to the rig (per
+segment mass and CoM offset, total CoM, support-polygon check per pose), shell geometry for every
+segment with joints, pulleys and winch-bank mounts, the W-mid and W-max modules, part-to-bone
+parenting in Blender, and a URDF export for a real dynamics simulator (Blender's rigid bodies are
+qualitative only). The mass model and CoM check are the immediate next step and need no
+geometry; the shells follow the roadmap phases. No files changed other than this entry.
