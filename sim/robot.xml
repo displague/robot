@@ -9,7 +9,7 @@
     <geom name="floor" type="plane" size="5 5 0.1" rgba="0.9 0.9 0.9 1"/>
     <body name="pelvis" pos="0.0000 0.0000 0.9500">
       <freejoint name="float"/>
-      <geom type="box" size="0.0250 0.0250 0.0500" pos="0.0000 0.0000 0.0500" mass="3.500"/>
+      <geom type="box" size="0.1400 0.0800 0.0500" pos="0.0000 0.0000 0.0500" mass="3.500" rgba="0.55 0.58 0.62 1"/>
       <body name="spine_pitch_gear" pos="0.060 0.020 0.000">
         <joint name="spine_pitch_gear" type="hinge" axis="0 0 1" armature="0.01760"/>
         <geom type="cylinder" size="0.006 0.004" mass="0.002" contype="0" conaffinity="0" rgba="0.8 0.3 0.1 1"/>
@@ -86,7 +86,7 @@
         <joint name="spine_pitch" type="hinge" axis="1 0 0" range="-0.3491 0.6981" limited="true" damping="0.05"/>
         <joint name="spine_roll" type="hinge" axis="0 1 0" range="-0.4363 0.4363" limited="true" damping="0.05"/>
         <joint name="spine_yaw" type="hinge" axis="0 0 1" range="-0.7854 0.7854" limited="true" damping="0.05"/>
-      <geom type="box" size="0.0250 0.0250 0.2000" pos="0.0000 0.0000 0.2000" mass="3.500"/>
+      <geom type="box" size="0.1300 0.0800 0.2000" pos="0.0000 0.0000 0.2000" mass="3.500" rgba="0.55 0.58 0.62 1"/>
         <body name="neck_pitch_gear" pos="0.060 0.020 0.000">
           <joint name="neck_pitch_gear" type="hinge" axis="0 0 1" armature="0.00142"/>
           <geom type="cylinder" size="0.006 0.004" mass="0.002" contype="0" conaffinity="0" rgba="0.8 0.3 0.1 1"/>
@@ -115,13 +115,13 @@
           <joint name="neck_pitch" type="hinge" axis="1 0 0" range="-0.8727 0.8727" limited="true" damping="0.05"/>
           <joint name="neck_roll" type="hinge" axis="0 1 0" range="-0.6109 0.6109" limited="true" damping="0.05"/>
           <joint name="neck_yaw" type="hinge" axis="0 0 1" range="-1.3963 1.3963" limited="true" damping="0.05"/>
-      <geom type="box" size="0.0250 0.0250 0.0500" pos="0.0000 0.0000 0.0500" mass="0.300"/>
+      <geom type="capsule" size="0.0350" fromto="0.0000 0.0000 0.0350 0.0000 0.0000 0.0650" mass="0.300" rgba="0.55 0.58 0.62 1"/>
           <body name="head" pos="0.0000 0.0000 0.1000">
-      <geom type="box" size="0.0250 0.0250 0.0750" pos="0.0000 0.0000 0.0750" mass="0.800"/>
+      <geom type="capsule" size="0.0800" fromto="0.0000 0.0000 0.0675 0.0000 0.0000 0.0825" mass="0.800" rgba="0.55 0.58 0.62 1"/>
           </body>
         </body>
         <body name="clavicle.L" pos="0.0200 0.0000 0.4000">
-      <geom type="box" size="0.0900 0.0250 0.0250" pos="0.0900 0.0000 0.0000" mass="0.200"/>
+      <geom type="capsule" size="0.0200" fromto="0.0200 0.0000 0.0000 0.1600 0.0000 0.0000" mass="0.200" rgba="0.55 0.58 0.62 1"/>
           <body name="upperarm.L_pitch_gear" pos="0.060 0.020 0.000">
             <joint name="upperarm.L_pitch_gear" type="hinge" axis="0 0 1" armature="0.01760"/>
             <geom type="cylinder" size="0.006 0.004" mass="0.002" contype="0" conaffinity="0" rgba="0.8 0.3 0.1 1"/>
@@ -150,7 +150,7 @@
             <joint name="upperarm.L_pitch" type="hinge" axis="1 0 0" range="-2.9671 0.7854" limited="true" damping="0.05"/>
             <joint name="upperarm.L_roll" type="hinge" axis="0 1 0" range="-2.8798 0.5236" limited="true" damping="0.05"/>
             <joint name="upperarm.L_yaw" type="hinge" axis="0 0 1" range="-1.3963 1.3963" limited="true" damping="0.05"/>
-      <geom type="box" size="0.0250 0.0250 0.1500" pos="0.0000 0.0000 -0.1500" mass="0.900"/>
+      <geom type="capsule" size="0.0450" fromto="0.0000 0.0000 -0.0450 0.0000 0.0000 -0.2550" mass="0.900" rgba="0.55 0.58 0.62 1"/>
             <body name="forearm.L_pitch_gear" pos="0.060 0.020 0.000">
               <joint name="forearm.L_pitch_gear" type="hinge" axis="0 0 1" armature="0.02916"/>
               <geom type="cylinder" size="0.006 0.004" mass="0.002" contype="0" conaffinity="0" rgba="0.8 0.3 0.1 1"/>
@@ -170,7 +170,7 @@
             <body name="forearm.L" pos="0.0000 0.0000 -0.3000">
               <joint name="forearm.L_pitch" type="hinge" axis="1 0 0" range="-2.4435 0.0000" limited="true" damping="0.05"/>
               <joint name="forearm.L_yaw" type="hinge" axis="0 0 1" range="-1.3963 1.3963" limited="true" damping="0.05"/>
-      <geom type="box" size="0.0250 0.0250 0.1300" pos="0.0000 0.0000 -0.1300" mass="0.900"/>
+      <geom type="capsule" size="0.0350" fromto="0.0000 0.0000 -0.0350 0.0000 0.0000 -0.2250" mass="0.900" rgba="0.55 0.58 0.62 1"/>
               <body name="hand.L_pitch_gear" pos="0.060 0.020 0.000">
                 <joint name="hand.L_pitch_gear" type="hinge" axis="0 0 1" armature="0.00142"/>
                 <geom type="cylinder" size="0.006 0.004" mass="0.002" contype="0" conaffinity="0" rgba="0.8 0.3 0.1 1"/>
@@ -190,13 +190,13 @@
               <body name="hand.L" pos="0.0000 0.0000 -0.2600">
                 <joint name="hand.L_pitch" type="hinge" axis="1 0 0" range="-1.2217 1.0472" limited="true" damping="0.05"/>
                 <joint name="hand.L_roll" type="hinge" axis="0 1 0" range="-0.2618 0.4363" limited="true" damping="0.05"/>
-      <geom type="box" size="0.0250 0.0250 0.0900" pos="0.0000 0.0000 -0.0900" mass="0.400"/>
+      <geom type="box" size="0.0400 0.0150 0.0900" pos="0.0000 0.0000 -0.0900" mass="0.400" rgba="0.55 0.58 0.62 1"/>
               </body>
             </body>
           </body>
         </body>
         <body name="clavicle.R" pos="-0.0200 0.0000 0.4000">
-      <geom type="box" size="0.0900 0.0250 0.0250" pos="-0.0900 0.0000 0.0000" mass="0.200"/>
+      <geom type="capsule" size="0.0200" fromto="-0.0200 0.0000 0.0000 -0.1600 0.0000 0.0000" mass="0.200" rgba="0.55 0.58 0.62 1"/>
           <body name="upperarm.R_pitch_gear" pos="-0.060 0.020 0.000">
             <joint name="upperarm.R_pitch_gear" type="hinge" axis="0 0 1" armature="0.01760"/>
             <geom type="cylinder" size="0.006 0.004" mass="0.002" contype="0" conaffinity="0" rgba="0.8 0.3 0.1 1"/>
@@ -225,7 +225,7 @@
             <joint name="upperarm.R_pitch" type="hinge" axis="1 0 0" range="-2.9671 0.7854" limited="true" damping="0.05"/>
             <joint name="upperarm.R_roll" type="hinge" axis="0 1 0" range="-0.5236 2.8798" limited="true" damping="0.05"/>
             <joint name="upperarm.R_yaw" type="hinge" axis="0 0 1" range="-1.3963 1.3963" limited="true" damping="0.05"/>
-      <geom type="box" size="0.0250 0.0250 0.1500" pos="0.0000 0.0000 -0.1500" mass="0.900"/>
+      <geom type="capsule" size="0.0450" fromto="0.0000 0.0000 -0.0450 0.0000 0.0000 -0.2550" mass="0.900" rgba="0.55 0.58 0.62 1"/>
             <body name="forearm.R_pitch_gear" pos="-0.060 0.020 0.000">
               <joint name="forearm.R_pitch_gear" type="hinge" axis="0 0 1" armature="0.02916"/>
               <geom type="cylinder" size="0.006 0.004" mass="0.002" contype="0" conaffinity="0" rgba="0.8 0.3 0.1 1"/>
@@ -245,7 +245,7 @@
             <body name="forearm.R" pos="0.0000 0.0000 -0.3000">
               <joint name="forearm.R_pitch" type="hinge" axis="1 0 0" range="-2.4435 0.0000" limited="true" damping="0.05"/>
               <joint name="forearm.R_yaw" type="hinge" axis="0 0 1" range="-1.3963 1.3963" limited="true" damping="0.05"/>
-      <geom type="box" size="0.0250 0.0250 0.1300" pos="0.0000 0.0000 -0.1300" mass="0.900"/>
+      <geom type="capsule" size="0.0350" fromto="0.0000 0.0000 -0.0350 0.0000 0.0000 -0.2250" mass="0.900" rgba="0.55 0.58 0.62 1"/>
               <body name="hand.R_pitch_gear" pos="-0.060 0.020 0.000">
                 <joint name="hand.R_pitch_gear" type="hinge" axis="0 0 1" armature="0.00142"/>
                 <geom type="cylinder" size="0.006 0.004" mass="0.002" contype="0" conaffinity="0" rgba="0.8 0.3 0.1 1"/>
@@ -265,7 +265,7 @@
               <body name="hand.R" pos="0.0000 0.0000 -0.2600">
                 <joint name="hand.R_pitch" type="hinge" axis="1 0 0" range="-1.2217 1.0472" limited="true" damping="0.05"/>
                 <joint name="hand.R_roll" type="hinge" axis="0 1 0" range="-0.4363 0.2618" limited="true" damping="0.05"/>
-      <geom type="box" size="0.0250 0.0250 0.0900" pos="0.0000 0.0000 -0.0900" mass="0.400"/>
+      <geom type="box" size="0.0400 0.0150 0.0900" pos="0.0000 0.0000 -0.0900" mass="0.400" rgba="0.55 0.58 0.62 1"/>
               </body>
             </body>
           </body>
@@ -275,7 +275,7 @@
         <joint name="thigh.L_pitch" type="hinge" axis="1 0 0" range="-1.9199 0.2618" limited="true" damping="0.05"/>
         <joint name="thigh.L_roll" type="hinge" axis="0 1 0" range="-0.6981 0.4363" limited="true" damping="0.05"/>
         <joint name="thigh.L_yaw" type="hinge" axis="0 0 1" range="-0.6109 0.6109" limited="true" damping="0.05"/>
-      <geom type="box" size="0.0250 0.0250 0.2150" pos="0.0000 0.0000 -0.2150" mass="2.200"/>
+      <geom type="capsule" size="0.0600" fromto="0.0000 0.0000 -0.0600 0.0000 0.0000 -0.3700" mass="2.200" rgba="0.55 0.58 0.62 1"/>
         <body name="shank.L_pitch_gear" pos="0.060 0.020 0.000">
           <joint name="shank.L_pitch_gear" type="hinge" axis="0 0 1" armature="0.01760"/>
           <geom type="cylinder" size="0.006 0.004" mass="0.002" contype="0" conaffinity="0" rgba="0.8 0.3 0.1 1"/>
@@ -286,7 +286,7 @@
         </body>
         <body name="shank.L" pos="0.0000 0.0000 -0.4300">
           <joint name="shank.L_pitch" type="hinge" axis="1 0 0" range="0.0000 2.3562" limited="true" damping="0.05"/>
-      <geom type="box" size="0.0250 0.0250 0.2200" pos="0.0000 0.0000 -0.2200" mass="0.900"/>
+      <geom type="capsule" size="0.0500" fromto="0.0000 0.0000 -0.0500 0.0000 0.0000 -0.3900" mass="0.900" rgba="0.55 0.58 0.62 1"/>
           <body name="foot.L_pitch_gear" pos="0.060 0.020 0.000">
             <joint name="foot.L_pitch_gear" type="hinge" axis="0 0 1" armature="0.01760"/>
             <geom type="cylinder" size="0.006 0.004" mass="0.002" contype="0" conaffinity="0" rgba="0.8 0.3 0.1 1"/>
@@ -306,7 +306,7 @@
           <body name="foot.L" pos="0.0000 0.0000 -0.4400">
             <joint name="foot.L_pitch" type="hinge" axis="1 0 0" range="-0.3491 0.6981" limited="true" damping="0.05"/>
             <joint name="foot.L_roll" type="hinge" axis="0 1 0" range="-0.3491 0.2618" limited="true" damping="0.05"/>
-      <geom type="box" size="0.0500 0.1300 0.0200" pos="0.0000 -0.0800 -0.0400" mass="0.600"/>
+      <geom type="box" size="0.0500 0.1300 0.0200" pos="0.0000 -0.0800 -0.0400" mass="0.600" rgba="0.55 0.58 0.62 1"/>
           </body>
         </body>
       </body>
@@ -314,7 +314,7 @@
         <joint name="thigh.R_pitch" type="hinge" axis="1 0 0" range="-1.9199 0.2618" limited="true" damping="0.05"/>
         <joint name="thigh.R_roll" type="hinge" axis="0 1 0" range="-0.4363 0.6981" limited="true" damping="0.05"/>
         <joint name="thigh.R_yaw" type="hinge" axis="0 0 1" range="-0.6109 0.6109" limited="true" damping="0.05"/>
-      <geom type="box" size="0.0250 0.0250 0.2150" pos="0.0000 0.0000 -0.2150" mass="2.200"/>
+      <geom type="capsule" size="0.0600" fromto="0.0000 0.0000 -0.0600 0.0000 0.0000 -0.3700" mass="2.200" rgba="0.55 0.58 0.62 1"/>
         <body name="shank.R_pitch_gear" pos="-0.060 0.020 0.000">
           <joint name="shank.R_pitch_gear" type="hinge" axis="0 0 1" armature="0.01760"/>
           <geom type="cylinder" size="0.006 0.004" mass="0.002" contype="0" conaffinity="0" rgba="0.8 0.3 0.1 1"/>
@@ -325,7 +325,7 @@
         </body>
         <body name="shank.R" pos="0.0000 0.0000 -0.4300">
           <joint name="shank.R_pitch" type="hinge" axis="1 0 0" range="0.0000 2.3562" limited="true" damping="0.05"/>
-      <geom type="box" size="0.0250 0.0250 0.2200" pos="0.0000 0.0000 -0.2200" mass="0.900"/>
+      <geom type="capsule" size="0.0500" fromto="0.0000 0.0000 -0.0500 0.0000 0.0000 -0.3900" mass="0.900" rgba="0.55 0.58 0.62 1"/>
           <body name="foot.R_pitch_gear" pos="-0.060 0.020 0.000">
             <joint name="foot.R_pitch_gear" type="hinge" axis="0 0 1" armature="0.01760"/>
             <geom type="cylinder" size="0.006 0.004" mass="0.002" contype="0" conaffinity="0" rgba="0.8 0.3 0.1 1"/>
@@ -345,7 +345,7 @@
           <body name="foot.R" pos="0.0000 0.0000 -0.4400">
             <joint name="foot.R_pitch" type="hinge" axis="1 0 0" range="-0.3491 0.6981" limited="true" damping="0.05"/>
             <joint name="foot.R_roll" type="hinge" axis="0 1 0" range="-0.2618 0.3491" limited="true" damping="0.05"/>
-      <geom type="box" size="0.0500 0.1300 0.0200" pos="0.0000 -0.0800 -0.0400" mass="0.600"/>
+      <geom type="box" size="0.0500 0.1300 0.0200" pos="0.0000 -0.0800 -0.0400" mass="0.600" rgba="0.55 0.58 0.62 1"/>
           </body>
         </body>
       </body>

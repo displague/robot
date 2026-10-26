@@ -76,6 +76,7 @@ JOINTS = {
 
 
 STIFF_MINI = False   # variant: W-mini pulleys 25 mm, pretension 25 % of continuous (docs/13 finding)
+HIP_ROLL_60 = False  # variant: hip roll on the 60 mm pulley with tackle 3 (single-support finding, docs/14)
 
 
 def winch_params(joint_name, axis, cls_name):
@@ -85,6 +86,8 @@ def winch_params(joint_name, axis, cls_name):
     m = MOTORS[c["motor"]]
     n = j.get("tackle_by_axis", {}).get(axis, j["tackle"])
     r_p = j["pulley"][axis]
+    if HIP_ROLL_60 and joint_name == "hip" and axis == "roll":
+        n, r_p = 3, 0.060
     pre_frac = PRETENSION_FRACTION
     if STIFF_MINI and cls_name == "W-mini":
         r_p, pre_frac = max(r_p, 0.025), 0.25
@@ -108,15 +111,36 @@ def winch_params(joint_name, axis, cls_name):
                 bowden=j["bowden"])
 
 
-def geom_box(l):
+# body shapes: radius of the printed shell per segment (capsule from bone head to tail), or a box
+# (x width, y depth, z height) for the trunk segments and the hand. These are the collision shapes too,
+# so the self-collision check is against the printed envelope, not a 50 mm stick. Masses are unchanged.
+SHELL = {"pelvis": ("box", (0.28, 0.16, 0.10)), "spine": ("box", (0.26, 0.16, 0.40)),
+         "neck": ("capsule", 0.035), "head": ("capsule", 0.08), "clavicle": ("capsule", 0.02),
+         "upperarm": ("capsule", 0.045), "forearm": ("capsule", 0.035), "hand": ("box", (0.08, 0.03, 0.18)),
+         "thigh": ("capsule", 0.06), "shank": ("capsule", 0.05)}
+TINT = {"W-max": "0.55 0.58 0.62 1", "W-mid": "0.62 0.60 0.52 1", "W-mini": "0.66 0.62 0.60 1"}
+
+
+BOX_GEOM = '      <geom type="box" size="%.4f %.4f %.4f" pos="%.4f %.4f %.4f" mass="%.3f" rgba="%s"/>\n'
+CAPSULE_GEOM = '      <geom type="capsule" size="%.4f" fromto="%.4f %.4f %.4f %.4f %.4f %.4f" mass="%.3f" rgba="%s"/>\n'
+
+
+def geom_shape(l, tint="0.75 0.75 0.75 1"):
     d = sub(l["tail"], l["head"])
     if l["base"] == "foot":
         size, origin = FOOT_BOX, FOOT_OFFSET
-    else:
-        size = tuple(max(abs(v), 0.05) for v in d)
+        return BOX_GEOM % (size[0] / 2, size[1] / 2, size[2] / 2, origin[0], origin[1], origin[2], l["mass"], tint)
+    kind, dim = SHELL[l["base"]]
+    if kind == "box":
+        size = tuple(max(abs(v), w) for v, w in zip(d, dim))
         origin = tuple(v / 2 for v in d)
-    return ('      <geom type="box" size="%.4f %.4f %.4f" pos="%.4f %.4f %.4f" mass="%.3f"/>\n'
-            % (size[0] / 2, size[1] / 2, size[2] / 2, origin[0], origin[1], origin[2], l["mass"]))
+        return BOX_GEOM % (size[0] / 2, size[1] / 2, size[2] / 2, origin[0], origin[1], origin[2], l["mass"], tint)
+    # capsule: the hemispherical ends overlap the neighbours at the joint, as a printed shell does
+    length = math.sqrt(sum(v * v for v in d))
+    inset = min(dim, 0.45 * length)
+    a = tuple(v / length * inset for v in d)
+    b = tuple(v - v / length * inset for v in d)
+    return CAPSULE_GEOM % ((dim,) + a + b + (l["mass"], tint))
 
 
 def winch_body_xml(pad, name, p, pos):
@@ -158,7 +182,7 @@ def mjcf(links, data):
             ax = WORLD_AXIS[d["axis"]]
             out.append('%s  <joint name="%s_%s" type="hinge" axis="%d %d %d" range="%.4f %.4f" limited="true" damping="0.05"/>\n'
                        % (pad, l["name"], d["axis"], ax[0], ax[1], ax[2], math.radians(d["lo"]), math.radians(d["hi"])))
-        out.append(geom_box(l))
+        out.append(geom_shape(l, TINT.get(jd["winch"], "0.75 0.75 0.75 1") if jd else "0.6 0.6 0.6 1"))
         k = 0
         for name, p, host in winches:
             if host == l["name"]:
