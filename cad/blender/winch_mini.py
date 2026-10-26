@@ -78,7 +78,7 @@ def box(name, x0, x1, y0, y1, z0, z1):
     return o
 
 
-def cyl(name, axis, r, a0, a1, c1, c2):
+def cyl(name, axis, r, a0, a1, c1, c2, segments=None):
     """Cylinder along `axis` ('x','y' or 'z') from a0 to a1; (c1, c2) are the other two coords in x,y,z order."""
     length = a1 - a0
     mid = (a0 + a1) / 2
@@ -88,7 +88,7 @@ def cyl(name, axis, r, a0, a1, c1, c2):
         loc, rot = (c1, mid, c2), (math.pi / 2, 0, 0)
     else:
         loc, rot = (c1, c2, mid), (0, 0, 0)
-    bpy.ops.mesh.primitive_cylinder_add(vertices=P["segments"], radius=r, depth=length, location=loc, rotation=rot)
+    bpy.ops.mesh.primitive_cylinder_add(vertices=segments or P["segments"], radius=r, depth=length, location=loc, rotation=rot)
     o = bpy.context.active_object
     o.name = name
     _activate(o)
