@@ -77,6 +77,27 @@ DOF are the homing reference.
 Reverses if: Phase 1 wrist loops show the loop binding or creeping (then look at pulley radius
 matching and sheath seating before anything else).
 
+## D-015 (2026-10-25) Passive balance = locked statue + long feet + foot ballast; no bladder; reaction wheel deferred
+
+Why: asked in P-005. A locked robot tips at ~18 N at shoulder height; foot length adds about
+1 N per cm, 2 kg of shot per foot adds ~4 N. Passive ankle springs would need 176 N m/rad to
+stand alone, beyond any elastic. A liquid bladder worsens lean (free-surface effect) and pumps
+too slowly for stepping. A torso reaction wheel is the one "natural" balancer worth revisiting.
+Reverses if: Phase 5 push tests show the ankle strategy cannot cover the gap between the statue
+margin and the 20 N target (then the reaction wheel moves into Phase 6).
+
+## D-016 (2026-10-25) Springs and compliance policy
+
+Why: asked in P-005. Constant-force spools (or badge reels) replace elastic cords for finger
+extensors in the Phase 1 trial; zero-free-length elastic counterbalance on shoulder flexion and
+abduction cancels the arm's own 9 N m; series elastic ankle; closed loops pretensioned by barrel
+adjuster except on neck and spine where a spring seat may self-tension. Compliance: tendon
+stretch plus elastic antagonists plus drag slip as the safety floor, series-spring force
+sensing (encoder minus joint sensor) feeding an impedance mode, and a limp mode for falls and
+hand-guiding. Locked joints are deliberately non-backdrivable.
+Reverses if: impedance mode proves too slow for safe arm contact (then add a true backdrivable
+BLDC W-max on the arms).
+
 ## D-012 (2026-10-25) Every set of work records the prompt that caused it
 
 Why: asked in P-002. `docs/prompt-log.md` holds each prompt verbatim with the files and

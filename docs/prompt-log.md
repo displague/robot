@@ -69,3 +69,14 @@ Produced: "Direction, return and termination" in `docs/02-tendon-actuator.md` (t
 reverse-stroke patterns, the closed loop in detail with its equal-moment-arm and both-runs-sheathed
 rules, barrel-adjuster pretension, backstops, and a termination table covering stopper knots,
 Palomar, crimp sleeves, crimped stop beads and needle toggles); D-014.
+
+## P-005 (2026-10-25) Passive balance, springs, compliance
+
+> Can balance be attained naturally, a balast/ bladder perhaps?
+> For tensions and rest positions are spools or winding springs used or needed?
+> Is the design soft and compliant?
+
+Produced: `docs/08-passive-balance-springs-compliance.md` (statue tipping margin numbers, foot
+length and foot ballast as the passive levers, why not a bladder, reaction wheel as a deferred
+option; the four places springs are used and why; the compliance inventory, the non-backdrivable
+lock and its three safeguards); D-015, D-016; README map row.
