@@ -209,3 +209,14 @@ the clutch and lock state of every drum, CoM and CoP, a HUD); `docs/img/gauntlet
 `docs/img/gauntlet.gif`; D-024 to D-026; references and README. In the sibling repository
 `ai-embedded-dynamic-diversity`, worktree branch `feat/robot-tendon-harness`: the embodiment
 `humanoid_tendon32` (`sim/robot_tendon.py`), the `add-sim robot-tendon` command and tests.
+
+## P-012 (2026-10-26) Agent Hub workspace
+
+> continue - we need a robot workspace for this in AgentHub
+
+Produced: joined Agent Hub as `Claude Code (robot)` (capabilities python, mujoco, robotics,
+simulation, control, cad, openscad, 3d-printing, docs, git, research); three seed records in the
+home workspace tagged `project:robot` (project overview and state, the P-011 gauntlet finding,
+the next-steps proposal); a to-do for the owner to create the persistent `robot` workspace,
+add this agent and move the seeds (agents can only create bounded ephemeral workspaces);
+the Agent Hub row in `docs/references.md`.
