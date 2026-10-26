@@ -64,6 +64,19 @@ inserts all go in post-print, so there is never a print pause.
 Reverses if: the cut needle rims prove impossible to deburr reliably at home (then PTFE liners
 everywhere, at the cost of a larger channel).
 
+## D-014 (2026-10-25) Reverse stroke: elastic for fingers, closed loop on one drum for everything else; crimp terminations
+
+Why: asked in P-004. A closed loop (both ends of one line on one drum, wound opposite ways,
+midpoint anchored to the joint pulley by a crimped stop bead) gives stiff motion both ways from
+a single motor with no slack, provided both sides have equal moment arms and both runs are
+sheathed. Fingers violate the equal-arm rule (9 / 6.5 / 4.5 mm palmar vs a different dorsal path),
+so they keep the elastic antagonist. Pretension via a bicycle barrel adjuster on one sheath end.
+Terminations: stopper knots for prototypes, fishing crimp sleeves and crimped stop beads for
+production, a needle toggle for the highest loads. Mechanical stops in both directions on every
+DOF are the homing reference.
+Reverses if: Phase 1 wrist loops show the loop binding or creeping (then look at pulley radius
+matching and sheath seating before anything else).
+
 ## D-012 (2026-10-25) Every set of work records the prompt that caused it
 
 Why: asked in P-002. `docs/prompt-log.md` holds each prompt verbatim with the files and

@@ -58,3 +58,14 @@ Produced: needle-liner section with a gauge table and usage rules in `docs/02-te
 the no-mid-print-inserts rule in `docs/03-skeleton-joints.md`; D-013; BOM line; `finger.py`
 flexor channel sized as a 16 G press fit (1.75 mm) with countersunk mouths on both channels at
 every body face.
+
+## P-004 (2026-10-25) Opposability, backstops, terminations
+
+> How is forward and reverse opposability attained? Is it a function of bidirectional feeding,
+> each line coming back to it source from the extremity on a loop?
+> Are there backstops? Use of particular knots? Beads?
+
+Produced: "Direction, return and termination" in `docs/02-tendon-actuator.md` (the three
+reverse-stroke patterns, the closed loop in detail with its equal-moment-arm and both-runs-sheathed
+rules, barrel-adjuster pretension, backstops, and a termination table covering stopper knots,
+Palomar, crimp sleeves, crimped stop beads and needle toggles); D-014.

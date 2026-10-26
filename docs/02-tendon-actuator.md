@@ -125,6 +125,85 @@ Rules for using them:
 The finger generator sizes its flexor channel for a 16 G needle (1.75 mm bore) with countersunk
 mouths on both channels at every body face.
 
+## Direction, return and termination (P-004)
+
+How a joint moves both ways with one motor, what stops it, and how the line is tied off.
+
+### Three ways to get the reverse stroke
+
+| Pattern | Reverse stroke comes from | Line path | Used for |
+| --- | --- | --- | --- |
+| Single tendon + elastic | an elastic antagonist (silicone cord, dental elastic, TPU band) | one line, out only; it ends at the extremity | fingers, thumb, eyes, jaw |
+| Closed loop | the other half of the same line, on the same drum | one line, out through tube A, around and anchored to the joint pulley, back through tube B to the same drum | wrist, elbow, forearm, shoulder, neck, spine, hip, knee, ankle |
+| Antagonistic pair | a second motor | two lines, two drums | not used (doubles motor count); only worth it for variable stiffness |
+
+### The closed loop in detail
+
+```
+      drum (one motor)                      joint pulley (on the moving bone)
+   +---------------+                      +---------------+
+   | ) ) ) ) ) )  |--- tube A ---------->|               |
+   | anchor A      |                      |  stop bead in |
+   |               |                      |  pocket (the  |
+   | ( ( ( ( ( (  |<-- tube B -----------|  line cannot  |
+   | anchor B      |                      |  slip here)   |
+   +---------------+                      +---------------+
+   half A wound right-hand, half B wound left-hand, separated by a middle flange
+```
+
+- Both ends of the line anchor on the **same drum**, wound in opposite senses on two halves of
+  the same core. One turn of the drum takes in on A exactly what it pays out on B, so the loop
+  length never changes and the line never goes slack once pretensioned.
+- The midpoint of the line is **anchored to the joint pulley** (a crimped stop bead sitting in a
+  pocket on the pulley rim, the way a bicycle cable head sits in a brake lever). The loop is a
+  positive drive, not a friction capstan, so no wraps are needed and nothing creeps.
+- **Equal moment arms both sides.** Half A and half B must have the same radius, and the two
+  sides of the joint pulley must too; otherwise the loop length changes with angle and the loop
+  binds. This is why a finger, whose palmar arms are 9 / 6.5 / 4.5 mm and whose dorsal path is
+  different again, cannot be a closed loop and gets an elastic instead.
+- **Both runs sheathed.** Because the sheath carries the compression on both runs, the loop
+  length is independent of every joint it passes over on the way, like a bicycle brake cable
+  through a bent frame. A shoulder loop driven from the torso does not care what the clavicle is
+  doing.
+- **Pretension**: set with the joint at mid-range, about 10 % of the working load on each run,
+  measured with a spring scale. The sheath end of one run seats on a **bicycle barrel adjuster**
+  (M6, ~$0.50, printable socket); turning it lengthens the sheath and adds tension without
+  touching the knots. Re-tension once after the first day of running, then rarely.
+
+### Backstops
+
+- **Mechanical stops at the joint**, both directions, on every DOF. They are the reference for
+  homing ("drive gently until current rises") and the thing that saves the line when the firmware
+  is wrong. The finger's extension stop is its dorsal faces meeting at 0 degrees, its flexion stop
+  the palmar chamfers meeting.
+- **Software limits** inside the mechanical ones, from `cad/skeleton.json`.
+- **Drum overtravel**: a single tendon fully paid out would hang on its anchor knot. The drum
+  carries one and a half spare turns beyond full excursion, so the joint stop is always reached
+  before the anchor is loaded.
+- **Slack on single tendons**: an external push can close a finger faster than the drum pays
+  out, leaving slack. The drum flanges and a close-fitting exit keep a slack line on the drum; the
+  winch's `tension` mode reels it back in under a current limit, like a fishing reel taking up
+  slack. The self-locking stage means slack is never a safety problem, only a position error
+  until the next contact.
+- **Broken line on a closed loop**: both runs go slack at once and the joint goes free. Detected
+  by the joint sensor disagreeing with the motor encoder; the node reports a fault and holds the
+  neighbouring joints.
+
+### Terminations: knots, crimps, beads, toggles
+
+| Termination | Strength (of line break) | Where | Notes |
+| --- | --- | --- | --- |
+| Double overhand stopper + melted tag | ~60-70 % | prototypes, drum anchors, fingertip pockets | Braided PE is slippery: at least a double overhand, pull tight, melt the tag into a mushroom with a lighter. A knot pocket keeps it from sitting proud. |
+| Palomar through a hole or toggle | ~85-90 % | anywhere a line passes through a part | Best knot for braid; needs the line doubled through the hole. |
+| **Crimp sleeve (fishing leader sleeve), line passed through, around, back through** | ~90 % | **production terminations** | Aluminium or copper sleeves sized to the line, $3 per hundred, crimped with pliers. Repeatable, compact, re-doable: cut and re-crimp to re-tension. |
+| **Crimped stop bead on the bare line** | ~80 % | the joint-pulley anchor, elastic-cord anchors, any "pull-through-and-stop" | A sleeve crimped on the line alone becomes a bead that cannot pass a 1.2 mm hole. This is the bicycle cable head. |
+| Toggle: lark's head over a 4 mm length of 12 G needle lying across a slot | ~95 % | high-load anchors (knee, hip pulleys) | The line wraps a smooth steel bar instead of biting itself; the slot is printed, the needle is dropped in after printing. |
+
+Rules: no termination ever sits in the bending path; every one lives in a pocket or
+counterbore; the drum anchor is through the flange, never through the core; and every
+termination is reachable with the part assembled so a line can be replaced without
+disassembling the joint.
+
 ## Why the "closing in air, squeezing on contact" profile suits a DC motor
 
 Closing a finger in free air costs only the elastic return (~3-5 N). A 100:1 N20 does that at
