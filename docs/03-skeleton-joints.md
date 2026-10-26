@@ -1,0 +1,120 @@
+# 03 - Skeleton and joints
+
+## Materials and hardware (all cheap, all common)
+
+| Item | Choice | Why |
+| --- | --- | --- |
+| Structural prints | PETG, 4 walls, 25-40 % gyroid | Tougher than PLA, does not creep at 40 C, cheap. PLA+ is acceptable for hands and face. |
+| Load-bearing prints (hip, knee, shoulder clevises, pulleys) | PETG with 6 walls or ASA/PC if the printer can | Layer orientation chosen so tendon load is in-plane, never peeling layers |
+| Flexible parts (finger pads, elastic return bands, drag springs) | TPU 95A | Printable springs and grip pads |
+| Big joint axles | 8 mm steel rod or M8 bolts, 608 bearings (8x22x7) | The InMoov standard. ~$0.20 per bearing. |
+| Medium joint axles | 5 mm rod, 625 bearings (5x16x5) or printed bushings with PTFE tube liner | |
+| Finger joints | 2 mm steel pins (cut from music wire or 2 mm nails), printed bushings | Loads are small, friction is low, cost is nothing |
+| Fasteners | M3 heat-set inserts + M3 screws; M2 self-tapping for small parts | One screw size for 90 % of the build |
+| Tendon sheath | PTFE tube 2 mm ID / 4 mm OD | Bowden tube |
+| Line | braided PE 50 / 100 / 200 lb | see `02-tendon-actuator.md` |
+
+## Print segmentation
+
+Every bone splits into pieces <= 240 mm so a 256 mm bed (Ender 3 class, Bambu A1/P1) prints
+them flat. Pieces join with a printed dovetail plus two M3 screws through the joint. Long bones
+(humerus, femur, tibia) are two half-shells screwed together so the tendon channels, PTFE tubes
+and wiring are laid in before closing. Target total print time: under 400 hours at 0.28 mm layers.
+
+## Joint catalogue with ROM targets
+
+Targets are the human range; "ours" is what the printed joint will mechanically allow. Where ours
+is smaller than human, that is a deliberate trade and the decision log says why.
+
+### Hand (per hand: 7 W-mini)
+
+| Joint | Human | Ours | Mechanism |
+| --- | --- | --- | --- |
+| MCP flexion | 0-90 | 0-90 | pin joint, 10 mm tendon moment arm (channel offset) |
+| PIP flexion | 0-110 | 0-105 | pin joint, 7 mm arm |
+| DIP flexion | 0-80 | 0-70 | pin joint, 5 mm arm, coupled to PIP by the same tendon |
+| MCP hyperextension | 30 | 10 | hard stop |
+| Finger abduction | 20 | 15 | one tendon through a whiffletree spreads all four; elastic closes |
+| Thumb CMC opposition | ~60 | 60 | one W-mini on a diagonal axis (saddle joint approximated by a pin at 45 degrees) |
+| Thumb MCP + IP | 60 + 80 | 55 + 75 | one flexor tendon, same as a finger |
+
+One flexor tendon per finger runs through all three joints on the palm side; the elastic
+extensor runs along the back. The tendon moment arms (10/7/5 mm) make the finger curl distal
+first then proximal, which is how a hand conforms to an object. A W-mini per finger plus one for
+thumb opposition and one for spread = 7.
+
+### Wrist and forearm (per arm: 2 W-mini + 1 W-mid)
+
+| Joint | Human | Ours | Mechanism |
+| --- | --- | --- | --- |
+| Flexion / extension | 80 / 70 | 70 / 60 | universal joint (two pin axes), closed-loop cable on a 15 mm pulley |
+| Radial / ulnar deviation | 20 / 35 | 15 / 25 | second axis of the universal, closed loop |
+| Pronation / supination | 85 / 90 | 80 / 80 | forearm shell rotates on a ring bearing (printed, with 6 mm airsoft BBs as balls, or a 6808 bearing); W-mid in the upper arm drives a capstan |
+
+### Elbow (1 W-mid)
+
+| Joint | Human | Ours | Mechanism |
+| --- | --- | --- | --- |
+| Flexion | 0-145 | 0-140 | 8 mm axle, two 608 bearings, 60 mm closed-loop pulley, 2:1 tackle |
+
+### Shoulder (3 W-max)
+
+| Joint | Human | Ours | Mechanism |
+| --- | --- | --- | --- |
+| Flexion / extension | 180 / 60 | 170 / 45 | ball joint approximated by three serial pin axes (yaw ring in the torso, pitch axle, roll axle), each on 608 bearings; each with closed-loop cable + 2:1 tackle driven from the torso bank |
+| Abduction / adduction | 180 / 45 | 165 / 30 | |
+| Internal / external rotation | 90 / 90 | 80 / 80 | |
+
+Three serial axes with offsets suffer gimbal lock near 90 degrees abduction; the yaw ring is
+tilted 30 degrees forward (like the scapula) so the singularity sits outside the useful workspace.
+
+### Neck (3 W-mini) and face (4 W-mini, optional)
+
+Neck: a two-axis universal at the base of the skull plus a yaw bearing at the top of the spine,
+closed-loop cables, all winches in the upper torso. Human ranges 60/70 pitch, 80 yaw, 45 roll;
+ours 50/50, 80, 35. Face is cosmetic and comes last.
+
+### Spine (3 W-max)
+
+A single universal joint at the waist plus a yaw bearing (a 6810-class thin-section bearing or a
+printed ball ring). Human 60-90 flexion, 30 extension, 35 lateral, 45 rotation. Ours 40 / 20 /
+25 / 45. Not a flexible spine: one strong joint at the waist is 80 % of the visible motion at 10 %
+of the complexity.
+
+### Hip (3 W-max), knee (1 W-max), ankle (2 W-max)
+
+| Joint | Human | Ours | Mechanism |
+| --- | --- | --- | --- |
+| Hip flexion / extension | 125 / 20 | 110 / 15 | three serial axes like the shoulder but on 8 mm axles with doubled 608 bearings; cables + 3:1 or 4:1 tackle from the pelvis bank |
+| Hip abduction / adduction | 45 / 30 | 40 / 25 | |
+| Hip rotation | 45 / 45 | 35 / 35 | |
+| Knee flexion | 0-140 | 0-135 | 8 mm axle, 100 mm pulley (50 mm moment arm), 2:1 tackle, W-max in the thigh |
+| Ankle dorsi / plantar | 20 / 50 | 20 / 40 | universal joint, W-max pair in the shank |
+| Ankle inversion / eversion | 35 / 20 | 20 / 15 | |
+| Toes | 70 | passive | elastic hinge for a natural-looking foot |
+
+## Elastic antagonists
+
+Printed TPU bands wear out and relax. Preference order: silicone surgical tubing (cheap, lasts),
+dental elastics (precise force, replaceable), TPU bands (printable, fine for prototypes). Elastic
+return force should be 10-15 % of the tendon's working force: enough to re-extend quickly, small
+enough not to steal grip.
+
+## Integrated tendon channels
+
+Each printed bone carries 4 mm channels for PTFE tubes printed in, with 8 mm bores where a tube
+end seats. Tubes are cut to length and pushed in; the tube end seats in the bore and takes the
+sheath compression. Where a tendon leaves a tube to cross a joint, the exit is a 2 mm radiused
+lip, never a sharp edge. Where a tendon wraps a pulley, the pulley groove radius is >= 5x line
+diameter and the groove is printed with the layer lines running around the groove.
+
+## What Blender is for here
+
+- Rig an armature with the exact joint axes, offsets and limits above. Drive every bone from a
+  slider and watch for collisions and reach.
+- Measure tendon excursion vs. angle with a curve that follows the tendon path (geometry nodes
+  or a simple Python driver measuring path length), which feeds the calculator's excursion column.
+- Mass properties via the 3D Print Toolbox add-on (volume x density) for every shell, summed into
+  the 20 kg budget.
+- Stress: not in Blender. Hand calculation first; FreeCAD FEM (CalculiX) for the hip and knee
+  clevises and the big pulleys.

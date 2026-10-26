@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+*.blend1
+*.blend2
+.vscode/
+cad/out/*.stl
+!cad/out/.gitkeep
