@@ -106,3 +106,22 @@ instances and 34 DOF (36 with thumb opposition), all verified manifold after exp
 generalisation taught (lug = pulley; stub axles free the axis for crossing tendons; small
 universals need bearings for routing not load; section width is set by routing; dimples not
 cones on chamfer planes; the big-joint presets are too heavy as prisms); D-017; renders.
+
+## P-008 (2026-10-25) Rotational geometry and physics as a design idea bank
+
+> capture all of the discussion points here in detail such that I can use them to inspire the
+> design of a humanoid robot https://github.com/displague/robot
+
+"Here" was an exploratory discussion held outside this repository, in three prompts:
+"facts about rotational geometry and physics", "and knots, pulleys, gears, cylindrical and
+conical", "and hollow threading splines and morphological twists".
+
+Produced: `docs/10-rotational-geometry.md`, every discussion point restated (rotation as
+isometry, matrices, 3D non-commutativity, Euler's theorem; the linear/rotational twins and
+conservation of angular momentum; Lie algebra and the SU(2) double cover; torus knots and
+helicity; pulley and gear ratios and the non-ideal pulley; cylinder vs cone, step cones, bevel
+gears; helical threads, hollow-shaft `J`, thread handedness; involute splines; morphological
+twists, the Poynting effect, chirality) with what each could mean for the robot, a table of where
+each idea lands with its cheapest test, and open questions. Extensions beyond the discussion are
+flagged in the doc (capstan friction, fusee and tapered drums, twisted string actuators, level-wind,
+swing-twist limits, tendon coupling matrix, among others). No decisions changed; README map row.
