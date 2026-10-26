@@ -57,6 +57,13 @@ in the calculator's finger scenarios. The extensor cord (2 mm channel) rides ove
 lug, which doubles as its pulley. Six-millimetre palmar chamfers at every joint clear the
 flexion. Print mass is about 34 g solid, under 20 g at 30 % infill.
 
+![Finger test article, palmar side: countersunk channel mouths on the chamfer planes](img/finger_palmar.png)
+
+The flexor channel is a 1.75 mm bore, a press fit for a 16 G hollow piercing needle pushed in
+after printing (P-003, D-013). Every channel mouth is countersunk 1 mm so the line bends on
+plastic; the needle stops 1 mm inside. In the fingertip both channels end at their knot pockets
+instead of breaking out through the rounded tip.
+
 ### Wrist and forearm (per arm: 2 W-mini + 1 W-mid)
 
 | Joint | Human | Ours | Mechanism |
@@ -121,6 +128,13 @@ end seats. Tubes are cut to length and pushed in; the tube end seats in the bore
 sheath compression. Where a tendon leaves a tube to cross a joint, the exit is a 2 mm radiused
 lip, never a sharp edge. Where a tendon wraps a pulley, the pulley groove radius is >= 5x line
 diameter and the groove is printed with the layer lines running around the groove.
+
+Straight runs inside thin parts (phalanges, the palm, the back of the hand, the foot) are lined
+with hollow stainless piercing needles cut to length and pressed in after printing (16 G in the
+fingers; see the needle table in `02-tendon-actuator.md`). The needle stops 1 mm short of each
+printed, countersunk mouth, so the line bends on plastic with a 1 mm radius and runs on steel in
+between. Nothing is inserted mid-print anywhere in the robot: every liner, tube, pin, bearing,
+magnet and insert goes in after the part comes off the bed.
 
 ## Whole-body joint table and rig
 

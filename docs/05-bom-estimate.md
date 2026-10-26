@@ -40,6 +40,7 @@ most testing (printed gears at 100 W). See decision D-006.
 | 8 mm steel rod, 5 mm rod, 2 mm music wire | | $25 |
 | M3 inserts and screws, M2 screws | ~1000 | $40 |
 | PTFE tube 2/4 mm | 30 m | $20 |
+| Hollow piercing needles (16 G and 12 G, 100 each) as channel liners and small axles | 200 | $26 |
 | Braided PE line 50/100/200 lb | 3 spools | $30 |
 | Silicone tubing / elastics | | $10 |
 

@@ -53,6 +53,17 @@ foot stay light; a series elastic element in the ankle plantarflexor tendon; roa
 (stand, balance) and Phase 6a/6b (static, dynamic walking) with exit tests.
 Reverses if: nothing planned; the mass budget is the thing most likely to force a trade.
 
+## D-013 (2026-10-25) Straight tendon runs are lined with hollow piercing needles; nothing is inserted mid-print
+
+Why: suggested in P-003. Stainless hypodermic tubing in piercing-needle form is ~$13 per
+hundred, cut to length with a rotary tool, and a press fit (OD + 0.1 mm) holds it in a printed
+channel after printing. It removes channel abrasion, the main wear mode of a braided line in
+plastic. Printed countersunk mouths take the bend; PTFE tube takes any curved path. The same
+rule applies to every insert in the robot: liners, tubes, pins, bearings, magnets, heat-set
+inserts all go in post-print, so there is never a print pause.
+Reverses if: the cut needle rims prove impossible to deburr reliably at home (then PTFE liners
+everywhere, at the cost of a larger channel).
+
 ## D-012 (2026-10-25) Every set of work records the prompt that caused it
 
 Why: asked in P-002. `docs/prompt-log.md` holds each prompt verbatim with the files and

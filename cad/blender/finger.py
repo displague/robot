@@ -29,7 +29,12 @@ P = {
     # joint axes, Z offset from the phalanx centreline (dorsal positive)
     "axis_z": {"mcp": 5.0, "pip": 2.5, "dip": 0.5},
     "flexor_z": -4.0,           # palmar channel centreline -> moment arm = axis_z - flexor_z
-    "flexor_d": 1.8,
+    # The flexor channel is lined with a hollow body-piercing needle cut to length (16 G: 1.65 mm OD,
+    # ~1.2 mm ID), pushed in after printing. Channel = needle OD + press-fit allowance.
+    "liner_od": 1.65,
+    "liner_press": 0.10,
+    "mouth_chamfer_r": 1.0,     # countersink at each channel mouth so the line never meets a sharp edge
+    "mouth_chamfer_depth": 1.2,
     "extensor_z": 5.5,          # dorsal channel; the cord rides over the knuckle lug (axis + lug_r) at each joint
     "extensor_d": 2.0,
     "lug_r": 4.5,               # knuckle radius around the pin
@@ -77,7 +82,7 @@ def box(name, x0, x1, y0, y1, z0, z1, rot_y=0.0, pivot=None):
     return o
 
 
-def cyl(name, axis, r, a0, a1, c1, c2):
+def cyl(name, axis, r, a0, a1, c1, c2, segments=None):
     length, mid = a1 - a0, (a0 + a1) / 2
     if axis == "x":
         loc, rot = (mid, c1, c2), (0, math.pi / 2, 0)
@@ -85,7 +90,30 @@ def cyl(name, axis, r, a0, a1, c1, c2):
         loc, rot = (c1, mid, c2), (math.pi / 2, 0, 0)
     else:
         loc, rot = (c1, c2, mid), (0, 0, 0)
-    bpy.ops.mesh.primitive_cylinder_add(vertices=P["segments"], radius=r, depth=length, location=loc, rotation=rot)
+    bpy.ops.mesh.primitive_cylinder_add(vertices=segments or P["segments"], radius=r, depth=length,
+                                        location=loc, rotation=rot)
+    o = bpy.context.active_object
+    o.name = name
+    _activate(o)
+    bpy.ops.object.transform_apply(rotation=True)
+    return o
+
+
+def cone_x(name, r_wide, r_narrow, depth, x_face, facing, y, z):
+    """Countersink cone along X: wide end on the face at x_face, narrowing into the part.
+    facing = -1 when the face looks toward -X (proximal mouth), +1 when it looks toward +X."""
+    # The narrow end is made 0.05 mm larger than the channel and the wide end starts 0.1 mm outside the
+    # face, with a different segment count, so no cone surface or vertex coincides with the channel
+    # cylinder (coincident geometry makes the exact boolean produce non-manifold output).
+    r_narrow += 0.05
+    over = 0.1
+    depth += over
+    if facing < 0:
+        r1, r2, xc = r_wide, r_narrow, x_face - over + depth / 2   # local -Z (wide) -> world -X
+    else:
+        r1, r2, xc = r_narrow, r_wide, x_face + over - depth / 2
+    bpy.ops.mesh.primitive_cone_add(vertices=P["segments"] - 11, radius1=r1, radius2=r2, depth=depth,
+                                    location=(xc, y, z), rotation=(0, math.pi / 2, 0))
     o = bpy.context.active_object
     o.name = name
     _activate(o)
@@ -115,6 +143,20 @@ def translate(obj, dx):
     obj.location.x += dx
     _activate(obj)
     bpy.ops.object.transform_apply(location=True)
+
+
+def cleanup(obj, dist=0.02):
+    """Merge near-coincident vertices and dissolve degenerate slivers the exact boolean can leave where
+    two cylinders cross (e.g. a mount hole through a tendon channel). Returns the non-manifold edge count."""
+    bm = bmesh.new()
+    bm.from_mesh(obj.data)
+    bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=dist)
+    bmesh.ops.dissolve_degenerate(bm, dist=dist, edges=bm.edges)
+    n = sum(1 for e in bm.edges if not e.is_manifold)
+    bm.to_mesh(obj.data)
+    bm.free()
+    obj.data.update()
+    return n
 
 
 def volume_mm3(obj):
@@ -184,9 +226,20 @@ def phalanx(name, L, prox_axis_z, dist_axis_z, is_distal=False):
         part = add_tongue(part, L, dist_axis_z)
         part = chamfer_palmar(part, x1, -1)
     part = chamfer_palmar(part, x0, +1)
-    # flexor channel (palmar) and extensor channel (dorsal), full length of the body
-    part = cut(part, cyl("flexor", "x", P["flexor_d"] / 2, -1, L + H, 0.0, P["flexor_z"]))
-    part = cut(part, cyl("extensor", "x", P["extensor_d"] / 2, -1, L + H, 0.0, P["extensor_z"]))
+    # flexor channel (palmar, sized for the needle liner) and extensor channel (dorsal), full length of the body
+    liner_r = (P["liner_od"] + P["liner_press"]) / 2
+    x_end = (L - 7.0) if is_distal else L + H   # in the fingertip the channels stop at the knot pockets
+    part = cut(part, cyl("flexor", "x", liner_r, -1, x_end, 0.0, P["flexor_z"]))
+    part = cut(part, cyl("extensor", "x", P["extensor_d"] / 2, -1, x_end, 0.0, P["extensor_z"]))
+    # countersunk mouths on both channels at the body faces (the needle stops 1 mm short of each mouth)
+    mouths = [(x0, -1)] + ([] if is_distal else [(x1, +1)])
+    # The flexor runs below the chamfer line, so its mouth is on the 45-degree chamfer plane, which at
+    # z = flexor_z sits (flexor_z + H/2) inboard of the body face; the extensor mouth is on the flat face.
+    flex_inset = P["flexor_z"] + H / 2
+    for xf, facing in mouths:
+        for zc, rc, inset in ((P["flexor_z"], liner_r, flex_inset), (P["extensor_z"], P["extensor_d"] / 2, 0.0)):
+            part = cut(part, cone_x("mouth", rc + P["mouth_chamfer_r"], rc, P["mouth_chamfer_depth"],
+                                    xf - facing * inset, facing, 0.0, zc))
     if is_distal:
         # flexor knot pocket from the palmar face near the tip; extensor cord anchor pocket from the dorsal face
         part = cut(part, cyl("knot_pocket", "z", P["knot_pocket_d"] / 2, -H, P["flexor_z"] + 0.6, L - 7.0, 0.0))
@@ -201,11 +254,16 @@ def palm_block():
     part = box("finger_palm", 0.0, x1, -W / 2, W / 2, -H / 2, H / 2)
     part = add_tongue(part, L, P["axis_z"]["mcp"])
     part = chamfer_palmar(part, x1, -1)
-    part = cut(part, cyl("flexor", "x", P["flexor_d"] / 2, -1, L + 1, 0.0, P["flexor_z"]))
+    liner_r = (P["liner_od"] + P["liner_press"]) / 2
+    part = cut(part, cyl("flexor", "x", liner_r, -1, L + 1, 0.0, P["flexor_z"]))
     part = cut(part, cyl("tube_socket", "x", (P["tube_od"] + P["tube_clear"]) / 2, -1, P["tube_socket_depth"], 0.0, P["flexor_z"]))
     part = cut(part, cyl("extensor", "x", P["extensor_d"] / 2, -1, L + 1, 0.0, P["extensor_z"]))
-    for x in (12.0, 18.0):  # mounting holes through Z for the test stand (clear of the socket and the chamfer)
-        part = cut(part, cyl("mount", "z", P["mount_hole_d"] / 2, -H, H, x, 0.0))
+    flex_inset = P["flexor_z"] + H / 2
+    for zc, rc, inset in ((P["flexor_z"], liner_r, flex_inset), (P["extensor_z"], P["extensor_d"] / 2, 0.0)):
+        part = cut(part, cone_x("mouth", rc + P["mouth_chamfer_r"], rc, P["mouth_chamfer_depth"], x1 - inset, +1, 0.0, zc))
+    for x in (10.5, 16.3):  # mounting holes through Z for the test stand (clear of the socket and the chamfer)
+        # 36 segments: a different tessellation from the X-axis channels avoids vertex coincidences in the boolean
+        part = cut(part, cyl("mount", "z", P["mount_hole_d"] / 2, -H, H, x, 0.0, segments=36))
     return part
 
 
@@ -234,10 +292,12 @@ def main(out_dir):
     print("flexor moment arms mm: " + ", ".join("%s %.1f" % (j, arms[j]) for j in az))
     print("full-curl tendon excursion: %.1f mm (ROM %s)" % (exc, ROM_DEG))
     for o in parts:
+        bad = cleanup(o)
         v = volume_mm3(o)
         path = os.path.join(out_dir, o.name + ".stl")
         export_stl(o, path)
-        print("  %-18s volume %6.0f mm^3  (~%.1f g solid PETG) -> %s" % (o.name, v, v * 1.27e-3, path))
+        print("  %-18s volume %6.0f mm^3  (~%.1f g solid PETG)  non-manifold edges %d -> %s" %
+              (o.name, v, v * 1.27e-3, bad, path))
 
 
 if __name__ == "__main__":

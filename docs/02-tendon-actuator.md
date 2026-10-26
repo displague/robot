@@ -91,6 +91,40 @@ day and the homing routine absorbs it.
 Knots: a Palomar or a doubled figure-eight in braid holds ~80-90 % of break strength. Melt the
 tag end with a lighter into a mushroom; it cannot pull through a 1.2 mm hole.
 
+## Hard guides: hollow needle liners (P-003)
+
+Printed channel walls abrade under a braided line that saws back and forth thousands of times.
+Where the tendon path is straight, line the channel with a hollow stainless body-piercing
+needle (the same thing as hypodermic tubing) cut to length and pushed in after printing. No
+print pause, no mid-print insert, about $13 per hundred.
+
+| Gauge | OD | ID | Use |
+| --- | --- | --- | --- |
+| 18 G | 1.27 mm | ~0.84 mm | 30-50 lb line, finger channels where space is tight |
+| 16 G | 1.65 mm | ~1.2 mm | **default finger / hand liner**, 50-100 lb line |
+| 14 G | 2.11 mm | ~1.6 mm | wrist, forearm bank exits, 100-150 lb line |
+| 12 G | 2.77 mm | ~2.2 mm | 200 lb line, doubled lines, tackle runs |
+| 10 G / 8 G | 3.4 / 4.0 mm | ~2.7 / 3.2 mm | arm and leg tendon runs; 8 G also fits inside a 4 mm PTFE socket bore as a hard exit |
+
+Rules for using them:
+
+- **Press fit, not snap.** Channel diameter = needle OD + 0.1 mm in PETG holds a needle by hand
+  force and survives tendon load (the load is along the needle, not trying to pull it out).
+  Where a channel must be open on one side (a surface groove), print the groove 0.9 x OD wide at
+  the mouth so the needle snaps in laterally and is captured.
+- **Cut both ends square, deburr, and keep the bevel inside.** The factory bevel is a blade. Cut
+  it off, or push that end deepest into the part. Chamfer the cut rim with a countersink bit or a
+  few turns in a drill against a file.
+- **The needle stops 1 mm short of every mouth** and the printed mouth is a countersink
+  (1 mm radial, 1.2 mm deep in `finger.py`). The line's bend over the joint happens on the
+  printed countersink, not on a steel rim. Where the path bends more than ~20 degrees,
+  use PTFE tube, which follows the bend; a steel liner is only for straight runs.
+- **Also useful as:** 1.27-2.77 mm axles for small printed pulleys and idlers, extension-cord
+  guides, and the stiff core of a sheath-end load cell (Phase 6b).
+
+The finger generator sizes its flexor channel for a 16 G needle (1.75 mm bore) with countersunk
+mouths on both channels at every body face.
+
 ## Why the "closing in air, squeezing on contact" profile suits a DC motor
 
 Closing a finger in free air costs only the elastic return (~3-5 N). A 100:1 N20 does that at

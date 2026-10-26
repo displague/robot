@@ -46,3 +46,15 @@ Produced, across four commits:
 
 Deferred from the "continue": the closed-loop two-anchor drum, the W-mid and W-max winch
 generators, and the firmware skeleton. Next in line per the roadmap.
+
+## P-003 (2026-10-25) Hollow needles as insertable tendon liners
+
+> If we need hollow threading needles anywhere, ideally insertable and/or snapped/locked into the
+> 3d printed cavity without needing to be added midprint via pauses, these are cheap to acquire
+> and cut to size, such as body piercing needles which are hollow end to end and 100 can be
+> acquired for ~$13.
+
+Produced: needle-liner section with a gauge table and usage rules in `docs/02-tendon-actuator.md`;
+the no-mid-print-inserts rule in `docs/03-skeleton-joints.md`; D-013; BOM line; `finger.py`
+flexor channel sized as a 16 G press fit (1.75 mm) with countersunk mouths on both channels at
+every body face.
