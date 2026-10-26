@@ -43,6 +43,20 @@ extensor runs along the back. The tendon moment arms (10/7/5 mm) make the finger
 first then proximal, which is how a hand conforms to an object. A W-mini per finger plus one for
 thumb opposition and one for spread = 7.
 
+#### Phase 0 finger test article (`cad/blender/finger.py`)
+
+![Finger test article, isometric](img/finger_iso.png)
+![Finger test article, side](img/finger_side.png)
+
+Four printed parts on 2 mm pins: a 30 mm palm block with the PTFE socket and two M3 mounting
+holes, then 45 / 28 / 24 mm phalanges of 16 x 16 mm section. Each phalanx has a two-lug fork at
+its proximal end and a centre tongue at its distal end around a 9 mm knuckle. The flexor channel
+(1.8 mm) runs 4 mm palmar of the centreline; the joint axes sit 5 / 2.5 / 0.5 mm dorsal of it,
+giving moment arms of 9 / 6.5 / 4.5 mm and a full-curl excursion of 31 mm, which is the number
+in the calculator's finger scenarios. The extensor cord (2 mm channel) rides over each knuckle
+lug, which doubles as its pulley. Six-millimetre palmar chamfers at every joint clear the
+flexion. Print mass is about 34 g solid, under 20 g at 30 % infill.
+
 ### Wrist and forearm (per arm: 2 W-mini + 1 W-mid)
 
 | Joint | Human | Ours | Mechanism |
