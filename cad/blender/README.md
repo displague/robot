@@ -14,9 +14,18 @@ Open the script in Blender's Text Editor and press Run Script to see the parts i
 | Script | Parts |
 | --- | --- |
 | `winch_mini.py` | W-mini housing, drum, lid (N20 motor) |
+| `finger.py` | Phase 0 finger: palm block + three phalanges with flexor/extensor channels, pins, chamfers |
+| `skeleton_rig.py` | Builds the whole-body armature from `cad/skeleton.json` with joint limits, poses every joint to its extremes, renders |
 
-Planned: `winch_mid.py` (37 mm motor, 2:1 tackle block), `drum_closed_loop.py`, `finger.py`
-(3-joint finger with tendon channels), `joint_pin.py` (bushing/pin joint with AS5600 seat).
+Planned: `winch_mid.py` (37 mm motor, 2:1 tackle block), `winch_max.py` (775 + planetary),
+`drum_closed_loop.py`, `joint_pin.py` (bushing/pin joint with AS5600 seat).
+
+## Whole-body kinematics
+
+`cad/skeleton.json` is the single source of truth for segment lengths, joint axes and limits.
+`skeleton_rig.py` reads it, builds a Blender armature with limit-rotation constraints, and can
+export a `.blend` for interactive posing. The firmware's joint table and the planner's model are
+generated from the same file so the three never disagree.
 
 ## What Blender does well for this project
 

@@ -33,8 +33,16 @@ have the force but not the power.
 > detailed initial commit (capture the prompts leading to each set or workand commit) and push to
 > a private repo on displague/robot. walking and balancing are goals. continue.
 
-Produced: this log; the initial commit and private repository `displague/robot`; walking and
-balancing promoted from stretch goal to requirement (`docs/07-locomotion.md`, roadmap Phase 5-6
-rewritten, D-006 criteria tightened, walking scenarios added to the calculator); next generators
-(`cad/blender/finger.py`, closed-loop drum) and the skeleton joint table that drives the Blender
-armature rig.
+Produced, across four commits:
+1. The initial commit of all P-001 work and the private repository `displague/robot`.
+2. Walking and balancing promoted from stretch goal to requirement: `docs/07-locomotion.md`,
+   roadmap Phase 5 / 6a / 6b with exit tests, D-006 set provisionally to 775 + printed planetary
+   (wiper motor retired for legs), D-011, D-012, four walking scenarios in the calculator, this log.
+3. `cad/blender/finger.py`: the Phase 0 finger test article (palm block + three phalanges, pins,
+   flexor and extensor channels, 31 mm excursion) with renders in `docs/03-skeleton-joints.md`.
+4. `cad/skeleton.json` (whole-body segments, joints, limits, winch classes) and
+   `cad/blender/skeleton_rig.py` (armature with limit constraints, DOF tally = 50, sign-check pose
+   verified numerically, `skeleton.blend` for hand posing).
+
+Deferred from the "continue": the closed-loop two-anchor drum, the W-mid and W-max winch
+generators, and the firmware skeleton. Next in line per the roadmap.

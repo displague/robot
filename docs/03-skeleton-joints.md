@@ -122,6 +122,26 @@ sheath compression. Where a tendon leaves a tube to cross a joint, the exit is a
 lip, never a sharp edge. Where a tendon wraps a pulley, the pulley groove radius is >= 5x line
 diameter and the groove is printed with the layer lines running around the groove.
 
+## Whole-body joint table and rig
+
+`cad/skeleton.json` holds every segment (lengths for a 1.75 m robot), every joint, its axis,
+its "ours" and human limits, its winch class and drive pattern. `cad/blender/skeleton_rig.py`
+builds an armature from it with a Limit Rotation constraint per joint, skins it with a stick
+mesh, prints the DOF table (50 actuated: 21 W-max, 4 W-mid, 25 W-mini, matching
+`01-architecture.md`), renders the rest pose and a sign-check pose, and saves
+`cad/out/skeleton.blend` for posing by hand.
+
+![Rest pose](img/skeleton_rest.png)
+![Sign-check pose: left arm forward, right arm abducted with elbow bent, left leg raised with knee bent, right foot plantarflexed](img/skeleton_demo.png)
+
+Sign convention (also in the JSON): pitch, roll and yaw are right-hand rotations about world
+X, Y and Z applied in each bone's rest frame. Bones that point up swing forward for positive
+pitch; bones that hang down swing backward, so hip, shoulder and elbow flexion are negative and
+knee flexion is positive; on the left side a hanging bone moves toward the body for positive
+roll, so abduction is negative, and the right side mirrors. The script checks this by posing the
+demo and printing each bone's direction; the firmware's joint table is generated from the same
+file so controller, planner and CAD agree on every sign.
+
 ## What Blender is for here
 
 - Rig an armature with the exact joint axes, offsets and limits above. Drive every bone from a

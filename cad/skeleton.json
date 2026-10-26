@@ -1,0 +1,81 @@
+{
+  "_comment": "Single source of truth for whole-body kinematics. Units: metres, degrees. Frame: +X robot left, -Y forward (Blender front view), +Z up; feet on z=0. Bones with mirror=true are listed for the left side and duplicated to the right by negating X and flipping the sign of roll and yaw limits. Joint limits are the 'ours' column of docs/03-skeleton-joints.md.",
+  "_axes": "pitch = rotation about world +X, roll = about world +Y, yaw = about world +Z, right-hand rule, applied in the bone's rest frame. Consequences: a bone pointing UP (spine, neck) swings FORWARD for positive pitch; a bone hanging DOWN (arm, thigh, shank) swings BACKWARD for positive pitch, so forward flexion of hips/shoulders/elbows is negative and knee flexion (shank backward) is positive; for the LEFT side a hanging bone moves TOWARD the body for positive roll, so abduction is negative; the foot (pointing forward) plantarflexes for positive pitch.",
+  "height_m": 1.75,
+  "mass_budget_kg": 20,
+  "bones": [
+    {"name": "pelvis",     "parent": null,       "head": [0, 0, 0.95],     "tail": [0, 0, 1.05],     "mirror": false},
+    {"name": "spine",      "parent": "pelvis",   "head": [0, 0, 1.05],     "tail": [0, 0, 1.45],     "mirror": false},
+    {"name": "neck",       "parent": "spine",    "head": [0, 0, 1.50],     "tail": [0, 0, 1.60],     "mirror": false},
+    {"name": "head",       "parent": "neck",     "head": [0, 0, 1.60],     "tail": [0, 0, 1.75],     "mirror": false},
+    {"name": "clavicle",   "parent": "spine",    "head": [0.02, 0, 1.45],  "tail": [0.20, 0, 1.45],  "mirror": true},
+    {"name": "upperarm",   "parent": "clavicle", "head": [0.20, 0, 1.45],  "tail": [0.20, 0, 1.15],  "mirror": true},
+    {"name": "forearm",    "parent": "upperarm", "head": [0.20, 0, 1.15],  "tail": [0.20, 0, 0.89],  "mirror": true},
+    {"name": "hand",       "parent": "forearm",  "head": [0.20, 0, 0.89],  "tail": [0.20, 0, 0.71],  "mirror": true},
+    {"name": "thigh",      "parent": "pelvis",   "head": [0.10, 0, 0.95],  "tail": [0.10, 0, 0.52],  "mirror": true},
+    {"name": "shank",      "parent": "thigh",    "head": [0.10, 0, 0.52],  "tail": [0.10, 0, 0.08],  "mirror": true},
+    {"name": "foot",       "parent": "shank",    "head": [0.10, 0, 0.08],  "tail": [0.10, -0.20, 0.02], "mirror": true}
+  ],
+  "joints": [
+    {"name": "waist", "bone": "spine", "mirror": false, "winch": "W-max", "pattern": "closed-loop + tackle",
+     "dof": [
+       {"name": "flex(+)/ext",   "axis": "pitch", "min": -20, "max": 40,  "human": [-30, 75]},
+       {"name": "lateral",       "axis": "roll",  "min": -25, "max": 25,  "human": [-35, 35]},
+       {"name": "rotation",      "axis": "yaw",   "min": -45, "max": 45,  "human": [-45, 45]}
+     ]},
+    {"name": "neck", "bone": "neck", "mirror": false, "winch": "W-mini", "pattern": "closed-loop",
+     "dof": [
+       {"name": "flex(+)/ext",   "axis": "pitch", "min": -50, "max": 50,  "human": [-70, 60]},
+       {"name": "lateral",       "axis": "roll",  "min": -35, "max": 35,  "human": [-45, 45]},
+       {"name": "rotation",      "axis": "yaw",   "min": -80, "max": 80,  "human": [-80, 80]}
+     ]},
+    {"name": "face", "bone": "head", "mirror": false, "winch": "W-mini", "pattern": "single tendon + elastic", "optional": true,
+     "dof": [
+       {"name": "eyes pan",      "axis": null, "min": -30, "max": 30},
+       {"name": "eyes tilt",     "axis": null, "min": -20, "max": 20},
+       {"name": "eyelids",       "axis": null, "min": 0,   "max": 1},
+       {"name": "jaw",           "axis": null, "min": 0,   "max": 25}
+     ]},
+    {"name": "shoulder", "bone": "upperarm", "mirror": true, "winch": "W-max", "pattern": "closed-loop + tackle",
+     "dof": [
+       {"name": "flex(-)/ext",   "axis": "pitch", "min": -170, "max": 45,  "human": [-180, 60]},
+       {"name": "abd(-)/add",    "axis": "roll",  "min": -165, "max": 30,  "human": [-180, 45]},
+       {"name": "int/ext rot",   "axis": "yaw",   "min": -80,  "max": 80,  "human": [-90, 90]}
+     ]},
+    {"name": "elbow", "bone": "forearm", "mirror": true, "winch": "W-mid", "pattern": "closed-loop + 2:1 tackle",
+     "dof": [
+       {"name": "flexion(-)",    "axis": "pitch", "min": -140, "max": 0,   "human": [-145, 0]},
+       {"name": "pron/sup",      "axis": "yaw",   "min": -80,  "max": 80,  "human": [-85, 90]}
+     ]},
+    {"name": "wrist", "bone": "hand", "mirror": true, "winch": "W-mini", "pattern": "closed-loop",
+     "dof": [
+       {"name": "flex(-)/ext",   "axis": "pitch", "min": -70, "max": 60,  "human": [-80, 70]},
+       {"name": "radial/ulnar",  "axis": "roll",  "min": -15, "max": 25,  "human": [-20, 35]}
+     ]},
+    {"name": "hand", "bone": null, "mirror": true, "winch": "W-mini", "pattern": "single tendon + elastic",
+     "dof": [
+       {"name": "index flex",    "axis": null, "min": 0, "max": 260, "note": "sum of MCP 90 + PIP 100 + DIP 70, one tendon"},
+       {"name": "middle flex",   "axis": null, "min": 0, "max": 260},
+       {"name": "ring flex",     "axis": null, "min": 0, "max": 260},
+       {"name": "little flex",   "axis": null, "min": 0, "max": 260},
+       {"name": "thumb flex",    "axis": null, "min": 0, "max": 130, "note": "MCP 55 + IP 75"},
+       {"name": "thumb opposition", "axis": null, "min": 0, "max": 60},
+       {"name": "finger spread", "axis": null, "min": 0, "max": 15, "note": "whiffletree, all four fingers"}
+     ]},
+    {"name": "hip", "bone": "thigh", "mirror": true, "winch": "W-max", "pattern": "closed-loop + tackle",
+     "dof": [
+       {"name": "flex(-)/ext",   "axis": "pitch", "min": -110, "max": 15,  "human": [-125, 20]},
+       {"name": "abd(-)/add",    "axis": "roll",  "min": -40,  "max": 25,  "human": [-45, 30]},
+       {"name": "rotation",      "axis": "yaw",   "min": -35,  "max": 35,  "human": [-45, 45]}
+     ]},
+    {"name": "knee", "bone": "shank", "mirror": true, "winch": "W-max", "pattern": "closed-loop + 2:1 tackle",
+     "dof": [
+       {"name": "flexion(+)",    "axis": "pitch", "min": 0, "max": 135,  "human": [0, 140]}
+     ]},
+    {"name": "ankle", "bone": "foot", "mirror": true, "winch": "W-max", "pattern": "closed-loop + 3:1 tackle",
+     "dof": [
+       {"name": "dorsi(-)/plantar", "axis": "pitch", "min": -20, "max": 40,  "human": [-20, 50]},
+       {"name": "inv/ev",        "axis": "roll",  "min": -20, "max": 15,  "human": [-35, 20]}
+     ]}
+  ]
+}
