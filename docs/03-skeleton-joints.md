@@ -14,12 +14,18 @@
 | Tendon sheath | PTFE tube 2 mm ID / 4 mm OD | Bowden tube |
 | Line | braided PE 50 / 100 / 200 lb | see `02-tendon-actuator.md` |
 
-## Print segmentation
+## Print segmentation and pipe bones
 
-Every bone splits into pieces <= 240 mm so a 256 mm bed (Ender 3 class, Bambu A1/P1) prints
-them flat. Pieces join with a printed dovetail plus two M3 screws through the joint. Long bones
-(humerus, femur, tibia) are two half-shells screwed together so the tendon channels, PTFE tubes
-and wiring are laid in before closing. Target total print time: under 400 hours at 0.28 mm layers.
+Long bones are not printed (P-009). Between two printed joint ends a humerus, forearm, femur,
+tibia or spine is an undifferentiated tube, so it is a length of Schedule 40 PVC or ABS pipe (1",
+1-1/4", 1-1/2", 2" for forearm/humerus, tibia, femur, spine) cut to length, pushed into the
+printed socket at each joint end and held by two M3 set screws. The sheathed tendons and the
+wiring run inside the pipe. Details and the per-bone table are in `11-ring-joint.md`.
+
+What remains printed is short: joint ends, winch banks, hands, feet, torso and pelvis shells.
+Anything printed longer than 240 mm still splits for a 256 mm bed (the chain generator does this
+with alignment pins), but no current part needs it. Target total print time drops to well under
+250 hours at 0.28 mm layers.
 
 ## Joint catalogue with ROM targets
 

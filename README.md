@@ -39,6 +39,11 @@ Goal ordering, in case they conflict: **cheap > simple to build > human range of
 | `docs/09-knuckle-chain.md` | The finger's principle generalised: one generator, 11 presets, 26 joint instances, what the generalisation taught |
 | `cad/blender/chain.py` | The knuckle-chain generator behind those presets |
 | `docs/10-rotational-geometry.md` | Rotational geometry and physics idea bank: each discussion point and what it could mean for the robot, with cheapest tests |
+| `docs/11-ring-joint.md` | The second primitive: axial rotation on a printed ball race, six presets; pipe bones |
+| `docs/12-render-simulation.md` | Gallery render, URDF pipeline, centre-of-mass checks, MuJoCo stand and push results |
+| `docs/references.md` | External projects to borrow test scenarios and tooling from (primo, microban, Isaac Lab, DreamDojo) |
+| `cad/blender/ring.py`, `cad/blender/winch_bank.py` | Ring-joint generator; N-winch bank generator |
+| `tools/export_urdf.py`, `tools/sim_check.py`, `sim/robot.urdf` | Joint table to URDF with CoM report; MuJoCo stand and push test; the generated URDF |
 | `docs/decisions.md` | Decision log (what we chose and why; revisit when a test disagrees) |
 | `docs/prompt-log.md` | Every prompt that produced a set of work, verbatim, with what it produced |
 | `tools/tendon_calc.py` | Force / speed / power / line-safety calculator for any motor + drum + tackle combination |

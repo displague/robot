@@ -110,6 +110,34 @@ Reverses if: the stub-axle press fit in PETG proves unable to hold under hip loa
 through-shaft with the crossing runs offset symmetrically above and below the axis, with the
 resulting pitch-into-yaw coupling compensated in firmware).
 
+## D-018 (2026-10-25) Ring joint: printed ball race on airsoft BBs, rotor as its own pulley, pin-in-track stop
+
+Why: asked in P-009. The eight axial DOF get one generator (`ring.py`). A four-wall PETG race on
+6 or 8 mm BBs is free and loaded through a plugged hole; a bought thin-section bearing stays as a
+drop-in preset. The closed loop wraps the rotor rim itself, so the moment arm equals the joint
+radius. Everything downstream passes through the bore on the axis (twist cost sqrt(L^2 + (rho
+theta)^2)). The stop is a pin in an arc track of length 2 x ROM, hidden inside the joint.
+Reverses if: the printed race wears or rattles in Phase 2 (then the 6808-class bearing preset,
+same hub and rotor interfaces).
+
+## D-019 (2026-10-25) Long bones are bought pipe, not printed shells
+
+Why: suggested in P-009. Humerus, forearm, femur, tibia, spine and neck are undifferentiated
+tubes between printed joint ends: Schedule 40 PVC/ABS in 1", 1-1/4", 1-1/2", 2", cut to length,
+in printed sockets (OD + 0.4 mm) with two M3 set screws, tendons and wires inside. Stiffer than a
+printed shell, a dollar each, and the print-time budget halves. PEX and vinyl rejected as too
+flexible; aluminium tube or conduit is the stiffer upgrade.
+Reverses if: the socket set screws loosen under leg loads (then a cross bolt through pipe and
+socket).
+
+## D-020 (2026-10-25) Simulation pipeline: skeleton.json -> URDF -> MuJoCo now, Isaac Lab later
+
+Why: asked in P-009. One joint table feeds the Blender rig, the URDF and later the firmware, so
+signs and limits cannot drift. MuJoCo loads the URDF directly and already reproduces the
+balance doc's push margin (stands at 20 N, falls at 30 N). Isaac Lab is the target for Phase 6b
+training, with primo's task layout and microban's walk conventions as references.
+Reverses if: nothing planned; the next step inside this decision is MuJoCo spatial tendons.
+
 ## D-012 (2026-10-25) Every set of work records the prompt that caused it
 
 Why: asked in P-002. `docs/prompt-log.md` holds each prompt verbatim with the files and

@@ -18,8 +18,14 @@ Open the script in Blender's Text Editor and press Run Script to see the parts i
 | `chain.py` | The knuckle-chain primitive with 11 presets (finger, thumb, toe, wrist, ankle, neck, waist, elbow, knee, hip, shoulder); `--preset name` builds one. See `docs/09-knuckle-chain.md` |
 | `skeleton_rig.py` | Builds the whole-body armature from `cad/skeleton.json` with joint limits, poses every joint to its extremes, renders |
 
+| `ring.py` | The ring-joint primitive (axial rotation): hub, rotor, optional cap; six presets; `--preset forearm`. See `docs/11-ring-joint.md` |
+| `winch_bank.py` | N W-mini housings as one block with floor exits, lid and mounting tabs; `--n 5` |
+
 Planned: `winch_mid.py` (37 mm motor, 2:1 tackle block), `winch_max.py` (775 + planetary),
-`drum_closed_loop.py`, `joint_pin.py` (bushing/pin joint with AS5600 seat).
+`drum_closed_loop.py`, part-to-bone assembly of the generated pieces on the skeleton rig.
+
+Generated STLs are checked after export by re-importing them and counting non-manifold edges.
+Lessons that keep the exact boolean solver happy are listed at the end of `docs/09-knuckle-chain.md`.
 
 ## Whole-body kinematics
 

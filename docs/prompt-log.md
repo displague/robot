@@ -107,6 +107,35 @@ generalisation taught (lug = pulley; stub axles free the axis for crossing tendo
 universals need bearings for routing not load; section width is set by routing; dimples not
 cones on chamfer planes; the big-joint presets are too heavy as prisms); D-017; renders.
 
+## P-009 (2026-10-25) Ring joints, the missing chain features, render and simulation
+
+> continue and solve the radial/rotors, similarly considering entwined designs as we just did.
+> afterward, lets move to render and simulation.
+> (for later steps, as a reference for test scenarios https://github.com/AlessioPagliai/primo
+> also https://github.com/Rhoban/microban .. and another interesting site is
+> https://robodienst.com/ )
+
+Mid-turn additions, in order: "(and work on all your 'still missing' steps)"; "(and for even
+later testing, https://github.com/NVIDIA/DreamDojo )"; "(and https://github.com/isaac-sim/IsaacLab )";
+"another instance of claude committed to main with docs/10*" (merged before continuing; that
+session's work is P-008); "(also worth consideration - if any segments are essentially long
+undifferentiated hollow tubes and off the shelf piping/tubing (pvc, abs, pex, vinyl) can be used
+for these purposes, that's worth noting if not incorporating)".
+
+Produced, in three commits:
+1. CAD: `cad/blender/ring.py` (the ring-joint primitive, six presets, printed ball race or
+   bought bearing, pin-in-track hard stops, tangent sheath bosses, pipe sockets); the chain
+   generator's missing features (hard stops from ROM, stub and bearing retention with printed
+   caps, thumb opposition knuckle, hollow shells with channel tubes, winch-bank pads, bed
+   splitting, pipe sockets); `cad/blender/winch_bank.py`; mesh-hygiene fixes (single-profile
+   lugs, spun coaxial cylinders, icosphere dimples).
+2. Simulation: masses in `cad/skeleton.json`; `tools/export_urdf.py` (URDF with floating base,
+   own forward kinematics, CoM and support-polygon report); `tools/sim_check.py` (MuJoCo stand
+   and push tests: stands, survives 20 N, falls at 30 N); `sim/robot.urdf`; `docs/references.md`.
+3. Docs: `docs/11-ring-joint.md` (with the pipe-bones table), `docs/12-render-simulation.md`
+   (gallery render, CoM table, MuJoCo results, what is not simulated), pipe bones in `03`,
+   P-009 additions in `09`, D-018 to D-020, README rows.
+
 ## P-008 (2026-10-25) Rotational geometry and physics as a design idea bank
 
 > capture all of the discussion points here in detail such that I can use them to inspire the

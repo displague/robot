@@ -80,8 +80,27 @@ Every preset is the same code with these knobs:
    The next chain feature is a pair of printed stop faces per joint matching `skeleton.json`,
    because homing (D-014) drives into them.
 
-## Not covered by the chain generator yet
+## Added at P-009 ("work on all your still-missing steps")
 
-Thumb opposition knuckle (a diagonal axis), the ring joint, bearing retention (caps or circlips),
-stub-axle retention (a cross pin or grub screw), explicit hard stops, hollowing to shells with
-print-bed splitting, and mounting features for the winch banks. In that order.
+| Feature | How it is done | Where |
+| --- | --- | --- |
+| **Hard stops** | Each joint takes `rom=(lo, hi)`. The tongue lug grows to 0.4 mm under the other body's face over the arc the joint may not enter, so the body face itself is the stop. Joints with stops get a 2.5 mm body gap so the stop has a real face. Homing drives into it (D-014). | every preset |
+| **Stub-axle retention** | A radial M3 heat-set insert hole from the outer face into each blind bore; a grub screw locks the stub. | all bearing joints |
+| **Bearing retention** | Two self-tapping pilot holes per lug at od/2 + 2.5 and a printed cap (disc + lip) per bearing size, exported with each preset. | all bearing joints |
+| **Thumb opposition** | The thumb is now palm, opposition knuckle (yaw, 0-60 degrees, offset pin, moment arm 9 mm, own tendon and return), then MCP and IP. The flexor and extensor pass through the opposition tongue centre at +-2.8 mm, clear of its pin. | thumb |
+| **Hollow shells** | `shell=3`: the body becomes a 3 mm shell with a tube left around every channel, bosses around mounts and pads, and the void kept behind the chamfer zones and pipe sockets. Masses in the table above are now shells for the large presets. | ankle, waist, elbow, knee, hip, shoulder |
+| **Winch-bank mount pads** | `pads=grid(...)`: M3 insert holes on a 20 mm pitch in the dorsal face (with bosses inside a shell), matching the tabs on `winch_bank.py`. | waist, elbow, knee, hip, shoulder |
+| **Print-bed splitting** | `split_at` or automatic above 240 mm: pieces with 3 mm alignment pin holes. Kept, but unused since pipe bones. | generator |
+| **Pipe sockets** | A free end takes a bought pipe (`pipe={"od": ...}`), bore OD + 0.4, two radial M3 set screws, void kept clear. | wrist, ankle, neck, waist, elbow, knee, hip, shoulder |
+| **Ring joint** | the second primitive, its own generator | `11-ring-joint.md` |
+| **Winch bank** | N W-mini housings sharing walls, floor exits, one lid, mounting tabs | `cad/blender/winch_bank.py` |
+
+Mesh hygiene lessons added to the first six: build a lug and its web as one extruded profile
+(coplanar unions between separately made cylinders and boxes leave slivers); twist every
+cylinder that is coaxial with another by a fraction of a vertex step and give it an odd vertex
+count; keep sector end faces off the 7.5-degree vertex rays of the lug arc; and put dimples, not
+cones, on chamfer planes with an icosphere centred just outside the plane. Residual after all of
+that: a handful of sliver edges on the thumb palm (4), thumb proximal (12) and shoulder end (3)
+after STL re-import, which slicers repair; every other piece is clean.
+
+![5-winch bank: five housings in one block, floor sockets, lid, mounting tabs](img/winch_bank5.png)
