@@ -93,3 +93,16 @@ segment with joints, pulleys and winch-bank mounts, the W-mid and W-max modules,
 parenting in Blender, and a URDF export for a real dynamics simulator (Blender's rigid bodies are
 qualitative only). The mass model and CoM check are the immediate next step and need no
 geometry; the shells follow the roadmap phases. No files changed other than this entry.
+
+## P-007 (2026-10-25) Generalise the finger
+
+> how many sections operate under the same principal as the finger - can they all be composed
+> now with the variations needed for each sewn into the design (which may offer alternative
+> thinking while solving for simalarity under three or more different scenarios)
+
+Produced: `cad/blender/chain.py`, the knuckle-chain generator with 11 presets covering 26 joint
+instances and 34 DOF (36 with thumb opposition), all verified manifold after export;
+`docs/09-knuckle-chain.md` with the count, the preset table, the knobs, and six things the
+generalisation taught (lug = pulley; stub axles free the axis for crossing tendons; small
+universals need bearings for routing not load; section width is set by routing; dimples not
+cones on chamfer planes; the big-joint presets are too heavy as prisms); D-017; renders.

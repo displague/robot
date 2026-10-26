@@ -15,6 +15,7 @@ Open the script in Blender's Text Editor and press Run Script to see the parts i
 | --- | --- |
 | `winch_mini.py` | W-mini housing, drum, lid (N20 motor) |
 | `finger.py` | Phase 0 finger: palm block + three phalanges with flexor/extensor channels, pins, chamfers |
+| `chain.py` | The knuckle-chain primitive with 11 presets (finger, thumb, toe, wrist, ankle, neck, waist, elbow, knee, hip, shoulder); `--preset name` builds one. See `docs/09-knuckle-chain.md` |
 | `skeleton_rig.py` | Builds the whole-body armature from `cad/skeleton.json` with joint limits, poses every joint to its extremes, renders |
 
 Planned: `winch_mid.py` (37 mm motor, 2:1 tackle block), `winch_max.py` (775 + planetary),

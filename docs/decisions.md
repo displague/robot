@@ -98,6 +98,18 @@ hand-guiding. Locked joints are deliberately non-backdrivable.
 Reverses if: impedance mode proves too slow for safe arm contact (then add a true backdrivable
 BLDC W-max on the arms).
 
+## D-017 (2026-10-25) Two mechanical primitives: the knuckle chain and the ring joint
+
+Why: asked in P-007. Generalising the finger shows that fork-and-tongue knuckles with tendon
+channels cover 36 of the 50 DOF across 26 joint instances, and axial ring joints cover 8 more.
+One generator (`chain.py`) now builds all knuckle instances from presets. Two rules came out of
+it and are binding for the shell pass: joints that a later tendon must cross use bearings with
+stub axles so the tongue centre stays solid and the crossing runs pass through the axis with no
+coupling; and section width is sized by that routing check, not by strength.
+Reverses if: the stub-axle press fit in PETG proves unable to hold under hip loads (then a
+through-shaft with the crossing runs offset symmetrically above and below the axis, with the
+resulting pitch-into-yaw coupling compensated in firmware).
+
 ## D-012 (2026-10-25) Every set of work records the prompt that caused it
 
 Why: asked in P-002. `docs/prompt-log.md` holds each prompt verbatim with the files and

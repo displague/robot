@@ -36,6 +36,8 @@ Goal ordering, in case they conflict: **cheap > simple to build > human range of
 | `docs/06-roadmap.md` | Phases with exit criteria, starting with one finger on one winch, ending in dynamic walking |
 | `docs/07-locomotion.md` | Walking and balancing: joint loads from gait, W-max sizing, sensors, controller stages, feet |
 | `docs/08-passive-balance-springs-compliance.md` | What balance comes for free (and why not a bladder), where springs are used, how compliant the robot is |
+| `docs/09-knuckle-chain.md` | The finger's principle generalised: one generator, 11 presets, 26 joint instances, what the generalisation taught |
+| `cad/blender/chain.py` | The knuckle-chain generator behind those presets |
 | `docs/decisions.md` | Decision log (what we chose and why; revisit when a test disagrees) |
 | `docs/prompt-log.md` | Every prompt that produced a set of work, verbatim, with what it produced |
 | `tools/tendon_calc.py` | Force / speed / power / line-safety calculator for any motor + drum + tackle combination |
