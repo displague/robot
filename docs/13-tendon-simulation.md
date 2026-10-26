@@ -65,6 +65,9 @@ which a real drum with its clutch plate has anyway.
 
 ## Results (`python tools/sim_tendon.py`, baseline; `--stiff-mini` in brackets where different)
 
+These are the P-010 results with the first balance loop. `14-balance-gauntlet.md` (P-011) replaced
+that loop; the sustained 15 N and the 30 N push now stand, and the table there is current.
+
 | Test | Result | What the lines did |
 | --- | --- | --- |
 | stand 4 s | stands, tilt 4 deg, **16 W** (14 W) mean, most of it the neck | ankle lines 146 N each side at 5 deg lean, 72 N pretension elsewhere, no slack on any W-max loop |
@@ -126,7 +129,7 @@ voltage loop.
 - Hip strategy, stepping, any gait. Motor thermal limits (only reported as time above continuous).
 - Line creep, knot slip, sheath compression (the Bowden is rigid here).
 
-## Next
+## Next (as written at P-010; see `14` for what happened)
 
 Hip strategy and a static-walk engine on this model (the stance leg's lines go to peak load and
 the swing leg's go slack, which is exactly what this model can now show), then the Isaac Lab

@@ -193,3 +193,48 @@ rating holding 1 kg. The `--stiff-mini` variant (25 mm, 25 % pretension) fixes b
 The `chain.py` wrist and neck presets have not been regenerated yet; the neck yaw already uses a
 25 mm ring rotor. Alternative under this decision: move neck pitch/roll to the ring primitive.
 Reverses if: a 2:1 tackle at the existing lug radius tests better than a larger lug.
+
+## D-024 (2026-10-26) Standing balance is a centre-of-pressure controller on the capture point; the ankle is a torque source through its lines; no sagittal hip lean
+
+Why: P-011 asked for the hip strategy toward the gauntlet. Building it in `tools/sim_tendon.py`
+showed the previous ankle loop (angle offsets from the CoM error) could not hold a sustained
+15 N chest push because its velocity estimate was wrong and it never asked the sole for more
+than a fraction of what the toe line allows. The loop that works: the CoP the feet must produce
+is (1 + k)(x + v/omega) plus an integral on the CoM offset, clamped 30 mm inside the toe and
+heel lines; the ankle torque that puts it there is converted to a gear position through the
+measured line stiffness (the lines are the series spring), with a disturbance observer that
+turns the CoM acceleration the IMU sees, less what the measured CoP explains, into an external
+force, so a push is answered in the first 100 ms. With it the ankle alone holds a sustained
+15 N and a 30 N impulse; 40 N needs a step. A hip lean against the push was tried in three
+forms (slow lean back, fast lean back, flexion toward the push): every one lifted the heels
+through the reaction on the pelvis and fell sooner than the ankle alone, so the sagittal hip
+term is in the code with zero gain. The ankle may lock (zero power) only after its torque
+demand has been steady for a second; locking and unlocking inside the loop rocked the sole.
+Reverses if: the real line stiffness differs from k = EA / (n L) by more than the integral can
+absorb (then tension sensing at the ankle, already planned for Phase 6b, closes the torque loop).
+
+## D-025 (2026-10-26) The simulation's collision shapes are the printed envelope, and self-collision is on
+
+Why: P-011 asked whether the segments could pass through each other. The MJCF now carries
+capsules (thigh 60 mm, shank 50, upper arm 45, forearm 35, neck 35, head 80 radius) and boxes
+(pelvis 280 x 160 x 100, trunk 260 x 160 x 400, hand 80 x 30 x 180 mm) instead of 50 mm sticks,
+with MuJoCo's default contact filter (parent and child never collide, everything else does).
+Zero body-to-body contacts occur in standing, the squat and an arm bend; the hinges sit at the
+bone heads so adjacent segments cannot separate or interpenetrate. Masses are unchanged. The
+winch gear and drum discs are visual only.
+Reverses if: shell geometry from `chain.py` and `ring.py` replaces the primitives (then the
+primitives become the collision proxies of the meshes).
+
+## D-026 (2026-10-26) Lateral weight shift is a hip-roll parallelogram with the ankles following geometrically; feet are grounded by load, and the planner declares the swing foot
+
+Why: the first lateral loop let both ankles run CoP control in double support and oscillated,
+swinging 100 N between the feet with a 10 mm CoM motion: two planted legs are a closed chain,
+and an ankle roll inside it is a very stiff way to move weight. Now the hip rolls shift the
+pelvis (P + I + D on the lateral CoM error, slewed at 0.15 rad/s), the ankle rolls follow with
+the opposite angle so the soles stay flat, and only a stance foot in single support runs the
+lateral CoP loop. A foot counts as support when its force sensors carry more than 5 % of the
+weight (15 % to re-enter) and the planner has not declared it the swing foot. With this the
+robot puts 95 % of its weight on one foot with the CoM over that sole; the single-support hold
+itself is still open (`14`).
+Reverses if: a whole-body (QP) controller replaces the cascade; then the chain is handled by
+the optimiser and the ankles can take part again.

@@ -178,3 +178,34 @@ clutch slip, motor torque and power readouts, CSV time series); `docs/13-tendon-
 D-021 to D-023 (current limit below the clutch, pretension 25 %, 25 mm W-mini pulleys); `02`
 pretension updated; `12` pointed at `13`; `references.md` rows for LeRobot and the sibling
 `ai-embedded-dynamic-diversity` project; README rows; MuJoCo renders in `docs/img/`.
+
+## P-011 (2026-10-26) Connectivity check, animation, hips toward the gauntlet
+
+> When I look at the screenshot above, I see a stickman whose sticks are not connected and if
+> connected and bent at ~ bone-joint distances , they appear that they may push each other or
+> move through floatation.  Is that the case? We're not moving in no clip mode, everything is
+> connected in a DOF vetted way?
+>
+> Perhaps what will help is seeing the model rendered and animated with all its components and
+> physics, performing the actions you've described. Yes, I suppose that means the sim, but the
+> sim needs to include the functioning parts functioning with the ML/neural controller.
+>
+> Yes, continue as you suggested, with the hips toward gauntlet status
+
+Mid-turn addition:
+
+> (If the sibling project appears useful for this project, create a worktree there and commit
+> as you go
+> this project can reference that project and extend it. Commits can reference this project too
+> (it's ok that this project stays private for now, it can be referenced).)
+
+Produced: `docs/14-balance-gauntlet.md` (the connectivity answer with the contact census, the
+balance controller rewrite, the hip findings, the lateral shift, the one-foot attempt, the
+recorded gauntlet, the harness); `tools/export_mjcf.py` printed-envelope shapes and the
+`HIP_ROLL_60` variant; `tools/sim_tendon.py` capture-point CoP balance with the disturbance
+observer, ankle impedance, lock gating, hip-roll weight shift, swing-foot handling, the
+scenario list; `tools/sim_video.py` (MP4 and GIF of the gauntlet with every line's tension,
+the clutch and lock state of every drum, CoM and CoP, a HUD); `docs/img/gauntlet.mp4`,
+`docs/img/gauntlet.gif`; D-024 to D-026; references and README. In the sibling repository
+`ai-embedded-dynamic-diversity`, worktree branch `feat/robot-tendon-harness`: the embodiment
+`humanoid_tendon32` (`sim/robot_tendon.py`), the `add-sim robot-tendon` command and tests.

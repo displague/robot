@@ -42,10 +42,12 @@ Goal ordering, in case they conflict: **cheap > simple to build > human range of
 | `docs/11-ring-joint.md` | The second primitive: axial rotation on a printed ball race, six presets; pipe bones |
 | `docs/12-render-simulation.md` | Gallery render, URDF pipeline, centre-of-mass checks, MuJoCo stand and push results |
 | `docs/13-tendon-simulation.md` | The drive train per DOF in MuJoCo: motor curve, self-lock, clutch, two elastic lines; tension, slack and slip readouts; standing, push, hold and squat results; three design changes it forced |
+| `docs/14-balance-gauntlet.md` | Is it connected (contact census, printed-envelope shapes); the balance controller that holds 30 N pushes and a sustained 15 N; what the hip can and cannot do; weight shift and the one-foot attempt; the recorded gauntlet; the sibling-project harness |
 | `docs/references.md` | External projects to borrow test scenarios and tooling from (primo, microban, Isaac Lab, DreamDojo, LeRobot, the sibling ai-embedded-dynamic-diversity) |
 | `cad/blender/ring.py`, `cad/blender/winch_bank.py` | Ring-joint generator; N-winch bank generator |
 | `tools/export_urdf.py`, `tools/sim_check.py`, `sim/robot.urdf` | Joint table to URDF with CoM report; MuJoCo stand and push test on the rigid statue; the generated URDF |
 | `tools/export_mjcf.py`, `tools/sim_tendon.py`, `sim/robot.xml` | Joint table to the tendon-actuated MJCF (32 winches, 96 tendons); controller, balance loop and test suite with per-line readouts; the generated model |
+| `tools/sim_video.py`, `docs/img/gauntlet.mp4`, `docs/img/gauntlet.gif` | Recorder: the gauntlet with every line's tension, every drum's lock/drive/slip state, CoM and CoP drawn into the MuJoCo render |
 | `docs/decisions.md` | Decision log (what we chose and why; revisit when a test disagrees) |
 | `docs/prompt-log.md` | Every prompt that produced a set of work, verbatim, with what it produced |
 | `tools/tendon_calc.py` | Force / speed / power / line-safety calculator for any motor + drum + tackle combination |
@@ -60,7 +62,8 @@ python tools/tendon_calc.py
 
 # tendon-level simulation: stand, pushes, arm hold, squat, with every line's tension (pip install mujoco)
 python tools/export_mjcf.py --table
-python tools/sim_tendon.py
+python tools/sim_tendon.py                 # or --only stand,push30,onefoot
+python tools/sim_video.py --gif            # docs/img/gauntlet.mp4 and .gif (ffmpeg on PATH)
 
 # generate the W-mini winch housing, drum and lid as STL (Blender 4.2+ / 5.x)
 & "C:\Program Files\Blender Foundation\Blender 5.1\blender.exe" -b -P cad/blender/winch_mini.py -- --out cad/out
