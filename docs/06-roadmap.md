@@ -29,7 +29,12 @@ an hour with no power to the motors; every hand joint reaches the "ours" range i
 ## Phase 2 - Arm (1-2 months, ~$150)
 
 Build: elbow (W-mid), forearm rotation (W-mid), humerus, and a bench-mounted shoulder with three
-W-max of whichever type D-006 chose. This is where W-max gets its first real test.
+W-max. This is where W-max gets its first real test, and it starts with the gearbox alone.
+
+Entry test (decides D-006): one printed 1:40 planetary on a 775 motor, loaded by a rope brake
+to 100 W mechanical for one hour, then to destruction. Pass = no tooth damage after the hour
+and failure above 2x the walking peak torque (40 N m). Fail = switch the leg W-max to a 5010
+class gimbal BLDC with a printed cycloid.
 
 Exit criteria: lifts 1 kg from the table to shoulder height in <= 4 s; shoulder reaches 165
 degrees abduction; a 100 N pull on the hand does not damage anything (the drags slip).
@@ -49,18 +54,30 @@ vision (object detection, hand-eye calibration for grasp).
 
 Exit criteria: "pick up the red cup" works from a voice command, unassisted.
 
-## Phase 5 - Legs, standing (2-3 months, ~$400)
+## Phase 5 - Legs, standing and balancing (2-3 months, ~$450)
 
-Build: both legs, feet, 12 W-max, IMU, a safety harness from the ceiling.
+Build: both legs, feet with four force sensors each, 12 W-max (775 + printed planetary unless
+the Phase 2 gearbox test failed), pelvis and foot IMUs, a ceiling harness.
 
 Exit criteria: sit-to-stand in <= 5 s on a chair; stands for 10 minutes with motors unpowered
-(self-locking); shifts weight foot to foot; sits down under control.
+(self-locking); recovers from a 20 N shoulder push without stepping (ankle strategy); lifts one
+foot 50 mm and holds for 10 s with the pelvis level (hip strategy); sits down under control.
 
-## Phase 6 - Walking (stretch)
+## Phase 6a - Static walking (1-2 months)
 
-Needs W-max power roughly 2-3x the Phase 5 requirement and a balance controller on the leg
-nodes. Decide after Phase 5 measurements whether the 775/planetary W-max has the headroom or
-whether the leg joints upgrade to BLDC/cycloid.
+Build: ZMP-constrained step trajectories at 0.2-0.3 m/s on the leg and torso nodes, foot
+sensors sequencing the steps, fall detection into the stiffen-and-crouch posture.
+
+Exit criteria: 20 steps forward on a flat floor on the harness with no harness load; 10 steps
+off the harness; a stop-and-stand from any point in the gait.
+
+## Phase 6b - Dynamic walking (open-ended)
+
+Build: series-elastic ankle tendon, tendon tension sensing at ankle and knee, capture-point
+stepping on a linear inverted pendulum model.
+
+Exit criteria: 0.5 m/s on flat ground; recovers from a 40 N push by stepping; a step up a
+50 mm kerb. See `07-locomotion.md` for the controller stages and the sensor list.
 
 ## Parallel tracks (no hardware needed)
 

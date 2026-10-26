@@ -6,7 +6,7 @@ want autonomy). Muscles are fishing line pulled by small spindles ("winches") th
 tension without power, routed through PTFE tube like bicycle brake cables, so the strong part
 (the motor) can live wherever there is room and the moving part (a finger, a wrist) stays light.
 
-Goal ordering, in case they conflict: **cheap > simple to build > human range of motion > strength > speed.**
+Goal ordering, in case they conflict: **cheap > simple to build > human range of motion > walks and balances > strength > speed.**
 
 ## Design principles
 
@@ -33,8 +33,10 @@ Goal ordering, in case they conflict: **cheap > simple to build > human range of
 | `docs/03-skeleton-joints.md` | Joint types per body region, ROM targets vs human, materials, print segmentation |
 | `docs/04-electronics.md` | Boards, bus, drivers, encoders, power |
 | `docs/05-bom-estimate.md` | Rough cost and mass |
-| `docs/06-roadmap.md` | Phases with exit criteria, starting with one finger on one winch |
+| `docs/06-roadmap.md` | Phases with exit criteria, starting with one finger on one winch, ending in dynamic walking |
+| `docs/07-locomotion.md` | Walking and balancing: joint loads from gait, W-max sizing, sensors, controller stages, feet |
 | `docs/decisions.md` | Decision log (what we chose and why; revisit when a test disagrees) |
+| `docs/prompt-log.md` | Every prompt that produced a set of work, verbatim, with what it produced |
 | `tools/tendon_calc.py` | Force / speed / power / line-safety calculator for any motor + drum + tackle combination |
 | `cad/blender/winch_mini.py` | Parametric Blender generator for the W-mini winch (N20 motor); exports STL |
 | `cad/out/` | Generated STLs (regenerate, do not hand-edit) |

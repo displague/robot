@@ -34,13 +34,29 @@ Why: calculator shows the worm costs half the power and makes a finger take 4 s 
 100:1 N20 closes in 0.5 s and still pinches 42 N peak; a 0.1 A hold is cheaper than a worm.
 Reverses if: Phase 0 hold test fails (then ratchet + pawl, D-005b).
 
-## D-006 (open) W-max motor class
+## D-006 (provisional, 2026-10-25) W-max = 775 brushed motor + printed 1:40 planetary
 
-Candidates: 12 V wiper motor (cheap, worm lock, 1 kg each, 21 kg total: over mass budget);
-775 brushed motor + printed 2-stage planetary (cheap, 0.45 kg, ~100 W, printed gears at full
-load unproven); 2806 gimbal BLDC + printed cycloid + SimpleFOC (quiet, back-drivable, 0.2 kg,
-dearest, most electronics). Leaning 775 + planetary for cost and mass. Decide after a bench test
-of one printed planetary at 100 W for 1 hour (Phase 2 entry).
+Why: walking is a goal (P-002), and the calculator's walking scenarios need ~65 W at the ankle
+and ~35 W at the hip. The wiper motor peaks near 18 W and weighs 21 kg across the body: retired
+for legs. The 775 + printed planetary is ~113 W peak, 0.45 kg, ~$11, and meets every walking
+scenario with margin. Risk: printed PETG gears at 100 W.
+Confirmed or reversed by: the Phase 2 entry test (one hour at 100 W on a rope brake, then to
+destruction; must survive 2x the 20 N m walking peak). Fallback: 5010/5208 gimbal BLDC +
+printed cycloid + SimpleFOC, ~2x the price, back-drivable.
+
+## D-011 (2026-10-25) Walking and balancing are requirements, not stretch goals
+
+Why: stated in P-002. Consequences: leg W-max chosen by walking power (D-006); pelvis and foot
+IMUs, four force sensors per foot, AS5600 on every leg DOF; balance controller on the leg and
+torso ESP32 nodes with no Pi in the loop; all leg motors in the pelvis and thigh so shank and
+foot stay light; a series elastic element in the ankle plantarflexor tendon; roadmap Phase 5
+(stand, balance) and Phase 6a/6b (static, dynamic walking) with exit tests.
+Reverses if: nothing planned; the mass budget is the thing most likely to force a trade.
+
+## D-012 (2026-10-25) Every set of work records the prompt that caused it
+
+Why: asked in P-002. `docs/prompt-log.md` holds each prompt verbatim with the files and
+decisions it produced; commit messages quote the prompt ID and text for the work they contain.
 
 ## D-007 (2026-10-25) ESP32 limb nodes on CAN; Pi-class brain optional and deferred to Phase 4
 

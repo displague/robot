@@ -68,7 +68,7 @@ drum, line exit into a PTFE socket, friction drag as overload protection, joint-
 | --- | --- | --- | --- | --- | --- | --- |
 | W-mini | N20 micro gearmotor, 6 V, 100:1 or 298:1, 3 mm drum | ~1 W | 13 / 42 N (100:1), 37 / 122 N (298:1) | 10 g + 15 g printed | ~$5 | hands, wrist, neck, face |
 | W-mid | 37 mm brushed gearmotor (JGB37-520) with hall encoder, 12 V, 1:90, 6 mm drum, 2:1 tackle | ~3-5 W | 130 / 425 N | 200 g + 60 g | ~$14 | elbow, forearm rotation |
-| W-max | *open decision*: 12 V wiper motor (worm, ~50 W, 900 g, $20) **or** 775 motor + printed planetary (~100 W, 300 g, $8 + print) **or** 2806 gimbal BLDC + printed cycloid + SimpleFOC (~30 W, 120 g, $20) | 30-100 W | 400-1600 N with 15 mm drum + 2:1 tackle | 0.3-0.9 kg | $20-30 | shoulder, spine, hip, knee, ankle |
+| W-max | 775 brushed motor + printed two-stage 1:40 planetary, 12 V, 15 mm drum, 2:1 or 3:1 tackle (provisional, D-006; fallback 5010-class gimbal BLDC + printed cycloid) | ~110 W | 580 / 1900 N (2:1), 860 / 2900 N (3:1) | 450 g | ~$11 + driver $4 | shoulder, spine, hip, knee, ankle |
 
 The honest finding from `tools/tendon_calc.py`: cheap gearmotors have **enough force** for
 every joint once drum radius and tackle are chosen, but **not enough power**, so large joints
@@ -124,12 +124,13 @@ critical path and should not be bought until Phase 4.
 - **Speed**: with the cheap motor classes above, arm motion is 3-5x slower than human, hands
   close in about half a second with light force. Human-speed arms would need ~50 W per shoulder
   and ~100 W per hip/knee, which moves W-max into the $50-80-per-joint actuator class.
-- **Walking**: dynamic walking needs 2-5x the torque and power of slow sit-to-stand. The plan
-  targets standing, weight shift, and sitting in Phase 5; walking is a stretch goal that needs
-  W-max to be the 775/planetary or BLDC/cycloid option, not the wiper motor.
+- **Walking** is a requirement (D-011). Walking needs 2-5x the power of slow sit-to-stand, which
+  is what fixed W-max as the 775 + printed planetary (~110 W) and retired the wiper motor. The
+  printed gearbox at 100 W is the biggest unproven element in the project and gets its own bench
+  test before any leg is printed. See `07-locomotion.md`.
 - **Mass**: InMoov-scale printed humanoids land at 15-30 kg. Our budget is 20 kg including 21
-  W-max motors; the wiper-motor option alone is 19 kg of motors, which is why it is probably not
-  the final W-max.
+  W-max motors at 0.45 kg. Walking makes that budget hard: leg power scales with the mass the
+  legs carry.
 - **Stress analysis**: Blender has no finite-element solver. It is used for kinematics, range of
   motion, tendon excursion vs angle, collision, mass properties and rendering. Stress on printed
   parts is checked by hand calculation first and by FreeCAD's FEM workbench (CalculiX) where a

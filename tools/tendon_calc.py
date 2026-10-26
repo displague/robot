@@ -48,6 +48,9 @@ MOTORS = {
     "JGB37_1:270": Motor("JGB37-520 encoder motor 1:270 12V", 3.5,   35, 3.5, 12, 200, 12.0),
     # Automotive windshield-wiper motor: worm gearbox built in (self-locking), heavy, cheap, strong
     "WIPER":       Motor("12V wiper motor (worm, 2-speed)", 25.0,  55, 18.0, 12, 900, 20.0),
+    # 775 brushed motor (12 V, ~0.6 Nm stall, ~12000 rpm) + printed two-stage 1:40 planetary.
+    # Torque below is BEFORE gearbox efficiency; pass eta_gear ~0.6 for printed PETG gears.
+    "775_PLAN40":  Motor("775 motor + printed 1:40 planetary", 24.0, 300, 25.0, 12, 450, 11.0),
 }
 
 # ---------------------------------------------------------------- lines (braided PE / Dyneema; verify spool label)
@@ -154,6 +157,21 @@ SCENARIOS = [
              joint_moment_arm_mm=50, excursion_mm=122, required_force_n=400, line="braid_200lb", target_time_s=2.0),
     Scenario("knee (slow stand) / JGB37 1:270, 8 mm drum, 4:1 tackle", "JGB37_1:270", 8.0, tackle=4,
              joint_moment_arm_mm=50, excursion_mm=122, required_force_n=400, line="braid_200lb", target_time_s=2.0),
+    # ---- walking (docs/07-locomotion.md): 20 kg robot, gait peaks scaled from human biomechanics
+    # Ankle push-off: 1.6 Nm/kg -> 32 Nm, 50 mm pulley -> 640 N, 30 deg in 0.25 s -> 26 mm
+    Scenario("WALK ankle push-off / wiper motor, 15 mm drum, 2:1 tackle", "WIPER", 15.0, tackle=2, eta_gear=0.5,
+             joint_moment_arm_mm=50, excursion_mm=26, required_force_n=640, line="braid_200lb", target_time_s=0.25),
+    Scenario("WALK ankle push-off / 775 + printed 1:40 planetary, 15 mm drum, 3:1 tackle", "775_PLAN40", 15.0,
+             tackle=3, eta_gear=0.6, joint_moment_arm_mm=50, excursion_mm=26, required_force_n=640,
+             line="braid_200lb", target_time_s=0.25),
+    # Knee swing: 20 Nm peak, 50 mm pulley -> 400 N (use 360 N walking), 60 deg in 0.4 s -> 52 mm
+    Scenario("WALK knee swing / 775 + printed 1:40 planetary, 15 mm drum, 2:1 tackle", "775_PLAN40", 15.0,
+             tackle=2, eta_gear=0.6, joint_moment_arm_mm=50, excursion_mm=52, required_force_n=360,
+             line="braid_200lb", target_time_s=0.4),
+    # Hip swing: 25 Nm, 60 mm pulley -> 420 N, 40 deg in 0.5 s -> 42 mm
+    Scenario("WALK hip swing / 775 + printed 1:40 planetary, 15 mm drum, 2:1 tackle", "775_PLAN40", 15.0,
+             tackle=2, eta_gear=0.6, joint_moment_arm_mm=60, excursion_mm=42, required_force_n=420,
+             line="braid_200lb", target_time_s=0.5),
 ]
 
 
