@@ -165,7 +165,9 @@ How a joint moves both ways with one motor, what stops it, and how the line is t
   length is independent of every joint it passes over on the way, like a bicycle brake cable
   through a bent frame. A shoulder loop driven from the torso does not care what the clavicle is
   doing.
-- **Pretension**: set with the joint at mid-range, about 10 % of the working load on each run,
+- **Pretension**: set with the joint at mid-range, **25 % of the continuous line force** on each
+  run (D-022; it was 10 % until the tendon simulation of `13` showed the loop's stiffness halves
+  the moment the unloaded run goes slack, and the standing ankle load did exactly that),
   measured with a spring scale. The sheath end of one run seats on a **bicycle barrel adjuster**
   (M6, ~$0.50, printable socket); turning it lengthens the sheath and adds tension without
   touching the knots. Re-tension once after the first day of running, then rarely.

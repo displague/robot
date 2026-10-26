@@ -61,16 +61,13 @@ shoulder height; a 0.2 s impulse at the torso surviving 20 N and failing at 30 N
 answer from a different direction. MuJoCo's subtree centre of mass (0.931 m) agrees with the
 exporter's own kinematics (0.932 m).
 
-## What is not simulated yet
+## What is not simulated here
 
-- Tendons. Joints are driven as hinges with springs. MuJoCo has a tendon model (spatial tendons
-  over wrapping geometry) that matches this robot unusually well; routing the real closed loops
-  and elastic antagonists is the next simulation step and the only way to simulate slack,
-  pretension and the drag clutches.
-- Feet are boxes; the printed sole, TPU pad and force sensors are not modelled.
-- Actuator power limits. The 775/planetary torque-speed curve from `tools/tendon_calc.py` should
-  become the motor model before any gait is trusted.
-- Contact with the robot's own body, and the hands.
+This doc's model is the rigid statue: hinges held by springs. `13-tendon-simulation.md` (P-010)
+replaces it with the drive train of `02` per DOF (DC motor curve, self-lock, drag clutch, two
+one-sided elastic lines with pretension) and reads every line's tension, slack and clutch slip
+per step; `tools/sim_check.py` stays as the quick load check. Still missing after 13: feet beyond
+boxes, hands, self-contact, hip strategy and gait.
 
 ## Test scenarios to borrow
 

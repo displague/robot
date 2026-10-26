@@ -154,3 +154,27 @@ twists, the Poynting effect, chirality) with what each could mean for the robot,
 each idea lands with its cheapest test, and open questions. Extensions beyond the discussion are
 flagged in the doc (capstan friction, fusee and tapered drums, twisted string actuators, level-wind,
 swing-twist limits, tendon coupling matrix, among others). No decisions changed; README map row.
+
+## P-010 (2026-10-26) Tendon-level simulation: tensions, locks, clutches, standing and holding
+
+> is it ready to see walk through the gauntlet of the gym? will the tensions on the lines and
+> other mechanisms be expressed while it exxerts and sustains forces?
+
+Answered (no on both: a statue with springs, nothing that corresponds to a line), then:
+
+> ok, get to it. also may be useful later: https://github.com/huggingface/lerobot .. I would
+> expect there would be some common/generic DOF based models that can express vision and other
+> inputs against their affectuators. I have a project in ../ai-embedded-dynamic-diversity that
+> attempted to make this generic (perhaps too naive, and perhaps the current project serves as a
+> means to ground that work and use it to build models trained in a more substantial harness).
+
+Produced: `tools/export_mjcf.py` (skeleton.json to `sim/robot.xml`: per DOF a DC-curve motor on
+a gear hinge, self-lock and stick/slip clutch as switched equalities plus friction, drum hinge,
+two one-sided elastic lines with pretension and sheath damping, tackle, hard stops);
+`tools/sim_tendon.py` (gear-position cascade controller with joint-sensor trim, zero-power lock,
+driver current limit below the clutch, ankle-strategy balance loop, standing pose; tests: stand,
+push 10-40 N, sustained 15 N, arm forward with 1 kg, quarter squat; per-line tension, slack,
+clutch slip, motor torque and power readouts, CSV time series); `docs/13-tendon-simulation.md`;
+D-021 to D-023 (current limit below the clutch, pretension 25 %, 25 mm W-mini pulleys); `02`
+pretension updated; `12` pointed at `13`; `references.md` rows for LeRobot and the sibling
+`ai-embedded-dynamic-diversity` project; README rows; MuJoCo renders in `docs/img/`.

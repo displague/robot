@@ -162,3 +162,34 @@ kinematic side needs. Stress on the few life-critical parts goes to CalculiX via
 
 Why: one universal + yaw bearing delivers most visible torso motion at a fraction of the parts.
 Reverses if: a use case needs a bending back (none planned).
+
+## D-021 (2026-10-26) The simulation carries the drive train per DOF, and the driver's current limit sits below the clutch
+
+Why: asked in P-010 ("will the tensions on the lines and other mechanisms be expressed").
+`tools/export_mjcf.py` builds, for every DOF, a DC-curve motor on a gear hinge, a self-lock, a
+stick/slip drag clutch, a drum, and the two one-sided elastic runs of the closed loop, from the
+same calculator figures as the docs, so tensions, slack and slip are read per step. Building it
+showed every winch class had stall torque above its clutch slip torque, so a saturated servo
+slipped its own clutch; the firmware therefore limits motor current to 90 % of the slip torque,
+and the clutch protects against external overloads only. The controller structure that works is
+a position loop on the gear (motor encoder) with the joint sensor trimming the gear target, not
+a voltage loop on joint error.
+Reverses if: bench tests show a clutch that re-sticks cleanly under motor overload (then the
+limit can move up to stall).
+
+## D-022 (2026-10-26) Closed-loop pretension is 25 % of the continuous line force, not 10 %
+
+Why: the loop's stiffness is 2k(n r_p)^2 while both runs are taut and half that once the
+unloaded run goes slack. At 10 % the standing ankle load slackened one run and the ankle sagged
+8 degrees; at 25 % every leg loop stays taut through standing, 20 N pushes and a quarter squat
+(`13`). The cost is 72 N resting in each W-max loop, a tenth of the line's break strength.
+Reverses if: creep at the higher rest tension proves faster than the re-home interval absorbs.
+
+## D-023 (2026-10-26) W-mini joints (neck, wrist) get 25 mm pulleys; CAD presets to follow
+
+Why: the chain presets' 10 mm neck and 12 mm wrist lugs give 1-1.3 N m/rad through W-mini lines;
+the simulated neck cannot lift the head back from its stop and the wrist exceeds the continuous
+rating holding 1 kg. The `--stiff-mini` variant (25 mm, 25 % pretension) fixes both in every test.
+The `chain.py` wrist and neck presets have not been regenerated yet; the neck yaw already uses a
+25 mm ring rotor. Alternative under this decision: move neck pitch/roll to the ring primitive.
+Reverses if: a 2:1 tackle at the existing lug radius tests better than a larger lug.
