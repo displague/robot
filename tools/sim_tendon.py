@@ -48,7 +48,10 @@ CP_GAIN, CP_KI, CP_IMAX = 1.0, 0.5, 0.12   # -, 1/s, m: capture-point gain, inte
 BAL_TAU = 0.03                             # s: CoM position/velocity estimate low-pass (IMU + joint sensors)
 DOB_TAU, DOB_MAX = 0.08, 0.15              # s, m: disturbance observer (external horizontal force from the CoM
                                            # acceleration against the measured CoP), expressed as a CoM offset
-COP_LIMIT_Y, COP_LIMIT_X = 0.10, 0.04      # m: CoP kept inside the toe/heel line, and within the stance sole laterally
+COP_MARGIN_Y, COP_LIMIT_X = 0.03, 0.04     # m: CoP kept this far inside the heel and toe lines of the soles on the
+                                           # ground (not a fixed distance from the reference: with the CoM biased
+                                           # ahead for a step the demand reached past the toe), and this far inside
+                                           # the stance sole laterally
 COP_DS_X = 0.035                           # m: in double support each ankle only moves its own CoP this far (the
                                            # closed chain makes ankle roll a very stiff way to move weight between feet)
 COP_HIP, HIP_GAIN, HIP_RATE, HIP_LEAK, HIP_MAX = 0.04, 0.0, 0.0, 0.2, math.radians(25)  # m, rad per m of excess,
@@ -80,6 +83,18 @@ SOLE_HALF = (0.05, 0.13)         # half width (x) and half length (y) of the sol
 GROUND_LOAD = 0.05               # of the weight: a foot carrying less is in the air for the balance loop
 UNLOAD_T = 0.15                  # s: for that long, unless the planner declared it the swing foot (a bounce in the
                                  # weight shift unloaded a foot for a few ms and the support reference jumped)
+STEP_LEN = 0.10                  # m: the first static step (docs/06 Phase 6a, hub task first-static-step)
+STAND_HIP = 0.076                # m: the hip is this far ahead of the ankle in the standing pose (the 5 deg lean)
+LAND_LOAD = 0.15                 # of the weight: the swing foot counts as placed once it carries this much
+PLACE_T = 1.5                    # s: the swing leg unfolds onto the floor over this long (stops at touchdown)
+TRANSFER_T = 5.0                 # s: a weight transfer between staggered feet (the hip-roll shift is slow, docs/14)
+LAND_REACH = 0.02                # m: the landing pose aims this far below the floor; touchdown ends the placement
+PLAN_SLEW = 0.6                  # rad/s: fastest the planner moves a leg target during a transfer
+REACH_0 = 0.003                  # m: the bent leg of a staggered stance is planned this much long; its knee is a
+                                 # torque source (the share of the weight the CoM implies), so the leg is a spring
+                                 # the weight settles onto rather than a position that hovers or presses
+ANKLE_BLEND = 0.3                # s: a foot that has just landed takes up its share of the ankle torque over this
+                                 # long (a swing foot's ankle is in position mode, sole level, carrying no offset)
 GEAR_FRICTION = 0.02             # of stall: running friction of the gear train when powered
 CURRENT_LIMIT = 0.9              # of the clutch slip torque: the driver's current limit
 
@@ -116,6 +131,11 @@ class Rig:
         self.floor = mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_GEOM, "floor")
         self.mass = float(sum(m.body_mass))
         self.reset()
+        mujoco.mj_forward(m, self.data)
+        j = lambda n: self.data.xanchor[mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_JOINT, n)]
+        self.leg = float(np.linalg.norm(j("thigh.L_pitch") - j("foot.L_pitch")))   # hip to ankle, m
+        self.thigh_len = float(np.linalg.norm(j("thigh.L_pitch") - j("shank.L_pitch")))
+        self.shank_len = float(np.linalg.norm(j("shank.L_pitch") - j("foot.L_pitch")))
 
     def reset(self):
         """Start in the standing pose: ankles dorsiflexed by STAND_LEAN, the body leaned forward by the same
@@ -147,12 +167,22 @@ class Rig:
         self.ankle_offset, self.ankle_roll, self.hip_lean, self.hip_shift = pre, {"L": 0.0, "R": 0.0}, 0.0, 0.0
         self._single, self._shift_hold, self._swing_free = False, 0.0, False
         self._grounded, self._unload_t = [True, True], [0.0, 0.0]
+        self._ank_w = [1.0, 1.0]         # each ankle's share of the sagittal balance torque (0 in the air)
+        self._load_f = [0.5 * self.mass * 9.81] * 2    # filtered vertical load per foot (its force sensors)
+        self.ankle_off = {"L": pre, "R": pre}          # per-ankle pitch offset: that foot's share of the torque
         self.swing = None                # planner: the foot being lifted ("L"/"R"), not a support foot
+        self.swing_land = False          # planner: the swing leg is being placed (its hip tracks the stance hip)
+        self.swing_parallel = False      # planner: a foot off the floor keeps its leg parallel to the stance leg
+        self.knee_tau = {"L": None, "R": None}   # planner: a knee carrying this torque (N m, + flexion) as a torque
+                                         # source about its planned angle (the bent leg of a staggered stance)
+                                         # (same vertical reach, so it neither presses the floor nor hangs wide)
+        self.com_bias = np.zeros(2)      # planner: where the CoM should sit relative to the support reference (m)
         self.hip_roll_cmd = {"L": 0.0, "R": 0.0}   # per hip: the shift (double support) or the levelling (stance)
         self._quiet, self._off_prev, self._hip_i = 0.0, pre, 0.0
         self._v_prev, self._dist = np.zeros(2), np.zeros(2)
         self._com_f, self._com_v, self._cp_i, self._roll_i = None, np.zeros(2), np.zeros(2), 0.0
         self.weight = (0.5, 0.5)         # planner: desired share of the weight on (left, right)
+        self.com_share = (0.5, 0.5)      # balance loop: the share the CoM position between the soles implies
         self.com_margin = (0.0, 0.0)
         self.cop_cmd = np.zeros(2)
         for w in self.w:
@@ -196,7 +226,7 @@ class Rig:
         if sum(wts) <= 0:
             return np.zeros(2), -1.0, -1.0
         ref = sum(w * s[i][0] for i, w in enumerate(wts)) / sum(wts)
-        e = com[:2] - ref[:2]
+        e = com[:2] - ref[:2] - self.com_bias
         return e, (ref[1] + SOLE_HALF[1]) - com[1], com[1] - (ref[1] - SOLE_HALF[1])
 
     def cop(self):
@@ -239,6 +269,11 @@ class Rig:
             return
         s = self.soles()
         grounded = [c for c, on in s if on]
+        for i, (c, on) in enumerate(s):
+            # the planner's swing foot carries no ankle torque (position mode, sole level); any other foot shares
+            # it, blending back in after a landing. By the planner's flag, not the load: a lightly loaded foot in
+            # a weight shift must not flip modes
+            self._ank_w[i] = 0.0 if self.swing == "LR"[i] else min(1.0, self._ank_w[i] + dt / ANKLE_BLEND)
         if not grounded:
             return
         mass = self.mass
@@ -249,7 +284,9 @@ class Rig:
         # external force; carried as the CoM offset it is equivalent to, so a push is answered at once
         acc = (self._com_v - self._v_prev) / dt
         self._v_prev = self._com_v.copy()
-        cop_meas, _ = self.cop()
+        cop_meas, loads = self.cop()
+        for i in range(2):
+            self._load_f[i] += a * (loads[i] - self._load_f[i])
         if cop_meas is not None:
             resid = acc / omega ** 2 - (self._com_f - (cop_meas - ref))
             b = dt / ((DOB_TAU_SS if len(grounded) == 1 else DOB_TAU) + dt)
@@ -259,17 +296,29 @@ class Rig:
         self._cp_i = np.clip(self._cp_i + CP_KI * self._com_f * dt, -CP_IMAX, CP_IMAX)
         p = np.array([(1.0 + CP_GAIN_X) * cp[0], (1.0 + CP_GAIN) * cp[1]]) + self._cp_i
         # keep the CoP inside what the grounded soles can supply
-        xs = [c[0] for c in grounded]
+        xs, ys = [c[0] for c in grounded], [c[1] for c in grounded]
         lim_x = (min(xs) - SOLE_HALF[0] + COP_LIMIT_X - ref[0], max(xs) + SOLE_HALF[0] - COP_LIMIT_X - ref[0])
-        p_y = float(np.clip(p[1], -COP_LIMIT_Y, COP_LIMIT_Y))
+        lim_y = (min(ys) - SOLE_HALF[1] + COP_MARGIN_Y - ref[1], max(ys) + SOLE_HALF[1] - COP_MARGIN_Y - ref[1])
+        p_y = float(np.clip(p[1], lim_y[0], lim_y[1]))
         p_x = float(np.clip(p[0], lim_x[0], lim_x[1]))
         single = len(grounded) == 1
         self.cop_cmd = ref + (p_x, p_y)
         # --- sagittal: ankle pitch torque for that CoP, shared by the grounded ankles, as a line-stretch angle.
         # CoP forward of the ankle (-Y) needs plantarflexion torque; +q is plantarflexion (toes down).
         ankle_y = np.mean([d.xpos[b][1] for b, (c, on) in zip(self.feet, s) if on])
-        tau_y = mass * 9.81 * (ankle_y - (ref[1] + p_y)) / len(grounded)
-        self.ankle_offset = self.torque_to_angle("foot.L_pitch", tau_y)
+        # shared by the feet by where the CoM sits between the soles (statically that is each foot's load). A
+        # lightly loaded foot asked for half the torque rocks onto its toe and pushes the body; sharing by the
+        # measured load feeds back (the loaded foot pushes itself off, the load slams across at 2 Hz); sharing
+        # by the planner's weight runs ahead of the real transfer and leaves the loaded foot with no torque
+        tau_y = mass * 9.81 * (ankle_y - (ref[1] + p_y))
+        seg = s[1][0][:2] - s[0][0][:2]
+        lam = float(np.clip(np.dot(com[:2] - s[0][0][:2], seg) / max(1e-6, np.dot(seg, seg)), 0.0, 1.0))
+        self.com_share = (1.0 - lam, lam)      # the static load share the CoM position implies (planner reads it)
+        share = [self._ank_w[0] * (1.0 - lam), self._ank_w[1] * lam]
+        tot = sum(share)
+        for i, side in enumerate("LR"):
+            self.ankle_off[side] = self.torque_to_angle("foot.%s_pitch" % side, tau_y * share[i] / tot if tot > 0 else 0.0)
+        self.ankle_offset = self.torque_to_angle("foot.L_pitch", tau_y / len(grounded))
         self._quiet = self._quiet + dt if abs(self.ankle_offset - self._off_prev) < math.radians(0.02) else 0.0
         self._off_prev = self.ankle_offset
         # excess beyond the ankle's comfortable CoP goes to the hip as a trunk lean (+ hip pitch = trunk back),
@@ -282,7 +331,6 @@ class Rig:
         # --- lateral: ankle roll torque for the lateral CoP, and the hip-roll weight shift on the lateral error
         # each grounded ankle moves the CoP within its own sole toward the demanded point; in double support
         # only a little (COP_DS_X), the weight transfer between the feet is the hip shift's job
-        _, loads = self.cop()
         want_x = ref[0] + p_x
         for side, b, (c, on), load in zip("LR", self.feet, s, loads):
             if single and on and SS_ANKLE_TORQUE:
@@ -308,7 +356,12 @@ class Rig:
                     # (SWING_CLEAR); a brush with the floor does not bring the shift back
                     if load < GROUND_LOAD * mass * 9.81:
                         self._swing_free = True
-                    want = SWING_CLEAR if self._swing_free else self._shift_hold
+                    if self.swing_land or self.swing_parallel:
+                        want = self.hip_shift            # parallel to the stance leg: it lands at stance width
+                    elif self._swing_free:
+                        want = SWING_CLEAR
+                    else:
+                        want = self._shift_hold
                     self.hip_roll_cmd[side] = cur + max(-ROLL_SLEW * dt, min(ROLL_SLEW * dt, want - cur))
         else:
             if self._single:
@@ -316,7 +369,9 @@ class Rig:
             self._roll_i = max(-ROLL_MAX, min(ROLL_MAX, self._roll_i + ROLL_KI * self._com_f[0] * dt))
             want = -max(-ROLL_MAX, min(ROLL_MAX, ROLL_KP * self._com_f[0] + ROLL_KD * self._com_v[0] + self._roll_i))
             self.hip_shift += max(-ROLL_SLEW * dt, min(ROLL_SLEW * dt, want - self.hip_shift))
-            self.hip_roll_cmd = {"L": self.hip_shift, "R": self.hip_shift}
+            for side in "LR":
+                cur = self.hip_roll_cmd[side]
+                self.hip_roll_cmd[side] = cur + max(-SS_SLEW * dt, min(SS_SLEW * dt, self.hip_shift - cur))
         self._single = single
 
     def torque_to_angle(self, winch, tau):
@@ -360,16 +415,20 @@ class Rig:
             bone, axis = w["name"].split("_")[0].split(".")[0], w["name"].split("_")[-1]
             torque_mode = False
             side = w["name"].split(".")[1][0] if "." in w["name"] else ""
-            if bone == "foot" and self.balance and (axis == "pitch" or self.ankle_roll[side] is not None):
+            if (bone == "foot" and self.balance and self.swing != side
+                    and (axis == "pitch" or self.ankle_roll[side] is not None)):
                 # ankle impedance: the gear is placed so the lines carry the balance torque at the planned
                 # ankle angle (the lines are the series spring, K per rad about the plan); the CoP loop's
                 # integral takes out what the stiffness term adds when the body sways
                 torque_mode = True
                 # roll: the parallelogram term stays (the leg keeps its angle to the pelvis when the other foot
                 # leaves the ground), the CoP torque is added on top
-                tgt += self.ankle_offset if axis == "pitch" else (self.ankle_roll[side] - self.hip_roll_cmd[side])
+                tgt += self.ankle_off[side] if axis == "pitch" else (self.ankle_roll[side] - self.hip_roll_cmd[side])
             elif bone == "foot" and axis == "roll":
                 tgt -= self.hip_roll_cmd[side]          # parallelogram: the sole stays flat under the shift
+            elif bone == "shank" and self.knee_tau.get(side) is not None:
+                torque_mode = True                      # knee impedance: the lines carry the planned torque at the
+                tgt += self.torque_to_angle(w["name"], self.knee_tau[side])   # planned angle (docs/16)
             elif bone == "thigh" and axis == "pitch":
                 tgt += self.hip_lean
             elif bone == "thigh" and axis == "roll":
@@ -464,6 +523,26 @@ class Rig:
             for k, v in targets.items():
                 self.target[k] = start[k] + (v - start[k]) * i / n
             self.step(record)
+
+    def ramp(self, seconds, targets=None, weight=None, bias=None, until=None):
+        """The planner's step primitive: ramp joint targets, the desired weight share and the CoM bias together
+        over `seconds`; stop early when `until(rig)` is true (touchdown). Returns True if it stopped early."""
+        targets = targets or {}
+        start = {k: self.target[k] for k in targets}
+        w0, b0 = self.weight, self.com_bias.copy()
+        n = int(round(seconds / self.model.opt.timestep))
+        for i in range(1, n + 1):
+            f = i / n
+            for k, v in targets.items():
+                self.target[k] = start[k] + (v - start[k]) * f
+            if weight is not None:
+                self.weight = tuple(w0[j] + (weight[j] - w0[j]) * f for j in range(2))
+            if bias is not None:
+                self.com_bias = b0 + (np.asarray(bias, dtype=float) - b0) * f
+            self.step()
+            if until is not None and until(self):
+                return True
+        return False
 
     def push(self, body, force_xyz, seconds):
         bid = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_BODY, body)
@@ -570,6 +649,173 @@ def scenarios():
         r.move({"thigh.R_pitch": -hip, "shank.R_pitch": knee, "foot.R_pitch": STAND_LEAN - (knee - hip)}, 1.0)
         r.run(10.0)
 
+    def unloaded(r, i):
+        # the planner lifts only once the foot carries under a tenth of the weight (foot sensors), the CoM is
+        # within 10 mm of the planned point and moving under 20 mm/s (IMU + kinematics) and the pelvis is level
+        # within 1.5 deg: a lift from the tail of the weight shift (pelvis rolled 4 deg, hip loop still moving)
+        # put the stance hip at its clamp within a second
+        d = r.data
+        for _ in range(int(10.0 / r.model.opt.timestep)):
+            _, loads = r.cop()
+            e, _, _ = r.support()
+            rm = d.xmat[r.pelvis].reshape(3, 3)
+            roll = math.degrees(math.atan2(rm[2, 0], rm[0, 0]))
+            if (loads[i] < 0.1 * r.mass * 9.81 and abs(e[0]) < 0.01 and abs(r._com_v[0]) < 0.02
+                    and abs(roll) < 1.5):
+                return
+            r.step()
+        print("   lift gate timed out (load %.0f N, e_x %.0f mm, v_x %.0f mm/s, roll %.1f deg)"
+              % (loads[i], e[0] * 1e3, r._com_v[0] * 1e3, roll))
+
+    def level(thigh, knee):
+        # ankle pitch that keeps the sole level for a thigh pitch (- is flexion, foot forward) and a knee flexion
+        # (foot back): the sole follows the shank, which leans by the pelvis pitch plus both
+        return STAND_LEAN - knee - thigh
+
+    def take_step(r):
+        """The first static step (docs/06 Phase 6a): shift left, lean half a step forward, lift the right and place
+        it STEP_LEN ahead, shift onto it, move the pelvis back half a step, lift the left and place it level with
+        the right, centre. Geometry (docs/16): the leg leaning most is straight and sets the hip height, every
+        other grounded leg bends its knee to reach the floor; the trunk keeps its standing pitch through the hip
+        targets; the CoM bias tells the balance loop where the pelvis is going and the leg targets follow it."""
+        lt, ls, big = r.thigh_len, r.shank_len, r.leg
+        half = 0.5 * STEP_LEN
+        sole = -SOLE_CENTRE[1]                            # the sole centre is this far ahead of the ankle
+        # the lift: 25 deg of hip and 38 deg of knee put the foot 50 mm up and 80 mm ahead of the hip with the
+        # sole level (ankle at -18 deg, inside its -20 deg stop). The one-foot hold's fold (10 and 50, foot up
+        # behind) needs -45 deg at the ankle, so its sole hangs toe-down from the stop and the toe catches the
+        # stance heel on the way back; here the foot goes forward, where the step is going
+        fold = dict(hip=math.radians(25), knee=math.radians(38))
+        # the straight knee (q = 0) is the reference: the anchors are not collinear, so the law of cosines
+        # gives it a nonzero included angle k0 and the thigh a fixed offset beta0 from the hip-ankle line
+        k0 = math.acos(max(-1.0, min(1.0, (big * big - lt * lt - ls * ls) / (2 * lt * ls))))
+        beta0 = math.asin(ls * math.sin(k0) / big)
+        theta0 = math.asin(STAND_HIP / big)               # lean of the standing leg (hip ahead of the ankle)
+
+        def leg(d, h):
+            # (thigh, knee, ankle) targets for a grounded leg whose hip is d ahead of its ankle at height h,
+            # relative to the standing pose (thigh 0, knee 0, ankle STAND_LEAN, trunk pitch kept)
+            r2 = d * d + h * h
+            k = math.acos(max(-1.0, min(1.0, (r2 - lt * lt - ls * ls) / (2 * lt * ls))))
+            theta = math.atan2(d, h)                      # lean of the hip-ankle line, + hip ahead
+            beta = math.asin(ls * math.sin(k) / math.sqrt(r2))
+            q_t = (theta - beta) - (theta0 - beta0)       # the thigh leans less than the line by beta
+            q_k = max(0.0, k - k0)
+            return q_t, q_k, level(q_t, q_k)
+
+        def anchor(name):
+            return r.data.xanchor[mujoco.mj_name2id(r.model, mujoco.mjtObj.mjOBJ_JOINT, name)]
+
+        def measure(s):
+            # where the ankles actually are, ahead of the left ankle's start (joint sensors + kinematics)
+            for i, side in enumerate("LR"):
+                s[i] = y_l0 - anchor("foot.%s_pitch" % side)[1]
+
+        def hip_height(side, floor):
+            # that side's hip above the floor, the floor being the `floor` foot's ankle (joint sensors + kinematics)
+            return anchor("thigh.%s_pitch" % side)[2] - anchor("foot.%s_pitch" % floor)[2]
+
+        def legs(f, s, tall, sides="LR", reach=0.0):
+            # joint targets for the CoM f ahead of the left ankle, the ankles s = (left, right) ahead of it. The
+            # `tall` leg is straight and sets the hip height by its own geometry; any other leg bends its knee to
+            # the hip height actually measured (the lateral lean of the loaded leg lowers it ~9 mm below what
+            # the sagittal geometry says, and that changes through a transfer), plus `reach` below the floor
+            d = {side: f - s[i] for i, side in enumerate("LR")}
+            h_tall = math.sqrt(max(0.0, big * big - d[tall] ** 2))
+            out = {}
+            for side in sides:
+                h = h_tall if side == tall else min(hip_height(side, tall) + reach,
+                                                   math.sqrt(max(0.0, big * big - d[side] ** 2)))
+                t, k, a = leg(d[side], h)
+                out["thigh.%s_pitch" % side], out["shank.%s_pitch" % side], out["foot.%s_pitch" % side] = t, k, a
+            return out
+
+        def move_com(seconds, f1, s, tall, weight=None, hold=0.0):
+            # the planner's transfer: the CoM target, the weight share and the leg targets move together over
+            # `seconds` (then `hold`), the legs recomputed every step from the measured hip height (a closed
+            # chain: targets set once at the start press one foot into the floor or lift it as the lean
+            # changes), each joint slewed at PLAN_SLEW. The bent leg's reach is closed on the foot sensors: it
+            # is pushed down until that foot carries the share the CoM position implies (a knee held at a fixed
+            # angle gives under the load as its lines stretch, the foot unloads and lifts, and the support
+            # flips back to one foot). Not the planned share: forcing the load ahead of the CoM lifts the
+            # other foot and tips the body over the loaded one
+            n = int(round((seconds + hold) / r.model.opt.timestep))
+            dt = r.model.opt.timestep
+            w0 = r.weight
+            f_0 = f_now[0]
+            lead = "LR"[0] if tall == "R" else "R"
+            li = "LR".index(lead)
+            sole_b = r.feet[li]
+            knee_j = mujoco.mj_name2id(r.model, mujoco.mjtObj.mjOBJ_JOINT, "shank.%s_pitch" % lead)
+            for i in range(1, n + 1):
+                g = min(1.0, i * dt / seconds)
+                f = f_0 + (f1 - f_0) * g
+                w = tuple(w0[j] + (weight[j] - w0[j]) * g for j in range(2)) if weight is not None else w0
+                r.weight = w
+                r.com_bias = np.asarray(bias(f, s, w), dtype=float)
+                # the leading knee carries its share of the weight: the ground reaction (vertical, through the
+                # sole centre, the share the CoM position implies) times its horizontal arm to the knee, as an
+                # extension torque (negative: + is flexion)
+                sole_c = r.data.xpos[sole_b] + r.data.xmat[sole_b].reshape(3, 3) @ np.array(SOLE_CENTRE)
+                arm = abs(r.data.xanchor[knee_j][1] - sole_c[1])
+                r.knee_tau[lead] = -r.com_share[li] * r.mass * 9.81 * arm
+                for k, v in legs(f, s, tall, reach=REACH_0).items():
+                    r.target[k] += max(-PLAN_SLEW * dt, min(PLAN_SLEW * dt, v - r.target[k]))
+                r.step()
+            f_now[0] = f1
+            _, loads = r.cop()
+            print("   transfer done at t=%.2f s: loads %.0f/%.0f N, lead knee %.1f N m, CoM error (%.0f, %.0f) mm"
+                  % (r.data.time, loads[0], loads[1], r.knee_tau[lead], 1e3 * r.support()[0][0],
+                     1e3 * r.support()[0][1]))
+
+        def bias(f, s, w):
+            # CoM bias (m, forward is -y) that puts the CoM f ahead of the left ankle for the weight share w
+            return (0.0, -(f - sum(w[i] * (s[i] + sole) for i in range(2))))
+
+        def place(swing, s, s_new):
+            i = "LR".index(swing)
+            stance = "LR"[1 - i]
+            f = f_now[0]
+            r.swing, r.swing_land = swing, False
+            # lift: fold the swing leg (sole level, foot up ahead); the stance leg straight at its lean
+            r.ramp(1.5, {"thigh.%s_pitch" % swing: -fold["hip"], "shank.%s_pitch" % swing: fold["knee"],
+                         "foot.%s_pitch" % swing: level(-fold["hip"], fold["knee"])} | legs(f, s, stance, stance))
+            r.run(0.5)
+            # place: unfold onto the landing pose, aimed LAND_REACH below the floor (the hip height moves with
+            # the stance lean, so geometry alone leaves the sole hovering), hip parallel to the stance leg; the
+            # foot sensors end it at touchdown
+            r.swing_land = True
+            s2 = list(s)
+            s2[i] = s_new
+            land = legs(f, s2, stance, swing, reach=LAND_REACH)
+            landed = r.ramp(PLACE_T, land, until=lambda r: r.cop()[1][i] > LAND_LOAD * r.mass * 9.81)
+            r.swing, r.swing_land = None, False
+            measure(s)
+            print("   %s foot %s at t=%.2f s, %.0f mm ahead of the other (planned %.0f)"
+                  % (swing, "placed" if landed else "NOT placed", r.data.time, 1e3 * (s[i] - s[1 - i]),
+                     1e3 * (s_new - s[1 - i])))
+
+        y_l0 = anchor("foot.L_pitch")[1]
+        s = [0.0, 0.0]                                    # ankles ahead of the left ankle's start
+        f0 = sole                                         # standing: CoM over the sole centres
+        f_now = [f0]                                      # where the planner has put the CoM
+        # a foot off the floor keeps its leg parallel to the stance leg: at 3 deg of abduction (the one-foot hold's
+        # setting) a straight free leg is vertically longer than the leaning stance leg, presses the floor with
+        # 150 N and the support flips between one foot and two until the stance CoP pins at an edge
+        r.swing_parallel = True
+        shift(r, 2.0)                                                               # weight onto the left foot
+        unloaded(r, 1)
+        place("R", s, STEP_LEN)                           # right foot a step ahead, knee bent to reach
+        # onto the right foot, the pelvis half a step forward (the CoM half a step behind the right sole centre:
+        # the heel margin is 80 mm, and the next lift swings the left leg's mass forward); the left leg stays
+        # straight and sets the height, the right knee follows
+        move_com(TRANSFER_T, f0 + half, s, "L", weight=(0.0, 1.0), hold=1.0)
+        unloaded(r, 0)
+        r.knee_tau["R"] = None                            # the right leg is the stance now: position mode
+        place("L", s, s[1])                               # left foot level with it (the right leg straightens)
+        move_com(TRANSFER_T, s[1] + sole, s, "R", weight=(0.5, 0.5), hold=3.0)   # centre over both
+        r.knee_tau["L"] = None
+
     out = [("stand", "stand 4 s (servo, then lock on target)", "zero-power hold: the W-max drums go blue", stand)]
     for f in (10, 20, 30, 40):
         out.append(("push%d" % f, "push %d N for 0.2 s at the torso" % f,
@@ -578,7 +824,9 @@ def scenarios():
             ("arm", "left arm forward, 1 kg in the hand for 4 s", "shoulder and wrist lines under a held load", arm),
             ("squat", "quarter squat held 4 s", "hip, knee and ankle loops all loaded", squat),
             ("shift", "weight shift onto the left foot", "hip-roll shift and ankle-roll CoP control", shift),
-            ("onefoot", "one-foot stance: right foot lifted, held 10 s", "Phase 5 exit test (docs/06)", onefoot)]
+            ("onefoot", "one-foot stance: right foot lifted, held 10 s", "Phase 5 exit test (docs/06)", onefoot),
+            ("step", "first static step: right foot 100 mm ahead, then the left level with it",
+             "Phase 6a (docs/06): shift, lift, place, shift, lift, place, centre", take_step)]
     return out
 
 

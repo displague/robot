@@ -203,7 +203,8 @@ def main():
         import export_mjcf
         export_mjcf.HIP_ROLL_60 = False
     rig = st.Rig()
-    rec = Recorder(rig, out, fps=fps, gif=gif, gif_scenes=("stand", "push30", "lean15", "onefoot"))
+    rec = Recorder(rig, out, fps=fps, gif=gif,
+                   gif_scenes=tuple(only) if only else ("stand", "push30", "lean15", "onefoot", "step"))
     for key, title, note, fn in st.scenarios():
         if only and key not in only:
             continue

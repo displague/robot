@@ -241,3 +241,19 @@ stance foot, swing hip abduction, slower disturbance observer in single support,
 `tools/export_mjcf.py` 60 mm hip roll as the baseline; `tools/sim_video.py` `--out`;
 `docs/img/onefoot.mp4`, `docs/img/onefoot.gif`; D-027, D-028; `sim/robot.xml` regenerated;
 `14`, `07`, README, references updated.
+
+## P-014 (2026-10-27) Status, then the first static step
+
+> where are we at? what's next? need anything from me?
+
+> I think I set those. continue.
+
+Produced (work in progress; the session ended at the usage limit): hub task `first-static-step`
+claimed, not finished. `tools/sim_tendon.py` `step` scenario with a geometry planner (the straight
+leg sets the hip height, the other knee from the law of cosines, measured foot positions and hip
+heights, touchdown by the foot sensors): the lift and the placement work (right foot lands 101 mm
+ahead, single support stable); the staggered double-support transfer still falls. Controller
+changes that pass the regression and improve it (shift 30 to 17 W, one-foot hold 34 to 27 W): the
+swing foot's ankle in position mode, sagittal ankle torque shared by the CoM position between the
+soles, CoP limits from the soles on the ground. Last untested idea in the tree: the leading knee as
+a torque source. `tools/sim_video.py` GIF scenes follow `--only`. No docs/16 yet.
