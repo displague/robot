@@ -261,3 +261,14 @@ clear), controller changes (swing ankle in position mode, ankle torque shared by
 CoP limits from the soles, ground debounce once per step), report columns (`hot s`, per-phase
 table); `tools/sim_video.py` GIF scenes follow `--only`; `docs/img/step.mp4`, `docs/img/step.gif`;
 D-029, D-030; `15`, `07`, README, references updated.
+
+## P-015 (2026-10-27) Landing accuracy and the gait cycle
+
+> Continue
+
+Produced: five attempts at correcting the swing foot from its measured position before
+touchdown, each worse than the open-loop placement of P-014 on the baseline model; the controller
+is left at a2b2a18. `docs/16-first-step.md` gains the section "Landing accuracy: five attempts that
+made it worse" (the table, why the correction fights the balance loop, the pelvis-pitch model
+error it exposed), and its Not yet and Next point at a world-frame swing-leg controller, filed as
+hub task `swing-leg-world-ik` in the robot workspace.

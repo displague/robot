@@ -104,12 +104,38 @@ squat and shift are unchanged to the joule; the one-foot hold still stands, at 3
 27 W: its lift gate also called the timer, so its lift moved. The console runner, the trace
 and the recorder now agree on the step to the joule.
 
+## Landing accuracy: five attempts that made it worse (P-015)
+
+Both feet land long, so the next step was to correct the swing foot from its measured position
+before it touches down. Five versions were tried; each made the baseline step worse than the open
+loop placement above, which stays in the code.
+
+| Version | Right foot (planned about 100 mm) | Outcome |
+| --- | --- | --- |
+| open loop (kept) | 120 mm | stands |
+| aim point integrating the error through the hover and the descent | 2 mm | falls (the integral wound up during the carry, when the foot is far from its mark by design) |
+| the same, integrating only over the mark, clamped to 50 mm | 67 mm | falls |
+| the same, hip offsets held through the placement | 87 mm (98 on `--stiff-mini`, and the left 9 mm against 11) | falls; the landed foot was dragged 68 mm by the next transfer |
+| the same, with the pelvis pitch fed into the swing leg live | 60 mm, never reached the floor | falls sideways (the swing hip's reaction pitched the pelvis and fed itself) |
+| hover, one measured correction, lower open loop | 26 mm (measured 32 mm short, 33 mm long after the correction) | falls |
+
+Why: the planner expresses the foot's target relative to the CoM and the hips, and while the foot
+hovers the balance loop keeps moving the body under it. A correction computed from the measured
+foot is overtaken by the balance loop's own motion, so the two fight. The one fact the attempts
+established is a model error worth fixing in any version: the planner's leg geometry assumes the
+pelvis keeps its standing pitch, and during the step it wanders up to 3.4 degrees, about 50 mm at
+the foot (a + pelvis pitch moves the ankle exactly as the same + hip pitch does, measured). The
+fix that should work is a swing-leg controller in the world frame: each step, the swing leg's
+joint targets from the full measured pose of the pelvis and the target foot position on the
+floor (inverse kinematics on the model's own chain), rather than planner geometry relative to the
+CoM. That is filed as hub task `swing-leg-world-ik`.
+
 ## Not yet
 
 - **Landing accuracy.** Both feet land long (18 mm and 29 mm here, 51 mm on `--stiff-mini`,
   where it falls). The landing pose is computed once from the CoM and hip positions at the start
-  of the hover; the body leans during the placement. Closing the swing foot's position on its
-  measured position during the hover is the next fix.
+  of the hover; the body leans during the placement. Correcting it from the measured foot made it
+  worse five ways (above); the next attempt is a world-frame swing-leg controller.
 - **The neck.** Above its rating in every scene; the 25 mm W-mini presets (hub task
   `w-mini-25mm-cad-presets`, D-023) fix it standing, but the step must pass on that variant too.
 - **The one-foot hold's arms** still rest on the thigh (hand roll above rating for 2.6 s); the
@@ -119,5 +145,5 @@ and the recorder now agree on the step to the joule.
 
 ## Next
 
-Close the swing foot on its measured position during the hover, then a second step (the left foot
-ahead of the right) to make a gait cycle, then the same on `--stiff-mini`.
+A world-frame swing-leg controller (hub task `swing-leg-world-ik`), then a second step (the left
+foot ahead of the right) to make a gait cycle, then the same on `--stiff-mini`.
