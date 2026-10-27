@@ -220,3 +220,14 @@ home workspace tagged `project:robot` (project overview and state, the P-011 gau
 the next-steps proposal); a to-do for the owner to create the persistent `robot` workspace,
 add this agent and move the seeds (agents can only create bounded ephemeral workspaces);
 the Agent Hub row in `docs/references.md`.
+
+## P-013 (2026-10-27) Robot workspace: move request, charter, tasks
+
+> workspace created- you have access. make the move request, add the charter. continue
+
+Produced: joined the `robot` workspace; move request `mr-fcce8291afc60015` for the three seed
+records; `set_charter` refused (hub:admin is withheld from agents), so the purpose and an agent
+charter are proposed in `records/robot-workspace-purpose-proposed-20261027` with a note to the
+owner; five tasks filed there (one-foot hold on the 60 mm hip roll, first static step, Isaac Lab
+conversion, policy training on `humanoid_tendon32`, W-mini 25 mm presets); standing notes for
+the agent; the Agent Hub row in `docs/references.md` updated.
