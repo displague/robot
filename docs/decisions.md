@@ -270,3 +270,32 @@ pulley at the hip and one more strand. `export_mjcf.HIP_ROLL_60` is now True; `-
 restores the old geometry for comparison.
 Reverses if: the hip housing of `11` cannot take a 60 mm pulley at the roll axis (then tackle 3
 on 50 mm, range 22 N m, is the fallback).
+
+## D-029 (2026-10-27) The static step is planned from measurement, with the leading knee as a torque source
+
+Why: the first static step (`16`) fell eleven different ways, and the controller of `14`/`15`
+needed only small changes (the swing ankle in position mode, the sagittal ankle torque shared by
+the CoM position between the soles, CoP limits from the soles on the ground). The rest is the
+planner: every leg pose from geometry (the leg leaning most straight, the others' knees from the
+law of cosines) on the feet, CoM and hip positions as measured, the hip offsets held through each
+transfer; the leading knee of a staggered stance as a torque source carrying its share of the
+weight (a bent knee held in position gives as its lines stretch and the foot flickers on and off
+the floor); the trailing foot declared the swing foot once a transfer has unloaded it below a
+tenth of the weight; placement in two moves (level to 40 mm above the mark, then down); the arms
+held 10 degrees clear of the thighs. The step completes on the baseline and on `--hip50`, with
+every leg line inside its rating on the baseline (255 N of 288). No winch class or pulley
+changes; on `--hip50` the hip roll reaches 304 N, which confirms D-028.
+Reverses if: a learned policy (hub task `policy-training-humanoid-tendon32`) steps more reliably
+than the planner, or the real knee's line stiffness is too low for the torque mode to hold a share
+of the weight.
+
+## D-030 (2026-10-27) The ground-contact debounce advances once per control step
+
+Why: the debounce timer advanced on every call to `Rig.soles()`, and the balance loop, the
+planner, the trace and the recorder all call it, so watching the robot changed what it did; the
+same step stood in the console and fell in the recorder. It now advances once per step in
+`control()` and every other call reads it. `UNLOAD_T` is 0.075 s, which is what the controller of
+`15` was tuned on (0.15 s counted twice a step). The gauntlet is unchanged to the joule except the
+one-foot hold (still stands, 27 W to 38 W). On the robot this is the firmware's contact state:
+one estimate per control tick, read by everything else.
+Reverses if: never; a controller whose state depends on how often it is observed is a bug.

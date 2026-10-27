@@ -74,7 +74,9 @@ the balance reference at 200 Hz over CAN. No Pi in the loop; the Pi only says wh
    at P-013 (`15`): 100 mm lift, 10 s hold, stance hip roll 15 to 25 N m.
 3. **Static walking** (Phase 6a): ZMP kept inside the stance foot at all times; precomputed
    joint trajectories at 0.2-0.3 m/s; foot sensors sequence the steps. Slow, obviously
-   robotic, and achievable with the force and speed figures above.
+   robotic, and achievable with the force and speed figures above. First step done in
+   simulation at P-014 (`16`): 100 mm, 32 s, every leg line inside its rating; the joint
+   trajectories are planned from measured positions rather than precomputed (D-029).
 4. **Dynamic walking** (Phase 6b): linear inverted pendulum model with capture-point stepping,
    swing-leg trajectories, and the ankle series elastic element doing push-off. Needs the tendon
    tension sensing and the 775/planetary headroom.

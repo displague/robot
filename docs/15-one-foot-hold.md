@@ -95,4 +95,5 @@ needs the ankle pitch pre-stretched for one foot's load.
 ## Next
 
 The first static step on this model: shift, lift, place 100 mm ahead, shift back, with the
-per-line readout the model exists for (hub task `first-static-step`).
+per-line readout the model exists for (hub task `first-static-step`). Done at P-014 (`16`). The
+ground-contact debounce fix of D-030 moved this hold from 27 W to 38 W; it still stands.

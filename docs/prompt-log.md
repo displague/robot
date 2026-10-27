@@ -248,12 +248,16 @@ stance foot, swing hip abduction, slower disturbance observer in single support,
 
 > I think I set those. continue.
 
-Produced (work in progress; the session ended at the usage limit): hub task `first-static-step`
-claimed, not finished. `tools/sim_tendon.py` `step` scenario with a geometry planner (the straight
-leg sets the hip height, the other knee from the law of cosines, measured foot positions and hip
-heights, touchdown by the foot sensors): the lift and the placement work (right foot lands 101 mm
-ahead, single support stable); the staggered double-support transfer still falls. Controller
-changes that pass the regression and improve it (shift 30 to 17 W, one-foot hold 34 to 27 W): the
-swing foot's ankle in position mode, sagittal ankle torque shared by the CoM position between the
-soles, CoP limits from the soles on the ground. Last untested idea in the tree: the leading knee as
-a torque source. `tools/sim_video.py` GIF scenes follow `--only`. No docs/16 yet.
+> Continue
+
+Produced: the hub task `first-static-step` claimed and done, over two sittings (the first ended
+at the usage limit, committed as work in progress in 6d1026c; the second was the user's
+"Continue"). `docs/16-first-step.md` (the step completes; per-phase readout of the stance-leg
+lines at peak, swing-leg slack, drum locks and power; the exit test verdict, which fails only on
+the neck of D-023; sensitivity on `--hip50` and `--stiff-mini`; the ten things it took; the
+observer bug; not yet; next); `tools/sim_tendon.py` `step` scenario and its planner (geometry
+from measured feet, CoM and hips, knee torque source, swing release, two-stage placement, arms
+clear), controller changes (swing ankle in position mode, ankle torque shared by CoM position,
+CoP limits from the soles, ground debounce once per step), report columns (`hot s`, per-phase
+table); `tools/sim_video.py` GIF scenes follow `--only`; `docs/img/step.mp4`, `docs/img/step.gif`;
+D-029, D-030; `15`, `07`, README, references updated.
