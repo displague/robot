@@ -231,3 +231,13 @@ charter are proposed in `records/robot-workspace-purpose-proposed-20261027` with
 owner; five tasks filed there (one-foot hold on the 60 mm hip roll, first static step, Isaac Lab
 conversion, policy training on `humanoid_tendon32`, W-mini 25 mm presets); standing notes for
 the agent; the Agent Hub row in `docs/references.md` updated.
+
+Then, as the "continue": the hub task `onefoot-hold-hip-roll-60` claimed and done.
+`docs/15-one-foot-hold.md` (the one-foot hold passes: what it took in seven steps, what the hip
+actually does, the pulley decision, not yet, next); `tools/sim_tendon.py` single-support rewrite
+(stance ankle keeps the parallelogram term and stays in position mode, stance hip capture-point
+loop with the measured sign, velocity from the CoM, unload debounce, swing-foot fold behind the
+stance foot, swing hip abduction, slower disturbance observer in single support, `--hip50`);
+`tools/export_mjcf.py` 60 mm hip roll as the baseline; `tools/sim_video.py` `--out`;
+`docs/img/onefoot.mp4`, `docs/img/onefoot.gif`; D-027, D-028; `sim/robot.xml` regenerated;
+`14`, `07`, README, references updated.

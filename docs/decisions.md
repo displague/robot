@@ -238,3 +238,35 @@ robot puts 95 % of its weight on one foot with the CoM over that sole; the singl
 itself is still open (`14`).
 Reverses if: a whole-body (QP) controller replaces the cascade; then the chain is handled by
 the optimiser and the ankles can take part again.
+
+## D-027 (2026-10-27) Single support: the stance ankle positions the leg, the stance hip levels the pelvis, one capture-point loop commands both; the swing foot comes up behind
+
+Why: the one-foot hold of `14` fell within a second of the lift. The trace (`15`) showed four
+separate causes, each masking the next: the stance ankle's target stepped by the shift angle at
+the mode switch; the torque-mode ankle dropped its proportional term and went soft at the lift;
+the velocity estimate saw the support reference jump; and the knee-first lift pushed the sole
+into the floor. With those removed, the controller that holds is: the stance ankle in position
+mode keeping the parallelogram term, the stance hip commanded from the lateral capture point
+(1.5 rad/m, 1.0 rad/(m s), 0.5 rad/s slew; sign measured: + stance hip roll moves the CoM left
+because the ankle target follows the hip and the leg leans over the foot), the swing foot
+folded 10 degrees of hip and 50 of knee with the sole level so it hangs 0.2 m behind the stance
+foot, the swing hip at 3 degrees of abduction, a foot leaving support only after 0.15 s unloaded
+unless the planner declared it the swing foot, and the disturbance observer at 0.25 s in single
+support. Exit test of `06` Phase 5 passed in simulation: 10 s on one foot, CoM within 5 mm of
+the sole centre in steady state.
+Reverses if: stepping needs lateral authority beyond the sole (then a trunk-roll hip strategy
+is added on top, with the heel-lift reaction of `14` to manage), or the real sole's CoP
+measurement is too noisy for the 0.25 s observer.
+
+## D-028 (2026-10-27) Hip roll on the 60 mm pulley with tackle 3
+
+Why: in single support the stance hip roll carries 15 to 25 N m (the trunk and the swing leg
+hanging off it). On the 50 mm pulley with tackle 2 the loop's pretension range is 14 N m, so one
+run is slack 27 % of the hold and the loop is half as stiff whenever it matters; on 60 mm with
+tackle 3 the range is 26 N m and the run is slack 7 % of the time, with the same 288 N rating on
+the line (232 N peak, SF 3.8). The controller of D-027 holds on either; the pulley is for the
+lines staying taut, which is what the tension sensing of Phase 6b will rely on. Cost: a 60 mm
+pulley at the hip and one more strand. `export_mjcf.HIP_ROLL_60` is now True; `--hip50`
+restores the old geometry for comparison.
+Reverses if: the hip housing of `11` cannot take a 60 mm pulley at the roll axis (then tackle 3
+on 50 mm, range 22 N m, is the fallback).

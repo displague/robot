@@ -544,11 +544,11 @@
     <fixed name="thigh.L_roll_clutch" frictionloss="4.4500" solreffriction="0.01 1" solimpfriction="0.99 0.999 0.001">
       <joint joint="thigh.L_roll_gear" coef="1"/><joint joint="thigh.L_roll_drum" coef="-1"/>
     </fixed>
-    <fixed name="thigh.L_roll_lineA" stiffness="18541.7" springlength="-100 -0.003883" damping="370.83">
-      <joint joint="thigh.L_roll" coef="0.10000"/><joint joint="thigh.L_roll_drum" coef="-0.01500"/>
+    <fixed name="thigh.L_roll_lineA" stiffness="12361.1" springlength="-100 -0.005825" damping="247.22">
+      <joint joint="thigh.L_roll" coef="0.18000"/><joint joint="thigh.L_roll_drum" coef="-0.01500"/>
     </fixed>
-    <fixed name="thigh.L_roll_lineB" stiffness="18541.7" springlength="-100 -0.003883" damping="370.83">
-      <joint joint="thigh.L_roll" coef="-0.10000"/><joint joint="thigh.L_roll_drum" coef="0.01500"/>
+    <fixed name="thigh.L_roll_lineB" stiffness="12361.1" springlength="-100 -0.005825" damping="247.22">
+      <joint joint="thigh.L_roll" coef="-0.18000"/><joint joint="thigh.L_roll_drum" coef="0.01500"/>
     </fixed>
     <fixed name="thigh.L_yaw_clutch" frictionloss="4.4500" solreffriction="0.01 1" solimpfriction="0.99 0.999 0.001">
       <joint joint="thigh.L_yaw_gear" coef="1"/><joint joint="thigh.L_yaw_drum" coef="-1"/>
@@ -571,11 +571,11 @@
     <fixed name="thigh.R_roll_clutch" frictionloss="4.4500" solreffriction="0.01 1" solimpfriction="0.99 0.999 0.001">
       <joint joint="thigh.R_roll_gear" coef="1"/><joint joint="thigh.R_roll_drum" coef="-1"/>
     </fixed>
-    <fixed name="thigh.R_roll_lineA" stiffness="18541.7" springlength="-100 -0.003883" damping="370.83">
-      <joint joint="thigh.R_roll" coef="0.10000"/><joint joint="thigh.R_roll_drum" coef="-0.01500"/>
+    <fixed name="thigh.R_roll_lineA" stiffness="12361.1" springlength="-100 -0.005825" damping="247.22">
+      <joint joint="thigh.R_roll" coef="0.18000"/><joint joint="thigh.R_roll_drum" coef="-0.01500"/>
     </fixed>
-    <fixed name="thigh.R_roll_lineB" stiffness="18541.7" springlength="-100 -0.003883" damping="370.83">
-      <joint joint="thigh.R_roll" coef="-0.10000"/><joint joint="thigh.R_roll_drum" coef="0.01500"/>
+    <fixed name="thigh.R_roll_lineB" stiffness="12361.1" springlength="-100 -0.005825" damping="247.22">
+      <joint joint="thigh.R_roll" coef="-0.18000"/><joint joint="thigh.R_roll_drum" coef="0.01500"/>
     </fixed>
     <fixed name="thigh.R_yaw_clutch" frictionloss="4.4500" solreffriction="0.01 1" solimpfriction="0.99 0.999 0.001">
       <joint joint="thigh.R_yaw_gear" coef="1"/><joint joint="thigh.R_yaw_drum" coef="-1"/>

@@ -70,7 +70,8 @@ the balance reference at 200 Hz over CAN. No Pi in the loop; the Pi only says wh
    loop on ankle plantar/dorsiflexion and inversion/eversion. Hip strategy added for larger
    disturbances. Exit test: a 20 N push at the shoulder without a step.
 2. **Weight shift and single-leg stance** (Phase 5): hip abduction holds the pelvis level while
-   the other foot lifts 50 mm. This is the first real load on the hip W-max.
+   the other foot lifts 50 mm. This is the first real load on the hip W-max. Done in simulation
+   at P-013 (`15`): 100 mm lift, 10 s hold, stance hip roll 15 to 25 N m.
 3. **Static walking** (Phase 6a): ZMP kept inside the stance foot at all times; precomputed
    joint trajectories at 0.2-0.3 m/s; foot sensors sequence the steps. Slow, obviously
    robotic, and achievable with the force and speed figures above.

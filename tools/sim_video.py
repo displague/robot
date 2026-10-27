@@ -196,8 +196,12 @@ def main():
     args = sys.argv[1:]
     fps = int(args[args.index("--fps") + 1]) if "--fps" in args else 30
     only = args[args.index("--only") + 1].split(",") if "--only" in args else None
-    out = os.path.join(ROOT, "docs", "img", "gauntlet.mp4")
-    gif = os.path.join(ROOT, "docs", "img", "gauntlet.gif") if "--gif" in args else None
+    name = args[args.index("--out") + 1] if "--out" in args else "gauntlet"
+    out = os.path.join(ROOT, "docs", "img", name + ".mp4")
+    gif = os.path.join(ROOT, "docs", "img", name + ".gif") if "--gif" in args else None
+    if "--hip50" in args:
+        import export_mjcf
+        export_mjcf.HIP_ROLL_60 = False
     rig = st.Rig()
     rec = Recorder(rig, out, fps=fps, gif=gif, gif_scenes=("stand", "push30", "lean15", "onefoot"))
     for key, title, note, fn in st.scenarios():

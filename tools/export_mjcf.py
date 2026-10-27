@@ -76,7 +76,7 @@ JOINTS = {
 
 
 STIFF_MINI = False   # variant: W-mini pulleys 25 mm, pretension 25 % of continuous (docs/13 finding)
-HIP_ROLL_60 = False  # variant: hip roll on the 60 mm pulley with tackle 3 (single-support finding, docs/14)
+HIP_ROLL_60 = True   # hip roll on the 60 mm pulley with tackle 3 (D-028, docs/15); False restores the 50 mm, tackle 2 of docs/14
 
 
 def winch_params(joint_name, axis, cls_name):

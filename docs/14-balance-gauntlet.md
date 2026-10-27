@@ -79,7 +79,7 @@ Results (`python tools/sim_tendon.py`):
 | arm forward, 1 kg for 4 s | stands | shoulder 202 N, spine 228 N, wrist 77 N (W-mini, above rating as in `13`) |
 | quarter squat 4 s | stands, 17 W | knee 151 N, ankle 130 N |
 | weight shift onto the left foot | stands | 190/10 N on the feet, CoM over the left sole, hip-roll loops at 12 to 15 N m |
-| one-foot stance, right foot lifted | **falls** within 1 s of the lift | see section 5 |
+| one-foot stance, right foot lifted | **falls** within 1 s of the lift (stands since P-013, `15`) | see section 5 |
 
 ## 4. What the hip could not do (and why it is in the code with zero gain)
 
@@ -94,6 +94,10 @@ stays in the code (`HIP_GAIN`, `HIP_RATE`) at zero. A real hip strategy here mea
 a whole-body controller that accounts for the angular momentum it generates.
 
 ## 5. The weight shift works; the one-foot hold does not yet (D-026)
+
+Superseded at P-013: the one-foot hold stands for 10 s (`15-one-foot-hold.md`, D-027, D-028).
+The diagnosis below was half right (the stance hip does run past its 14 N m range on the 50 mm
+pulley) and half wrong (that is not what made it fall; four controller faults did).
 
 The lateral side taught more than the sagittal. Letting both ankles run CoP control in double
 support oscillated at once: two planted legs are a closed chain, and an ankle roll inside it
@@ -145,7 +149,7 @@ spatial tendons over the real pulley geometry, the sole's TPU pad and force sens
 rather than contact sums, motor heating, line creep. The neck still flops into its stop in the
 baseline model (`--stiff-mini` fixes it; the CAD presets are still to regenerate, D-023).
 
-## Next
+## Next (as written at P-011; the one-foot hold is done in `15`)
 
 The one-foot hold with the 60 mm hip roll and a lateral two-link model, then the first static
 step on this model (the stance leg's lines at peak, the swing leg's slack, which is what this

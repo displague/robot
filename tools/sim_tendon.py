@@ -59,18 +59,27 @@ ROLL_KP, ROLL_KI, ROLL_KD = 0.2, 0.5, 0.2     # hip-roll shift: rad per m of lat
                                  # closed chain of two planted feet moves ~35 mm of CoM per degree of hip roll)
 ROLL_MAX = math.radians(20)      # rad: hip-roll shift clamp
 ROLL_SLEW = 0.15                 # rad/s: the weight shift is slow by design (static walking, docs/06 Phase 6a)
-LEVEL_K = 0.0                    # single support: stance hip roll per rad of pelvis roll (levelling fights the CoM
-                                 # term below: measured, + hip roll moves the CoM left in single support too)
-SS_KP, SS_KI, SS_KD = 0.0, 0.0, 0.0   # single support: stance hip roll per m of lateral CoM error, per m s, per m/s.
-                                 # Off: with the hip and ankle both compliant the sign of the CoM response to a hip
-                                 # roll command was not consistent across runs (docs/14); the stance hip holds the
-                                 # shift and the stance ankle alone does the lateral CoP control
+SS_KP, SS_KI = 1.5, 1.0          # single support: stance hip roll per m of lateral capture point, per m s of CoM
+                                 # error. Sign: + stance hip roll moves the CoM left (measured with the stance ankle
+                                 # in position mode, docs/15); the loop is written as negative feedback on that
+SS_SLEW = 0.5                    # rad/s: the stance hip may move faster than the weight shift (capture-point time
+                                 # constant 1/omega = 0.3 s)
+SWING_CLEAR = math.radians(3)    # rad: the swing hip's roll once its foot is off the ground: the leg hangs from the
+                                 # (level) pelvis with this much abduction. Held parallel to the leaning stance leg
+                                 # its mass sat out wide and the loop ran out of hip range; hanging straight down
+                                 # it touched the stance shank and its hip loop wound up against the contact
+DOB_TAU_SS = 0.25                # s: the disturbance observer is slower in single support (one rocking sole makes a
+                                 # noisy CoP and the hip-roll loop's own accelerations read as a push)
 CP_GAIN_X = 0.5                  # lateral capture-point gain (double support is not one pendulum)
+SS_ANKLE_TORQUE = False          # single support: the stance ankle roll as a torque source (True) or a position
+                                 # (False: it holds the leg at the parallelogram angle and the stance hip moves the CoM)
 BAL_START = 0.5                  # s: when the balance loop starts (the locks settle first)
 LOCK_TOL_SCALE = {"foot": 0.2}   # the ankle locks and re-locks within 0.2 deg so each correction is a few N m
 SOLE_CENTRE = (0.0, -0.08, -0.04)  # sole centre relative to the ankle (export_urdf.FOOT_OFFSET)
 SOLE_HALF = (0.05, 0.13)         # half width (x) and half length (y) of the sole (export_urdf.FOOT_BOX)
 GROUND_LOAD = 0.05               # of the weight: a foot carrying less is in the air for the balance loop
+UNLOAD_T = 0.15                  # s: for that long, unless the planner declared it the swing foot (a bounce in the
+                                 # weight shift unloaded a foot for a few ms and the support reference jumped)
 GEAR_FRICTION = 0.02             # of stall: running friction of the gear train when powered
 CURRENT_LIMIT = 0.9              # of the clutch slip torque: the driver's current limit
 
@@ -136,8 +145,8 @@ class Rig:
             self.target["foot.%s_pitch" % side] = STAND_LEAN
         # balance state: ankle pitch/roll torque-equivalent offsets, hip pitch lean, hip roll shift, estimates
         self.ankle_offset, self.ankle_roll, self.hip_lean, self.hip_shift = pre, {"L": 0.0, "R": 0.0}, 0.0, 0.0
-        self._single, self._shift_hold = False, 0.0
-        self._grounded = [True, True]
+        self._single, self._shift_hold, self._swing_free = False, 0.0, False
+        self._grounded, self._unload_t = [True, True], [0.0, 0.0]
         self.swing = None                # planner: the foot being lifted ("L"/"R"), not a support foot
         self.hip_roll_cmd = {"L": 0.0, "R": 0.0}   # per hip: the shift (double support) or the levelling (stance)
         self._quiet, self._off_prev, self._hip_i = 0.0, pre, 0.0
@@ -165,10 +174,13 @@ class Rig:
         d = self.data
         _, loads = self.cop()
         out = []
+        dt = self.model.opt.timestep
         for i, (b, load) in enumerate(zip(self.feet, loads)):
             c = d.xpos[b] + d.xmat[b].reshape(3, 3) @ np.array(SOLE_CENTRE)
             thr = (GROUND_LOAD if self._grounded[i] else 3 * GROUND_LOAD) * self.mass * 9.81
-            self._grounded[i] = load > thr and self.swing != "LR"[i]   # the planner knows which foot it lifted
+            self._unload_t[i] = self._unload_t[i] + dt if load <= thr else 0.0
+            swing = self.swing == "LR"[i]                      # the planner knows which foot it lifted
+            self._grounded[i] = not swing and (load > thr or self._unload_t[i] < UNLOAD_T)
             out.append((c, self._grounded[i]))
         return out
 
@@ -215,15 +227,16 @@ class Rig:
         dt = m.opt.timestep
         e, heel, toe = self.support()
         self.com_margin = (heel, toe)
+        com = d.subtree_com[self.pelvis]
         if self._com_f is None:
-            self._com_f, self._e_prev = e.copy(), e.copy()
+            self._com_f, self._e_prev = e.copy(), com[:2].copy()
         a = dt / (BAL_TAU + dt)
-        self._com_v = (1 - a) * self._com_v + a * (e - self._e_prev) / dt
-        self._e_prev = e.copy()
+        # velocity from the CoM itself (the IMU's job): the support reference jumps when a foot leaves the ground
+        self._com_v = (1 - a) * self._com_v + a * (com[:2] - self._e_prev) / dt
+        self._e_prev = com[:2].copy()
         self._com_f = self._com_f + a * (e - self._com_f)
         if not (self.balance and d.time > BAL_START):
             return
-        com = d.subtree_com[self.pelvis]
         s = self.soles()
         grounded = [c for c, on in s if on]
         if not grounded:
@@ -239,7 +252,7 @@ class Rig:
         cop_meas, _ = self.cop()
         if cop_meas is not None:
             resid = acc / omega ** 2 - (self._com_f - (cop_meas - ref))
-            b = dt / (DOB_TAU + dt)
+            b = dt / ((DOB_TAU_SS if len(grounded) == 1 else DOB_TAU) + dt)
             self._dist = np.clip(self._dist + b * (resid - self._dist), -DOB_MAX, DOB_MAX)
         # capture-point CoP demand (m, relative to the reference point), integral on the CoM offset
         cp = self._com_f + self._dist + self._com_v / omega
@@ -272,27 +285,31 @@ class Rig:
         _, loads = self.cop()
         want_x = ref[0] + p_x
         for side, b, (c, on), load in zip("LR", self.feet, s, loads):
-            if single and on:
+            if single and on and SS_ANKLE_TORQUE:
                 dx = max(-COP_LIMIT_X, min(COP_LIMIT_X, (ref[0] + p[0]) - d.xpos[b][0]))
                 self.ankle_roll[side] = self.torque_to_angle("foot.%s_roll" % side, mass * 9.81 * dx)
             else:
                 self.ankle_roll[side] = None     # position mode: the parallelogram, or the swing foot held level
-        R = d.xmat[self.pelvis].reshape(3, 3)
-        pelvis_roll = math.atan2(R[2, 0], R[0, 0])      # left hip higher than the right: positive
         if single:
-            # the parallelogram is gone: the stance hip holds the pelvis level (+ thigh roll on the planted leg
-            # rolls the pelvis left-side-up, i.e. the trunk right), the swing hip is eased to its plan
+            # the parallelogram is gone. Two-link lateral model: the stance ankle holds the leg at its angle (position
+            # mode, the lines both taut) and the stance hip moves the CoM over the sole from the lateral capture
+            # point; the swing hip is eased to its plan once its foot has left the ground, and stays there
             if not self._single:
-                self._shift_hold, self._ss_i = self.hip_shift, 0.0
+                self._shift_hold, self._ss_i, self._swing_free = self.hip_shift, 0.0, False
             ex, vx = float(self._com_f[0]), float(self._com_v[0])
             self._ss_i = max(-ROLL_MAX, min(ROLL_MAX, self._ss_i + SS_KI * ex * dt))
-            self.hip_shift = max(-ROLL_MAX, min(ROLL_MAX, self._shift_hold - LEVEL_K * pelvis_roll
-                                                  - SS_KP * ex - SS_KD * vx - self._ss_i))
+            self.hip_shift = max(-ROLL_MAX, min(ROLL_MAX, self._shift_hold - SS_KP * (ex + vx / omega) - self._ss_i))
             for side, (c, on), load in zip("LR", s, loads):
-                # a lifting foot keeps the shift until it has actually left the ground
-                want = self.hip_shift if (on or load > GROUND_LOAD * mass * 9.81) else 0.0
                 cur = self.hip_roll_cmd[side]
-                self.hip_roll_cmd[side] = cur + max(-ROLL_SLEW * dt, min(ROLL_SLEW * dt, want - cur))
+                if on:
+                    self.hip_roll_cmd[side] = cur + max(-SS_SLEW * dt, min(SS_SLEW * dt, self.hip_shift - cur))
+                else:
+                    # a lifting foot keeps the shift until it has actually left the ground, then abducts a little
+                    # (SWING_CLEAR); a brush with the floor does not bring the shift back
+                    if load < GROUND_LOAD * mass * 9.81:
+                        self._swing_free = True
+                    want = SWING_CLEAR if self._swing_free else self._shift_hold
+                    self.hip_roll_cmd[side] = cur + max(-ROLL_SLEW * dt, min(ROLL_SLEW * dt, want - cur))
         else:
             if self._single:
                 self._roll_i = -self.hip_shift - ROLL_KP * self._com_f[0]
@@ -348,7 +365,9 @@ class Rig:
                 # ankle angle (the lines are the series spring, K per rad about the plan); the CoP loop's
                 # integral takes out what the stiffness term adds when the body sways
                 torque_mode = True
-                tgt += self.ankle_offset if axis == "pitch" else self.ankle_roll[side]
+                # roll: the parallelogram term stays (the leg keeps its angle to the pelvis when the other foot
+                # leaves the ground), the CoP torque is added on top
+                tgt += self.ankle_offset if axis == "pitch" else (self.ankle_roll[side] - self.hip_roll_cmd[side])
             elif bone == "foot" and axis == "roll":
                 tgt -= self.hip_roll_cmd[side]          # parallelogram: the sole stays flat under the shift
             elif bone == "thigh" and axis == "pitch":
@@ -544,9 +563,11 @@ def scenarios():
                 break
             r.step()
         r.swing = "R"
-        # knee first so the foot comes straight up instead of pushing off, then the hip and ankle follow
-        r.move({"shank.R_pitch": math.radians(70)}, 0.6)
-        r.move({"thigh.R_pitch": math.radians(-35), "foot.R_pitch": math.radians(-30)}, 0.6)
+        # fold the leg with the sole kept level: a little hip flexion and a lot of knee, so the foot comes up
+        # behind the stance foot (100 mm of clearance, 0.2 m back) instead of beside it, where it touched. A
+        # knee-first lift pushed the sole into the floor and shoved the body
+        hip, knee = math.radians(10), math.radians(50)
+        r.move({"thigh.R_pitch": -hip, "shank.R_pitch": knee, "foot.R_pitch": STAND_LEAN - (knee - hip)}, 1.0)
         r.run(10.0)
 
     out = [("stand", "stand 4 s (servo, then lock on target)", "zero-power hold: the W-max drums go blue", stand)]
@@ -567,6 +588,9 @@ def main():
     if "--stiff-mini" in sys.argv:
         import export_mjcf
         export_mjcf.STIFF_MINI = True
+    if "--hip50" in sys.argv:
+        import export_mjcf
+        export_mjcf.HIP_ROLL_60 = False      # the 50 mm, tackle 2 hip roll of docs/14, for comparison
     rig = Rig()
     print("mujoco %s: %d bodies, %d DOF (%d joint + %d winch), %d tendons, %d motors, mass %.1f kg"
           % (mujoco.__version__, rig.model.nbody, rig.model.nv, len(rig.w), 2 * len(rig.w), rig.model.ntendon,
