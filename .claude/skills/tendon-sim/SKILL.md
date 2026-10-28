@@ -24,6 +24,10 @@ gauntlets in the background with output to a file in the scratchpad, and keep wo
 Always regenerate both models after touching `tools/export_mjcf.py`, `cad/skeleton.json` or a preset, and
 commit `sim/robot.xml` and `sim/robot_standin.*` with the change.
 
+`docs/05-bom-estimate.md` names the part behind every winch class and motor in `CLASSES` / `MOTORS`
+(D-035). Changing a motor, ratio, line or winch count in the model means changing its row and the totals
+in `05` in the same commit; `python tools/export_mjcf.py --table` gives the per-DOF classes to count.
+
 ## Reading a scene's table
 
 `== <scene>: t, pelvis height, tilt -> STANDS|FALLS; electrical energy (mean W)`, then lines worst first:

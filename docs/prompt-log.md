@@ -428,3 +428,15 @@ both feet within 4 mm, no line above its rating, 444 J. Made the default; the re
 to the joule. `19`, D-034, recording `docs/img/step-ik.gif`. Branch `feat/w-mini-25mm` merged to main and
 released as v0.2.0.
 
+## P-028 (2026-10-28) Parts with costs and recommended parts
+
+> Are the parts listed with estimated costs? Are there specific parts that can be recommended for the prebuilt components?
+
+> continue
+
+Produced: `05` rewritten from the model: drives counted per joint (21 W-max, 4 W-mid, 25 W-mini), a
+recommended part per line item, prices checked against live listings where marked, the missing items
+added (foot load sensors, IMUs, pipe bones, ring-joint balls, crimps, barrel adjusters), buying notes
+(775 speed at 12 V, hobby N20s), totals for recommended, budget, all-Pololu and BLDC builds (~$1,940
+recommended, was ~$1,070), D-035. `04`'s BTS7960 price corrected.
+

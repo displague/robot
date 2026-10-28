@@ -26,7 +26,7 @@ The torso node is the busiest; split it into torso-upper (neck, face, shoulders)
 | PWM expansion | PCA9685 16-ch I2C | 1-2 | $2 | one 16-ch board drives 8 bidirectional channels (2 pins each) through the H-bridges |
 | H-bridge, W-mini | DRV8833 (2 ch, 1.5 A each) | 1 per 2 mini | $1.5 | 6 V rail |
 | H-bridge, W-mid | TB6612FNG (2 ch, 1.2 A cont / 3 A peak) | 1 per 2 mid | $2 | 12 V rail |
-| H-bridge, W-max | BTS7960 (43 A) or IBT-2 module | 1 per max | $4 | 12 V rail; current sense output used for stall detection |
+| H-bridge, W-max | BTS7960 (43 A) or IBT-2 module | 1 per max | $9 (checked 2026-10-28, `05`) | 12 V rail; current sense output used for stall detection |
 | Joint angle sensor | AS5600 magnetic (12-bit, I2C) + 6x2.5 mm diametric magnet | 1 per DOF | $1 | fixed I2C address, so: |
 | I2C multiplexer | TCA9548A (8 ch) | 1-2 | $1 | up to 16 AS5600s per node |
 | Motor encoder | magnetic encoder PCB that ships with N20 / hall encoder on JGB37 | 1 per motor | included | velocity + slip detection only |

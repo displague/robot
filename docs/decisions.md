@@ -364,3 +364,15 @@ Reverses if: the bench winch shows real holding current costs far above the mode
 unlocked drains the battery (then lock per joint, only the stance leg's unloaded axes), or the real drum
 releases without the stick-slip the model has.
 
+## D-035 (2026-10-28) The parts list names the parts the model is built from; the neck and wrist motors are bought by name
+
+Why: asked in P-028 ("Are there specific parts that can be recommended"). The line ratings and margins of
+docs 13 to 19 come from `tendon_calc.py`'s motor figures, so `05` now names a part per drive with those
+figures: the neck and wrist W-minis are Pololu 298:1 HP 6V (the model's motor; no-name N20s deliver 60 to
+70 % of it, hobby encoder N20s far less), the fingers and face stay 100:1 of any brand (D-005), the W-max
+775 must be rated about 12 000 rpm at 12 V. Prices checked against live listings put the full body at
+about $1,940 (the 2026-10-25 estimate was $1,070).
+Alternative: every W-mini a no-name N20 (~$1,750), with the neck and wrist re-rated in the model first.
+Reverses if: the Phase 0/1 bench test measures a no-name 298:1 N20 at the model's stall torque (then buy
+budget motors throughout), or a part in the model changes (then its row in `05` changes in the same commit).
+

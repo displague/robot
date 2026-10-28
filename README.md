@@ -32,7 +32,7 @@ Goal ordering, in case they conflict: **cheap > simple to build > human range of
 | `docs/02-tendon-actuator.md` | The winch: physics, lock options, drum rules, line choice, creep, calculator results |
 | `docs/03-skeleton-joints.md` | Joint types per body region, ROM targets vs human, materials, print segmentation |
 | `docs/04-electronics.md` | Boards, bus, drivers, encoders, power |
-| `docs/05-bom-estimate.md` | Rough cost and mass |
+| `docs/05-bom-estimate.md` | Parts list with recommended parts, checked prices, totals and mass |
 | `docs/06-roadmap.md` | Phases with exit criteria, starting with one finger on one winch, ending in dynamic walking |
 | `docs/07-locomotion.md` | Walking and balancing: joint loads from gait, W-max sizing, sensors, controller stages, feet |
 | `docs/08-passive-balance-springs-compliance.md` | What balance comes for free (and why not a bladder), where springs are used, how compliant the robot is |
