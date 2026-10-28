@@ -457,3 +457,13 @@ redundant (the inner loop runs on gear position, D-021), but a W-mini has no clu
 drum end can replace it for about $2.30 if the winch bank gets a sensor pocket. Found the printed joint ends
 alone are about 13 kg in the generators against the 6 kg mass budget; PETG raised to 12 to 15 kg.
 
+## P-030 (2026-10-28) The open items as hub tasks
+
+> capture this in agent hub, perhaps the load tests (comparissons, projects that state requirements which used items in range)
+
+Produced: hub tasks `bench-load-tests` (the owner's to-do: N20 stall and hold, JGB37, the 775 planetary
+entry test, line break, crimps and clutch, each against the model's figure), `reference-projects-loads`
+(published projects and tests that used these parts in range, compared with `tendon_calc.py`),
+`printed-mass-rollup` (every generated part against the 20 kg budget and the model) and `winch-drum-sensor`
+(AS5600 pocket at the W-mini drum end).
+
