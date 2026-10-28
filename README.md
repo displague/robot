@@ -48,6 +48,9 @@ Goal ordering, in case they conflict: **cheap > simple to build > human range of
 | `docs/17-learned-control.md` | Learned control: the fast stand-in, the sibling's model core as a PPO actor, the hand-written controller as teacher, the first ladder (cloning: 90 % standing under pushes), the failing gate on the tendon model, why get-up needs a kneeling curriculum (D-031) |
 | `docs/references.md` | External projects to borrow test scenarios and tooling from (primo, microban, Isaac Lab, DreamDojo, LeRobot, the sibling ai-embedded-dynamic-diversity) |
 | `cad/blender/ring.py`, `cad/blender/winch_bank.py` | Ring-joint generator; N-winch bank generator |
+| `cad/blender/render.py` | Headless PNG renders: one generated assembly, or the gallery of every STL in `cad/out` |
+| `CLAUDE.md`, `.claude/skills/` | How to work in this repo: the project loop, the CAD generators, the tendon simulation, releases |
+| `docs/releases.md` | Release history; each tag has a GitHub release with visuals, STLs and the models |
 | `tools/export_urdf.py`, `tools/sim_check.py`, `sim/robot.urdf` | Joint table to URDF with CoM report; MuJoCo stand and push test on the rigid statue; the generated URDF |
 | `tools/export_mjcf.py`, `tools/sim_tendon.py`, `sim/robot.xml` | Joint table to the tendon-actuated MJCF (32 winches, 96 tendons); controller, balance loop and test suite with per-line readouts; the generated model |
 | `tools/sim_video.py`, `docs/img/gauntlet.mp4`, `docs/img/gauntlet.gif` | Recorder: the gauntlet with every line's tension, every drum's lock/drive/slip state, CoM and CoP drawn into the MuJoCo render |
