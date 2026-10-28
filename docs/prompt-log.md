@@ -354,3 +354,18 @@ scored by the sibling's `add-cross-eval`: champion 0.567, stand-grown 0.543, sta
 transfer result (RPO stand started from this robot's policy: 79 % standing in its first 10 iterations
 against 27 % from scratch), both in `docs/17-learned-control.md` and the sibling's `docs/rl-standin.md`;
 PR #36 (the training work) squash-merged in the sibling as 4b2649f, issue #35 closed.
+
+## P-024 (2026-10-28) Fix, review, merge and release the sibling's backlog
+
+> Fix those, address, review, merge, and release from the existing issues and prs too (you can choose not to where it doesn't support our goals).
+
+> And make sure robot is getting committed and pushed too
+
+Produced, in the sibling (each PR squash-merged after green CI, per its dev-loop): #38 the four failing
+tests fixed and CI running pytest (#37); #40 the Dependabot updates consolidated (#39; #28-#32 closed as
+superseded); #45 reproducible CUDA torch under uv on Windows (#14; #24 closed as superseded, its ignore
+rules carried over); #25 hyphenated storyboard scenarios; #47 every open security alert (#46; #26, #41-#44
+superseded; alerts now 0); #52 `rl/render.py`, the release GIFs, version 0.3.0; release v0.3.0 with the
+trained policies, logs and the forgetting cross-eval attached. Issues #8, #9, #13, #16, #17, #18 triaged and
+kept open as not on the grounded-body path; #48-#51 opened for the next steps (stand-in gap, get-up
+curriculum, rehearsal and regression gate, seeds). Here: this entry, `docs/17` and references updated.

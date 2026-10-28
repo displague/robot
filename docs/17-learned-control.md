@@ -125,6 +125,12 @@ across bodies has to keep training on all of them (rehearsal of the old tasks, o
 toward the champion on them) and has to be scored on the old benchmark as a regression gate after every
 body run, which the sibling's promotion discipline already demands.
 
+## Released
+
+The sibling released this work as v0.3.0 (github.com/displague/ai-embedded-dynamic-diversity, release
+`v0.3.0`: the stand policy, the RPO policy, every training log and the forgetting cross-eval attached).
+The next steps below are its issues #48 (stand-in gap), #49 (get-up), #50 (rehearsal) and #51 (seeds).
+
 ## Next
 
 1. Close the stand-in to tendon gap (locks and slack in the stand-in; then a short fine-tune on the tendon
