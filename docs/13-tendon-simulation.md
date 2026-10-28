@@ -133,7 +133,7 @@ voltage loop.
 
 Hip strategy and a static-walk engine on this model (the stance leg's lines go to peak load and
 the swing leg's go slack, which is exactly what this model can now show), then the Isaac Lab
-conversion for the gauntlet proper (`references.md`). The CAD follow-up is the 25 mm W-mini
-pulleys. For the learning side, `references.md` now notes LeRobot and the sibling
+conversion for the gauntlet proper (`references.md`). The CAD follow-up, the 25 mm W-mini
+pulleys, is done for the neck (25 mm) and the wrist (18 mm) in D-032. For the learning side, `references.md` now notes LeRobot and the sibling
 `ai-embedded-dynamic-diversity` project; this model is the harness that can ground a generic
 DOF-and-sensor policy in real tensions, slack and clutch slip.

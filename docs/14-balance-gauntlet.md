@@ -146,8 +146,8 @@ work; LeRobot stays the route for the manipulation side.
 
 Stepping (the 40 N push and anything beyond the sole), the single-support hold (section 5),
 spatial tendons over the real pulley geometry, the sole's TPU pad and force sensors as sensors
-rather than contact sums, motor heating, line creep. The neck still flops into its stop in the
-baseline model (`--stiff-mini` fixes it; the CAD presets are still to regenerate, D-023).
+rather than contact sums, motor heating, line creep. The neck flopped into its stop in the
+baseline model until the presets were regenerated with 25 mm neck lugs (D-032).
 
 ## Next (as written at P-011; the one-foot hold is done in `15`)
 

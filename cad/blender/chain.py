@@ -697,11 +697,11 @@ PRESETS = {
     "toe": toe_preset,
     # Long bones between printed joint ends are bought pipe (P-009): forearm and humerus 1" (33.4 mm),
     # tibia 1-1/4" (42.2), femur 1-1/2" (48.3), spine 2" (60.3). Sockets sit at the free ends.
-    "wrist": lambda: universal_preset("wrist", 58, 42, 12, 7.5, BEARING_625, 0.55, 2.11, (-70, 60), (-25, 15), chamfer=8,
+    "wrist": lambda: universal_preset("wrist", 66, 42, 18, 7.5, BEARING_625, 0.55, 2.11, (-70, 60), (-25, 15), chamfer=8, shell=3.0,
                                       pipe_base="1"),
     "ankle": lambda: universal_preset("ankle", 76, 60, 18, 9.5, BEARING_608, 0.75, 2.77, (-40, 20), (-20, 15),
                                       L=(60, 40, 50), chamfer=12, shell=3.0, pipe_base="1-1/4"),
-    "neck": lambda: universal_preset("neck", 52, 42, 10, 7.5, BEARING_625, 0.48, 1.65, (-50, 50), (-35, 35),
+    "neck": lambda: universal_preset("neck", 80, 52, 25, 7.5, BEARING_625, 0.48, 1.65, (-50, 50), (-35, 35),
                                      L=(50, 30, 40), instances=1, chamfer=6, pipe_base="1"),
     "waist": lambda: universal_preset("waist", 120, 80, 30, 9.5, BEARING_608, 0.75, 2.77, (-20, 40), (-25, 25),
                                       L=(60, 60, 60), instances=1, chamfer=16, shell=3.0, pads=grid(15, 2, -20, 3),

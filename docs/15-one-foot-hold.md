@@ -88,7 +88,8 @@ robot that is the difference between a loop that reads its tension and one that 
 The swing foot still brushes the stance foot for a few frames during the first two seconds of
 the hold (the fold passes it). The arm hanging against the thigh takes 250 N on its roll line
 when the folded leg leans on it (`upperarm.R_roll`): the arms should be held clear in single
-support. The neck still flops into its stop (W-mini presets, D-023). The sagittal loop in single
+support. The neck flopped into its stop until D-032; with its 25 mm lugs it no longer does, but its pitch line
+still peaks at 54 N on a 37 N rating in this hold. The sagittal loop in single
 support runs the ankle pitch at 10 to 22 N m against a 22 N m linear range; a quieter hold
 needs the ankle pitch pre-stretched for one foot's load.
 

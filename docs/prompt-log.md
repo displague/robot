@@ -390,3 +390,24 @@ D-031's fallback. In the sibling: the ten merged remote branches deleted; the se
 removed after their trained checkpoints, logs and RPO meshes were copied into the main checkout
 (`artifacts/rl`, `third_party/roboparty_rpo/meshes`), which is now on master; the three remote branches of
 unmerged, closed PRs kept.
+
+## P-026 (2026-10-28) Back to the pre-learning backlog; v0.1.0; W-mini presets; durable skills
+
+> there were a bunch of next steps that were going to take place before we went down the neural and roboto paths. time to pick those back up?
+
+> tag robot v0.1.0 where we are and proceed with this work (tags can be issued as fit)
+
+> for the tags - I would like tags detailed like the sibling project, you have visuals, let's see them there
+
+> you created those blender scripts and seemingly forgot. make sure you are capturing durable skills in the repo
+
+Produced: the backlog from docs 14 to 16 ordered (W-mini presets, world-frame swing-leg controller, second
+step and gait cycle, arm clearance and ankle pre-stretch, speed). Tag v0.1.0 at c86a8bc with a GitHub
+release in the sibling's form (summary, the gauntlet, one-foot and step GIFs, results, gaps, the STLs
+built fresh from the generators, the MuJoCo models); `docs/releases.md`. `CLAUDE.md` and
+`.claude/skills/` (project-loop, cad-generators, tendon-sim, release) so the Blender generators, the
+simulation and the release steps are found by the next session; `cad/blender/render.py` replaces the
+uncommitted scratch render script (single assemblies and the gallery). On branch `feat/w-mini-25mm`:
+D-032, neck pitch/roll 25 mm lugs and wrist 18 mm in `chain.py` and the model; the neck within its rating
+standing; the 40 N push now stands; the first static step falls on this model, which the swing-leg
+controller has to fix before the branch merges.

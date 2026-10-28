@@ -136,8 +136,10 @@ CoM. That is filed as hub task `swing-leg-world-ik`.
   where it falls). The landing pose is computed once from the CoM and hip positions at the start
   of the hover; the body leans during the placement. Correcting it from the measured foot made it
   worse five ways (above); the next attempt is a world-frame swing-leg controller.
-- **The neck.** Above its rating in every scene; the 25 mm W-mini presets (hub task
-  `w-mini-25mm-cad-presets`, D-023) fix it standing, but the step must pass on that variant too.
+- **The neck.** The 25 mm neck presets are in (D-032): within its rating standing, still above it
+  in this scene. On that model the step falls: the right foot lands 123 mm ahead (planned 101), and
+  the planner then places the left foot 333 mm behind, so the robot falls in the second transfer. The
+  swing-leg controller has to pass on this model; `--stiff-mini` is now only the wider wrist.
 - **The one-foot hold's arms** still rest on the thigh (hand roll above rating for 2.6 s); the
   step's 10 degree arm clearance should be applied there too.
 - **Speed.** 32 s for one step: the transfers are 5 s ramps because the hip-roll shift is slow by
@@ -146,4 +148,4 @@ CoM. That is filed as hub task `swing-leg-world-ik`.
 ## Next
 
 A world-frame swing-leg controller (hub task `swing-leg-world-ik`), then a second step (the left
-foot ahead of the right) to make a gait cycle, then the same on `--stiff-mini`.
+foot ahead of the right) to make a gait cycle, on the D-032 model.

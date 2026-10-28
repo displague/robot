@@ -60,22 +60,23 @@ CLUTCH_LINE_FRACTION = 1 / 3.0    # clutch slips when the line reaches this frac
 
 # ------------------------------------------------------------------- per joint: tackle, pulley radii, Bowden run
 # pulley radius per DOF axis (m) = the joint's tendon moment arm: knuckle-chain lug radius (chain.py presets:
-# wrist 12, neck 10 mm) or ring rotor radius (ring.py: forearm 28, neck_yaw 25 mm), tendon_calc moment arms
+# wrist 18, neck 25 mm since D-032; they were 12 and 10) or ring rotor radius (ring.py: forearm 28, neck_yaw 25 mm), tendon_calc moment arms
 # for the W-max joints; bowden = sheath length from the bank to the joint (m); tackle = strands at the joint.
 # --stiff-mini (sim_tendon.py) raises the W-mini pulleys to 25 mm and their pretension to 25 % (see docs/13).
 JOINTS = {
     "waist":    dict(tackle=2, pulley={"pitch": 0.050, "roll": 0.050, "yaw": 0.050}, bowden=0.30),
-    "neck":     dict(tackle=1, pulley={"pitch": 0.010, "roll": 0.010, "yaw": 0.025}, bowden=0.30),
+    "neck":     dict(tackle=1, pulley={"pitch": 0.025, "roll": 0.025, "yaw": 0.025}, bowden=0.30),   # D-032
     "shoulder": dict(tackle=2, pulley={"pitch": 0.040, "roll": 0.040, "yaw": 0.040}, bowden=0.40),
     "elbow":    dict(tackle=2, pulley={"pitch": 0.030, "yaw": 0.028}, bowden=0.50, tackle_by_axis={"yaw": 1}),
-    "wrist":    dict(tackle=1, pulley={"pitch": 0.012, "roll": 0.012}, bowden=0.30),
+    "wrist":    dict(tackle=1, pulley={"pitch": 0.018, "roll": 0.018}, bowden=0.30),                  # D-032
     "hip":      dict(tackle=2, pulley={"pitch": 0.060, "roll": 0.050, "yaw": 0.050}, bowden=0.30),
     "knee":     dict(tackle=2, pulley={"pitch": 0.050}, bowden=0.50),
     "ankle":    dict(tackle=3, pulley={"pitch": 0.050, "roll": 0.050}, bowden=0.60),
 }
 
 
-STIFF_MINI = False   # variant: W-mini pulleys 25 mm, pretension 25 % of continuous (docs/13 finding)
+STIFF_MINI = False   # variant: every W-mini pulley at least 25 mm (docs/13 finding; since D-032 the neck is at 25 mm
+                     # in the baseline and the wrist at 18, so this now only raises the wrist)
 HIP_ROLL_60 = True   # hip roll on the 60 mm pulley with tackle 3 (D-028, docs/15); False restores the 50 mm, tackle 2 of docs/14
 
 
@@ -115,7 +116,7 @@ def winch_params(joint_name, axis, cls_name):
 # (x width, y depth, z height) for the trunk segments and the hand. These are the collision shapes too,
 # so the self-collision check is against the printed envelope, not a 50 mm stick. Masses are unchanged.
 SHELL = {"pelvis": ("box", (0.28, 0.16, 0.10)), "spine": ("box", (0.26, 0.16, 0.40)),
-         "neck": ("capsule", 0.035), "head": ("capsule", 0.08), "clavicle": ("capsule", 0.02),
+         "neck": ("capsule", 0.040), "head": ("capsule", 0.08), "clavicle": ("capsule", 0.02),
          "upperarm": ("capsule", 0.045), "forearm": ("capsule", 0.035), "hand": ("box", (0.08, 0.03, 0.18)),
          "thigh": ("capsule", 0.06), "shank": ("capsule", 0.05)}
 TINT = {"W-max": "0.55 0.58 0.62 1", "W-mid": "0.62 0.60 0.52 1", "W-mini": "0.66 0.62 0.60 1"}

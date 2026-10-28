@@ -115,7 +115,7 @@
           <joint name="neck_pitch" type="hinge" axis="1 0 0" range="-0.8727 0.8727" limited="true" damping="0.05"/>
           <joint name="neck_roll" type="hinge" axis="0 1 0" range="-0.6109 0.6109" limited="true" damping="0.05"/>
           <joint name="neck_yaw" type="hinge" axis="0 0 1" range="-1.3963 1.3963" limited="true" damping="0.05"/>
-      <geom type="capsule" size="0.0350" fromto="0.0000 0.0000 0.0350 0.0000 0.0000 0.0650" mass="0.300" rgba="0.55 0.58 0.62 1"/>
+      <geom type="capsule" size="0.0400" fromto="0.0000 0.0000 0.0400 0.0000 0.0000 0.0600" mass="0.300" rgba="0.55 0.58 0.62 1"/>
           <body name="head" pos="0.0000 0.0000 0.1000">
       <geom type="capsule" size="0.0800" fromto="0.0000 0.0000 0.0675 0.0000 0.0000 0.0825" mass="0.800" rgba="0.55 0.58 0.62 1"/>
           </body>
@@ -383,19 +383,19 @@
       <joint joint="neck_pitch_gear" coef="1"/><joint joint="neck_pitch_drum" coef="-1"/>
     </fixed>
     <fixed name="neck_pitch_lineA" stiffness="9250.0" springlength="-100 -0.000993" damping="185.00">
-      <joint joint="neck_pitch" coef="0.01000"/><joint joint="neck_pitch_drum" coef="-0.00300"/>
+      <joint joint="neck_pitch" coef="0.02500"/><joint joint="neck_pitch_drum" coef="-0.00300"/>
     </fixed>
     <fixed name="neck_pitch_lineB" stiffness="9250.0" springlength="-100 -0.000993" damping="185.00">
-      <joint joint="neck_pitch" coef="-0.01000"/><joint joint="neck_pitch_drum" coef="0.00300"/>
+      <joint joint="neck_pitch" coef="-0.02500"/><joint joint="neck_pitch_drum" coef="0.00300"/>
     </fixed>
     <fixed name="neck_roll_clutch" frictionloss="0.2220" solreffriction="0.01 1" solimpfriction="0.99 0.999 0.001">
       <joint joint="neck_roll_gear" coef="1"/><joint joint="neck_roll_drum" coef="-1"/>
     </fixed>
     <fixed name="neck_roll_lineA" stiffness="9250.0" springlength="-100 -0.000993" damping="185.00">
-      <joint joint="neck_roll" coef="0.01000"/><joint joint="neck_roll_drum" coef="-0.00300"/>
+      <joint joint="neck_roll" coef="0.02500"/><joint joint="neck_roll_drum" coef="-0.00300"/>
     </fixed>
     <fixed name="neck_roll_lineB" stiffness="9250.0" springlength="-100 -0.000993" damping="185.00">
-      <joint joint="neck_roll" coef="-0.01000"/><joint joint="neck_roll_drum" coef="0.00300"/>
+      <joint joint="neck_roll" coef="-0.02500"/><joint joint="neck_roll_drum" coef="0.00300"/>
     </fixed>
     <fixed name="neck_yaw_clutch" frictionloss="0.2220" solreffriction="0.01 1" solimpfriction="0.99 0.999 0.001">
       <joint joint="neck_yaw_gear" coef="1"/><joint joint="neck_yaw_drum" coef="-1"/>
@@ -500,37 +500,37 @@
       <joint joint="hand.L_pitch_gear" coef="1"/><joint joint="hand.L_pitch_drum" coef="-1"/>
     </fixed>
     <fixed name="hand.L_pitch_lineA" stiffness="9250.0" springlength="-100 -0.000993" damping="185.00">
-      <joint joint="hand.L_pitch" coef="0.01200"/><joint joint="hand.L_pitch_drum" coef="-0.00300"/>
+      <joint joint="hand.L_pitch" coef="0.01800"/><joint joint="hand.L_pitch_drum" coef="-0.00300"/>
     </fixed>
     <fixed name="hand.L_pitch_lineB" stiffness="9250.0" springlength="-100 -0.000993" damping="185.00">
-      <joint joint="hand.L_pitch" coef="-0.01200"/><joint joint="hand.L_pitch_drum" coef="0.00300"/>
+      <joint joint="hand.L_pitch" coef="-0.01800"/><joint joint="hand.L_pitch_drum" coef="0.00300"/>
     </fixed>
     <fixed name="hand.L_roll_clutch" frictionloss="0.2220" solreffriction="0.01 1" solimpfriction="0.99 0.999 0.001">
       <joint joint="hand.L_roll_gear" coef="1"/><joint joint="hand.L_roll_drum" coef="-1"/>
     </fixed>
     <fixed name="hand.L_roll_lineA" stiffness="9250.0" springlength="-100 -0.000993" damping="185.00">
-      <joint joint="hand.L_roll" coef="0.01200"/><joint joint="hand.L_roll_drum" coef="-0.00300"/>
+      <joint joint="hand.L_roll" coef="0.01800"/><joint joint="hand.L_roll_drum" coef="-0.00300"/>
     </fixed>
     <fixed name="hand.L_roll_lineB" stiffness="9250.0" springlength="-100 -0.000993" damping="185.00">
-      <joint joint="hand.L_roll" coef="-0.01200"/><joint joint="hand.L_roll_drum" coef="0.00300"/>
+      <joint joint="hand.L_roll" coef="-0.01800"/><joint joint="hand.L_roll_drum" coef="0.00300"/>
     </fixed>
     <fixed name="hand.R_pitch_clutch" frictionloss="0.2220" solreffriction="0.01 1" solimpfriction="0.99 0.999 0.001">
       <joint joint="hand.R_pitch_gear" coef="1"/><joint joint="hand.R_pitch_drum" coef="-1"/>
     </fixed>
     <fixed name="hand.R_pitch_lineA" stiffness="9250.0" springlength="-100 -0.000993" damping="185.00">
-      <joint joint="hand.R_pitch" coef="0.01200"/><joint joint="hand.R_pitch_drum" coef="-0.00300"/>
+      <joint joint="hand.R_pitch" coef="0.01800"/><joint joint="hand.R_pitch_drum" coef="-0.00300"/>
     </fixed>
     <fixed name="hand.R_pitch_lineB" stiffness="9250.0" springlength="-100 -0.000993" damping="185.00">
-      <joint joint="hand.R_pitch" coef="-0.01200"/><joint joint="hand.R_pitch_drum" coef="0.00300"/>
+      <joint joint="hand.R_pitch" coef="-0.01800"/><joint joint="hand.R_pitch_drum" coef="0.00300"/>
     </fixed>
     <fixed name="hand.R_roll_clutch" frictionloss="0.2220" solreffriction="0.01 1" solimpfriction="0.99 0.999 0.001">
       <joint joint="hand.R_roll_gear" coef="1"/><joint joint="hand.R_roll_drum" coef="-1"/>
     </fixed>
     <fixed name="hand.R_roll_lineA" stiffness="9250.0" springlength="-100 -0.000993" damping="185.00">
-      <joint joint="hand.R_roll" coef="0.01200"/><joint joint="hand.R_roll_drum" coef="-0.00300"/>
+      <joint joint="hand.R_roll" coef="0.01800"/><joint joint="hand.R_roll_drum" coef="-0.00300"/>
     </fixed>
     <fixed name="hand.R_roll_lineB" stiffness="9250.0" springlength="-100 -0.000993" damping="185.00">
-      <joint joint="hand.R_roll" coef="-0.01200"/><joint joint="hand.R_roll_drum" coef="0.00300"/>
+      <joint joint="hand.R_roll" coef="-0.01800"/><joint joint="hand.R_roll_drum" coef="0.00300"/>
     </fixed>
     <fixed name="thigh.L_pitch_clutch" frictionloss="4.4500" solreffriction="0.01 1" solimpfriction="0.99 0.999 0.001">
       <joint joint="thigh.L_pitch_gear" coef="1"/><joint joint="thigh.L_pitch_drum" coef="-1"/>

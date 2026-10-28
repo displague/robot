@@ -316,3 +316,23 @@ on the tendon model), so the stand-in has to grow the drum locks and the slack r
 Reverses if: the gap cannot be closed in the stand-in, in which case training moves to a GPU port of
 the tendon model itself (MJX or Isaac Lab with the tendon equalities), or the hand-written controller
 stays the controller of record and learning is kept to residual corrections on top of it.
+
+## D-032 (2026-10-28) W-mini presets regenerated: neck pitch/roll 25 mm lugs, wrist 18 mm; both sections widened
+
+Why: D-023's fix, now in the CAD. Measured on the tendon model, holding the head standing still: 10 mm
+neck lugs 82 N on a 37 N line, 18 mm 37 N, 25 mm 29 N; a 2:1 tackle at 10 mm gave 28 N standing but fell
+in the one-foot hold. The wrist with 1 kg in the hand: 12 mm 78 N, 18 mm 72 N, 25 mm 57 N; no lug size
+brings the hand's pitch line under 37 N there, so the wrist takes 18 mm (the size its 66 mm section
+allows without growing the hand) and the hand load stays a W-mini rating question. A larger lug needs a
+wider tongue for the yaw runs: neck 52 x 42 -> 80 x 52 mm (the neck capsule in the model grows from
+35 to 40 mm radius), wrist 58 -> 66 mm wide with a 3 mm shell. Pretension is unchanged (the
+`--stiff-mini` variant's 25 % was not needed). Effect on the gauntlet: the neck is within its rating
+standing, in the 10 and 20 N pushes, the squat and the weight shift, at it in the arm hold (38 N), above
+it in the 30 N push, the sustained push and the one-foot hold (42 to 54 N); the 40 N push now stands; the first static step now falls
+(the right foot lands 22 mm long, then the planner places the left 333 mm behind), the same failure the
+`--stiff-mini` variant showed, so the swing-leg controller is next on this branch.
+Alternative: a 2:1 tackle at the old lug (kept the section, fell in the one-foot hold); neck pitch/roll
+on the ring primitive (D-023's alternative), not needed at this load.
+Reverses if: the printed neck's mass at real infill exceeds the skeleton's 0.3 kg budget enough to move
+the head's CoM, or the bench test of the W-mini line rating comes in well above 37 N.
+
