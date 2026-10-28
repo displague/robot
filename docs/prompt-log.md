@@ -440,3 +440,20 @@ added (foot load sensors, IMUs, pipe bones, ring-joint balls, crimps, barrel adj
 (775 speed at 12 V, hobby N20s), totals for recommended, budget, all-Pololu and BLDC builds (~$1,940
 recommended, was ~$1,070), D-035. `04`'s BTS7960 price corrected.
 
+## P-029 (2026-10-28) The Amazon shopping list, priced
+
+> give me the list and I'll have a chrome claude session price them on amazon looking for bulk (within reason - I see 10 packs, etc) - be sure to specify the power requirements, etc
+
+> number of devices is needed too (if you have a current estimate, I'll include that)
+
+> does this list use the pvc pipe approach or is it all printed?
+
+> (pasted: the browser session's Amazon pricing table, and its answer on a bare 10-pack of N20s, ending "Ask the other session whether D-008 makes the motor encoder redundant for the neck and wrists")
+
+Produced: a 47-line shopping list with specs (voltage, current, ratio, rpm, sizes), quantities and the
+devices needed per line, given to the user for a Chrome session. The pricing came back at about $2,197 on
+Amazon; recorded in `05` with links and the before-buying checks. Answered: the motor encoder is not
+redundant (the inner loop runs on gear position, D-021), but a W-mini has no clutch, so an AS5600 on the
+drum end can replace it for about $2.30 if the winch bank gets a sensor pocket. Found the printed joint ends
+alone are about 13 kg in the generators against the 6 kg mass budget; PETG raised to 12 to 15 kg.
+

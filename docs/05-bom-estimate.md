@@ -80,7 +80,7 @@ The foot load sensors and IMUs were in `07` but not in this list before; the bal
 
 | Item | Recommended part | Qty | Total |
 | --- | --- | --- | --- |
-| PETG filament | any reputable 1 kg spools | 10 to 12 kg | $200 |
+| PETG filament | any reputable 1 kg spools | 12 to 15 kg (the joint ends alone are ~13 kg in the generators; see Mass) | $145 to $200 |
 | TPU filament | 95A | 1 kg | $25 |
 | Bones (D-019) | Schedule 40 PVC or ABS DWV: 1" (humerus, forearm, neck), 1-1/4" (tibia), 1-1/2" (femur), 2" (spine) | ~2.5 m | $30, estimate |
 | Ring-joint balls (D-018) | 6 mm and 8 mm airsoft BBs (seamless) | ~200 | $15, estimate |
@@ -114,6 +114,91 @@ Full body, 775 option: 9.5 kg W-max + 1.6 kg mini/mid + 6 kg printed structure +
 bearings/hardware + 1 kg battery + 0.5 kg electronics = **~20 kg**. On budget, with no margin.
 Shaving the structure to 5 kg and the W-max count to 17 (fixed ankle inversion, fixed spine
 lateral) is the first thing to try if the first leg comes out heavy.
+
+**Open: the printed parts look heavier than this.** The masses the generators report for the joint ends
+alone (`09`, `11`; the large presets already hollow) add up to about 13 kg: knees 3.0, hips 1.8, waist 1.5,
+shoulders 1.2, ankles 1.2, elbows 1.1, ring joints 1.8. That is before the feet, pelvis, torso, head and
+winch banks, and twice the 6 kg above. The 10 to 12 kg filament figure was written before the pipe bones
+(D-019) and never revisited. A full roll-up (every generated part against the model's masses) is next.
+
+## Motor encoders and the drum sensor
+
+The firmware's inner loop is a position loop on the gear output (D-021; `control()` in
+`tools/sim_tendon.py`); the joint AS5600 (D-008) only trims its target. So the motor encoder is not made
+redundant by the joint sensor. But a W-mini has no clutch (`02`): its drum turns with the gear output, so a
+second AS5600 facing a magnet on the drum end reads the gear position directly (4096 counts per drum turn,
+about 5 um of line on the 3 mm drum, absolute). That lets the W-minis be bare N20s without encoders (about
+$1.90 each in 10-packs on Amazon instead of $14 to $20) for about $2.30 a drum in sensor and magnet, if
+the winch bank (`cad/blender/winch_bank.py`) gets a sensor pocket at each drum end, which it has not yet. The
+W-mid and W-max keep their encoders: their clutch sits between the gear and the drum.
+
+## Amazon pricing, 2026-10-28
+
+Priced line by line on amazon.com by a browser session (listed prices before tax and shipping; variant
+listings at the price shown on the search page). Bulk packs up to about twice the need. **Build total
+about $2,197** for lines 1 to 4, 6 to 8, 10 to 27 and 29 to 46, which includes items this doc's totals do
+not (bench supply, wire, connector kit, crimpers, scales; 16 kg PETG).
+
+| # | Item | Listing | Unit $ | Line $ | Note |
+| --- | --- | --- | --- | --- | --- |
+| 1 | N20 298:1, neck and wrist (8) | [GM12-N20 6V 1:298 hall encoder](https://www.amazon.com/dp/B07ZWW66BR) | 20.11 | 160.88 | no Amazon N20 states stall current or torque; Pololu #2218 direct is $199.60 for 8 and meets the spec |
+| 2 | N20 100:1, fingers and face (20) | [Waveshare N20 metal gear, hall encoder](https://www.amazon.com/dp/B0CW1TCCTL) | 13.99 | 279.80 | stall torque not stated |
+| 3 | JGB37-520 12 V 110 rpm (5) | [listing](https://www.amazon.com/dp/B0B17ZFQ44) | 16.01 | 80.05 | |
+| 4 | 775 12 V 12 000 rpm ball bearing (23) | [listing](https://www.amazon.com/dp/B0D2RKP1F6) | 12.99 | 298.77 | the one listing that states 12 000 rpm at 12 V; the cheaper "12 to 24 V 12000 rpm" 2-packs are 12 000 at 24 V |
+| 6 | DRV8833 (15) | [10-pack](https://www.amazon.com/dp/B0GX9F695H) + [5-pack](https://www.amazon.com/dp/B0GX94VQ5F) | 1.59 | 23.87 | |
+| 7 | TB6612FNG (3) | [3-pack](https://www.amazon.com/dp/B0GX9G92DV) | 3.33 | 9.98 | |
+| 8 | BTS7960 (24) | [4-pack](https://www.amazon.com/dp/B0FND3VTGK) x 6 | 5.75 | 137.94 | |
+| 10 | XL4016 8 A buck (4) | [4-pack](https://www.amazon.com/dp/B0DSYXLKZT) | 3.84 | 15.36 | |
+| 11 | 5 V 3 A buck (6) | [6-pack](https://www.amazon.com/dp/B0GYJDP96Q) | 1.50 | 8.99 | |
+| 12 | INA219 (6) | [6-pack](https://www.amazon.com/dp/B0FG2CHL6R) | 2.13 | 12.79 | |
+| 13 | Battery | [3S LiPo 10 Ah, 2-pack](https://www.amazon.com/dp/B09YM8P25C) | 60.00 | 119.99 | closest only: no prebuilt 3S Li-ion with a 40 A BMS; LiPo needs a balance charger. Build-your-own: [DALY 3S 40 A BMS](https://www.amazon.com/dp/B0CZQJCG5Z) $26.16 + cells |
+| 14 | 12 V 30 A bench supply | [ALITOVE 360 W](https://www.amazon.com/dp/B06XJVYDDW) | 23.99 | 23.99 | |
+| 15 | 40 A fuse + holder | [4-pack](https://www.amazon.com/dp/B08BWRSPY1) | 2.50 | 9.99 | |
+| 16 | E-stop + relay | [latching E-stop](https://www.amazon.com/dp/B07LFXB8PF) + [200 A continuous relay](https://www.amazon.com/dp/B07T48QKQB) | | 22.58 | |
+| 17 | Wire | [12 AWG](https://www.amazon.com/dp/B07CZZ11K2), [18 AWG](https://www.amazon.com/dp/B07HGTKQ89), [24 AWG](https://www.amazon.com/dp/B0C7TJG9YB) | | 58.12 | |
+| 18 | JST-XH kit + crimper | [listing](https://www.amazon.com/dp/B0G2L3LGWD) | | 24.99 | |
+| 19 | ESP32-S3 N16R8 (6) | [3-pack](https://www.amazon.com/dp/B0CGYXJB6Y) x 2 | 6.33 | 37.98 | |
+| 20 | SN65HVD230 (6) | [6-pack](https://www.amazon.com/dp/B0GRXVCJ46) | 2.15 | 12.88 | |
+| 21 | PCA9685 (8) | [listing](https://www.amazon.com/dp/B07RMTN4NZ) | 5.99 | 47.92 | |
+| 22 | TCA9548A (12) | [6-pack](https://www.amazon.com/dp/B08JGSMRF9) x 2 | 1.67 | 19.98 | |
+| 23 | AS5600 (60) | [10-pack](https://www.amazon.com/dp/B0D3WMK5MT) x 6 | 1.90 | 114.00 | magnet not included; avoid bare-chip "AS5600-ASOM SOP-8" listings |
+| 24 | 6 x 2.5 mm diametric magnets (100) | [50-pack](https://www.amazon.com/dp/B0H1578MWG) x 2 | 0.42 | 41.96 | |
+| 25 | BNO085 | [GY-BNO085](https://www.amazon.com/dp/B0CL26J81F) | 22.99 | 22.99 | |
+| 26 | ICM-42688 (4) | [GY-601N1](https://www.amazon.com/dp/B0GCRW1NPQ) | 17.06 | 68.24 | -P variant not stated |
+| 27 | FSR 402 (10) | [10-pack](https://www.amazon.com/dp/B0DGPMDJS1) | 3.11 | 31.08 | |
+| 29 | PETG (16 kg) | [ELEGOO 4 kg](https://www.amazon.com/dp/B0D86BXVL6) x 4 | 9.00/kg | 143.96 | |
+| 30 | TPU 95A 1 kg | [SUNLU](https://www.amazon.com/dp/B0BXNWK6NS) | | 20.99 | |
+| 31 | 608-2RS (70) | [50](https://www.amazon.com/dp/B0GLVL76MN) + [20](https://www.amazon.com/dp/B0F83XSSP7) | 0.33 | 22.97 | |
+| 32 | 625ZZ (50) | [25-pack](https://www.amazon.com/dp/B0CJFRSK7D) x 2 | 0.32 | 15.78 | |
+| 33 | 6 mm BBs 0.20 g | [bag](https://www.amazon.com/dp/B0HGRWN3Z6) | | 9.99 | |
+| 34 | 8 mm POM balls (100) | [uxcell](https://www.amazon.com/dp/B0FJ1SV5ZW) | 0.07 | 6.69 | |
+| 35 | Rod and wire | [8 mm](https://www.amazon.com/dp/B0C2MKDWD7), [5 mm](https://www.amazon.com/dp/B0F32VCRFV) x 2, [spring wire kit](https://www.amazon.com/dp/B0B491L6LV) | | 54.96 | stainless spring wire, not music wire |
+| 36 | M3 inserts (500) | [Yaocom](https://www.amazon.com/dp/B0F43D2TTH) | 0.03 | 16.99 | 4 mm long is fine (the generators' insert holes run deep); check the insert's outside diameter suits their 4.2 mm hole (`INSERT_D`, `chain.py`) |
+| 37 | Screw kits | [M3](https://www.amazon.com/dp/B0FGV5FCBN) + [M2](https://www.amazon.com/dp/B0FG2CC91J) | | 19.98 | |
+| 38 | Sheath 2 x 4 mm (30 m) | [PFA 10 m](https://www.amazon.com/dp/B0DRP6RCX7) x 3 | 1.24/m | 37.29 | PFA, not PTFE; true PTFE about $90 for 30 m |
+| 39 | Piercing needles 16 G, 12 G | [16 G](https://www.amazon.com/dp/B0FL6NTDH2) + [12 G](https://www.amazon.com/dp/B0DDPL9YW6) | 0.10 | 19.98 | |
+| 40 | 50 lb braid | [Reaction Tackle](https://www.amazon.com/dp/B09CW6L3PF) | | 20.98 | |
+| 41 | 100 lb braid | [KastKing Superpower](https://www.amazon.com/dp/B0D1R1YGT6) | | 10.18 | 4-strand |
+| 42 | 200 lb braid | [HERCULES 8-strand](https://www.amazon.com/dp/B0791D3SZN) | | 16.99 | base price; 200 lb variant may cost more |
+| 43 | Crimp kit | [pliers + 500 sleeves](https://www.amazon.com/dp/B08PZ34MYZ) | | 29.99 | sleeve IDs not checked against 1.0 / 1.2 / 1.6 mm |
+| 44 | M5 barrel adjusters (40) | [10-pack](https://www.amazon.com/dp/B07FDZYB9Z) x 4 | 0.70 | 27.96 | |
+| 45 | Elastics | [silicone tube](https://www.amazon.com/dp/B08PTXMNCN) + [cord](https://www.amazon.com/dp/B0CBTRJV19) | | 16.18 | |
+| 46 | Scales | [10 N spring](https://www.amazon.com/dp/B00VYNT6Q6) + [50 kg luggage](https://www.amazon.com/dp/B09PQB73JD) | | 19.97 | |
+
+Options: 5010 360 KV x 21 [GoolRC](https://www.amazon.com/dp/B0C2YRNX1Z) $587.58; SimpleFOC Mini x 21
+[listing](https://www.amazon.com/dp/B0DRV88Z16) $167.79. Phase 4: Pi 5 8 GB, camera, USB-CAN about $256
+(the Pi listing is above MSRP). Pipe (line 47): home-improvement store.
+
+Before buying:
+
+1. **Measure an N20 first.** No Amazon N20 states stall current or torque, and the neck and wrist ratings
+   depend on them (D-035). A bare 10-pack (6 V, 104 rpm, full metal, about $19) costs less than one
+   encoder motor: lock the shaft at 6 V and read the current, hang a weight on a lever for the torque. Pass
+   is about 1.5 A and 4 kg-cm (Pololu HP 298:1). Its stated 0.04 A no-load current points to a low-power
+   winding (the HP draws 0.1 A), so expect it to fail; then Pololu for the neck and wrist.
+2. **Battery:** a 3S LiPo with a balance charger, or a 3S Li-ion pack built with a 40 A BMS.
+3. **The 775** listing above is the only one found stating 12 000 rpm at 12 V; buy two for the gearbox test
+   first (D-006).
 
 ## Sources (checked 2026-10-28)
 
