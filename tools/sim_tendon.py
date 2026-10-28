@@ -185,6 +185,7 @@ class Rig:
                                          # source about its planned angle (the bent leg of a staggered stance)
         self.com_bias = np.zeros(2)      # planner: where the CoM should sit relative to the support reference (m)
         self.hip_roll_cmd = {"L": 0.0, "R": 0.0}   # per hip: the shift (double support) or the levelling (stance)
+        self.applied = dict(self.target)  # per DOF: the joint target control() applied last step, balance terms in
         self._quiet, self._off_prev, self._hip_i = 0.0, pre, 0.0
         self._v_prev, self._dist = np.zeros(2), np.zeros(2)
         self._com_f, self._com_v, self._cp_i, self._roll_i = None, np.zeros(2), np.zeros(2), 0.0
@@ -443,6 +444,7 @@ class Rig:
             elif bone == "thigh" and axis == "roll":
                 tgt += self.hip_roll_cmd[side]
             tgt = min(max(tgt, w["lo"]), w["hi"])
+            self.applied[w["name"]] = tgt               # what the joint was asked for (the teacher's action)
             err = tgt - q
             # outer loop: integral trim on the joint error, clamped (the "re-home absorbs creep" of docs/01)
             g = 0.0 if torque_mode else OUTER_GAIN.get(bone, 1.0)

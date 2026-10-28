@@ -45,6 +45,7 @@ Goal ordering, in case they conflict: **cheap > simple to build > human range of
 | `docs/14-balance-gauntlet.md` | Is it connected (contact census, printed-envelope shapes); the balance controller that holds 30 N pushes and a sustained 15 N; what the hip can and cannot do; weight shift and the one-foot attempt; the recorded gauntlet; the sibling-project harness |
 | `docs/15-one-foot-hold.md` | The one-foot hold passes (Phase 5 exit test in simulation): the seven things it took, what the stance hip actually does, the 60 mm hip-roll pulley (D-027, D-028) |
 | `docs/16-first-step.md` | The first static step completes (Phase 6a in simulation): per-phase line readout, the exit test verdict, what it took, the observer bug (D-029, D-030) |
+| `docs/17-learned-control.md` | Learned control: the fast stand-in, the sibling's model core as a PPO actor, the hand-written controller as teacher, the first ladder (cloning: 90 % standing under pushes), the failing gate on the tendon model, why get-up needs a kneeling curriculum (D-031) |
 | `docs/references.md` | External projects to borrow test scenarios and tooling from (primo, microban, Isaac Lab, DreamDojo, LeRobot, the sibling ai-embedded-dynamic-diversity) |
 | `cad/blender/ring.py`, `cad/blender/winch_bank.py` | Ring-joint generator; N-winch bank generator |
 | `tools/export_urdf.py`, `tools/sim_check.py`, `sim/robot.urdf` | Joint table to URDF with CoM report; MuJoCo stand and push test on the rigid statue; the generated URDF |
@@ -52,6 +53,8 @@ Goal ordering, in case they conflict: **cheap > simple to build > human range of
 | `tools/sim_video.py`, `docs/img/gauntlet.mp4`, `docs/img/gauntlet.gif` | Recorder: the gauntlet with every line's tension, every drum's lock/drive/slip state, CoM and CoP drawn into the MuJoCo render |
 | `docs/img/onefoot.mp4`, `docs/img/onefoot.gif` | The weight shift and the 10 s one-foot hold, recorded the same way |
 | `docs/img/step.mp4`, `docs/img/step.gif` | The first static step, recorded the same way |
+| `tools/export_standin.py`, `sim/robot_standin.xml`, `sim/robot_standin.json` | The fast stand-in for training: each drive train as one position servo, with the per-DOF figures for the damage gates |
+| `tools/record_teacher.py` | Demonstrations from the hand-written controller on the tendon model, in the stand-in's observation layout |
 | `docs/decisions.md` | Decision log (what we chose and why; revisit when a test disagrees) |
 | `docs/prompt-log.md` | Every prompt that produced a set of work, verbatim, with what it produced |
 | `tools/tendon_calc.py` | Force / speed / power / line-safety calculator for any motor + drum + tackle combination |
@@ -70,6 +73,8 @@ python tools/sim_tendon.py                 # or --only stand,push30,onefoot; --h
 python tools/sim_video.py --gif            # docs/img/gauntlet.mp4 and .gif (ffmpeg on PATH)
 python tools/sim_video.py --only shift,onefoot --gif --out onefoot   # docs/img/onefoot.mp4 and .gif
 python tools/sim_video.py --only step --gif --out step               # docs/img/step.mp4 and .gif
+python tools/export_standin.py             # sim/robot_standin.xml and .json (training stand-in, docs/17)
+python tools/record_teacher.py --pushes 200   # sim/out/teacher/teacher.npz (demonstrations)
 
 # generate the W-mini winch housing, drum and lid as STL (Blender 4.2+ / 5.x)
 & "C:\Program Files\Blender Foundation\Blender 5.1\blender.exe" -b -P cad/blender/winch_mini.py -- --out cad/out

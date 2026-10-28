@@ -272,3 +272,85 @@ is left at a2b2a18. `docs/16-first-step.md` gains the section "Landing accuracy:
 made it worse" (the table, why the correction fights the balance loop, the pelvis-pitch model
 error it exposed), and its Not yet and Next point at a world-frame swing-leg controller, filed as
 hub task `swing-leg-world-ik` in the robot workspace.
+
+## P-016 (2026-10-27) Neural or algorithmic; the sibling project; roboto_origin
+
+> are we using a neural controller or purely algorithmic? (any value in the the sibling project ../ai-embedded-dynamic-diversity)
+>
+> What can we learn from https://github.com/Roboparty/roboto_origin (considering most but not all of it is GPL)
+
+Produced: an answer in conversation (purely algorithmic; the sibling's harness is ready, its
+learner is not a locomotion learner; roboto_origin's licence map and what its BSD-3 training module
+teaches). No files changed.
+
+## P-017 (2026-10-27) Can roboto_origin's gates train the sibling's model
+
+> > Nothing in it shows it can learn to walk
+>
+> We previously instructed that we can develop worktrees from that repo to fit our purposes (and perhaps improve the overall health and maturity of the sibling project). Can the gates of the roboto_origin training setup serve to better train our neural model into a funtioning crawl, walk, push, run, lunge, jumper, lander?
+
+> (...croucher.. all the things)
+
+Produced: an answer in conversation (the gates are terminations, score-based promotion and a
+MuJoCo validation; the core needs a PPO loop and a fast stand-in; a skill table against our joint
+speed and line-rated torque: run, jump and jump-landing need about 3 times the speed). No files
+changed.
+
+## P-018 (2026-10-27) Survival as the reward; rolling over; surviving a fall
+
+> (we are running on a 5080 16gb locally). we built various simulation obstacles and threats in the sibling projects sim, could the desired qualities be trained in through survival necessity as the reward? what about rolling over? if we can't run/jump/land, we'll at least need to be able to survive a fall and stand back up)
+
+Produced: an answer in conversation (survival works when threats are physical and stillness is
+lethal; get-up training starts fallen and ends on damage, not on falling; the 5080 budget). No
+files changed.
+
+## P-019 (2026-10-27) Stand to observe, grasp and swing, train as evolution did
+
+> what about stand, grasp, swing (core, legs, etc) as a means to traverse pits (..swing from trees)- standing as a way to better observe threats at a distance - train as evolution has trained creatures
+
+Produced: an answer in conversation (watching versus resting under an energy budget with
+occlusion; hook hands for a dead hang, no pull-ups or catches on a 4 N m elbow; POET,
+quality-diversity, body parameters in the loop, PPO inside evolution). No files changed.
+
+## P-020 (2026-10-27) The sibling's champion as the base
+
+> the model in the sibling project has already evolved through several stages and the goal has been to strengthen training through all modalities/enfigurements/inputs/outputs. can we leverage the strongest model as the base?
+
+Produced: an answer in conversation (champions v07 and v09, 46,876 parameters, 48 in, 16 out,
+never on contact physics; grow it with zero-initialised connections, use it as the PPO actor,
+measure it against random weights). No files changed.
+
+## P-021 (2026-10-27) Go: the stand-in, the grown champion, the comparison, the merge
+
+> Ok to all.
+> 5- ok, we can work in the worktree, or pr/merge and use more wortktrees. this step will bring our tendon/joint/sensor count needs into the project? Can we train from the algorithimic to artificially advance evolution? (Likewise by running the other robot through the same sibling project sim).. a goal was to create a neural model that you could transfer the controller/brain from one robot to another, and it would adapt.
+
+Produced: `tools/export_standin.py` with `sim/robot_standin.xml` and `.json` (the fast stand-in for
+training, per-DOF damage-gate figures, impact, torque and joint-stop sensors, the tendon model's control
+order); `tools/record_teacher.py` and `Rig.applied` in `tools/sim_tendon.py` (demonstrations from the
+hand-written controller); `docs/17-learned-control.md` (the stand-in, the teacher, the first ladder, the
+failing gate, why get-up needs a kneeling curriculum, the second body); D-031; README and references rows.
+In the sibling: PR #33 (the tendon embodiment, registered statically) merged to master as 7e5867f, issue
+#34 closed; branch `feat/standin-rl` (issue #35) with PPO, the grown champion actor, cloning, the tendon gate
+and Roboparty RPO as a second body.
+
+## P-022 (2026-10-28) Merges and releases in the sibling
+
+> Merges and releases to ai-embedded-dynamic-dicersity are permitted following the repos standards
+
+Produced: PR #33 squash-merged following `skills/dev-loop/SKILL.md` (issue linked, IMPLEMENTED and TODO
+updated, CI green, the Copilot reviewer unavailable on quota and noted); the training branch brought up to
+master by a merge (the force-push and branch deletion of a rebase were refused as destructive, so the merged
+`feat/robot-tendon-harness` branch and its worktree are left for the owner to remove); the training PR for
+#35 opened. No release: the dev-loop's release gate is a confirmed improvement, and the first learned policy
+does not yet pass the tendon-model gate.
+
+## P-023 (2026-10-28) When should the neural controller try the sibling's other sims
+
+> What about the other sims? When should our neural controller try those, with either embodiment?
+
+Produced: the forgetting measurement (each body-trained core cut back to the champion's channel counts and
+scored by the sibling's `add-cross-eval`: champion 0.567, stand-grown 0.543, stand-grown-bc 0.435), the
+transfer result (RPO stand started from this robot's policy: 79 % standing in its first 10 iterations
+against 27 % from scratch), both in `docs/17-learned-control.md` and the sibling's `docs/rl-standin.md`;
+PR #36 (the training work) squash-merged in the sibling as 4b2649f, issue #35 closed.

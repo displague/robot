@@ -299,3 +299,20 @@ same step stood in the console and fell in the recorder. It now advances once pe
 one-foot hold (still stands, 27 W to 38 W). On the robot this is the firmware's contact state:
 one estimate per control tick, read by everything else.
 Reverses if: never; a controller whose state depends on how often it is observed is a bug.
+
+## D-031 (2026-10-27) Learned control trains on a fast stand-in and is judged on the tendon model
+
+Why: the tendon model (`13`) is the truth about lines, slack, clutches and locks but runs well under
+real time; PPO needs hundreds of millions of steps. `tools/export_standin.py` makes a stand-in of the
+same skeleton with each drive train as one position servo (line-loop stiffness, motor back-EMF damping,
+clutch slip torque) that runs at about 190,000 control steps per second on this machine's 24 cores,
+and exports per DOF the figures for the same damage gates (line force from joint torque, rating,
+pretension). Training happens there, in the sibling project (`feat/standin-rl`); a policy counts only
+once it passes on the tendon model (`17`). The policy network is the sibling's model core grown from
+its champion, and the hand-written controller of `14` to `16` is a teacher (`tools/record_teacher.py`,
+`Rig.applied`): cloning it first was the largest effect in the first ladder (90 % standing under pushes
+against 45 % from random weights). The first gate run fails (the cloned policy leans over within 10 s
+on the tendon model), so the stand-in has to grow the drum locks and the slack run next.
+Reverses if: the gap cannot be closed in the stand-in, in which case training moves to a GPU port of
+the tendon model itself (MJX or Isaac Lab with the tendon equalities), or the hand-written controller
+stays the controller of record and learning is kept to residual corrections on top of it.

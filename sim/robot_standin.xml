@@ -1,0 +1,211 @@
+<mujoco model="tendon_humanoid_standin">
+  <compiler angle="radian"/>
+  <option timestep="0.005" gravity="0 0 -9.81" integrator="implicitfast"/>
+  <default>
+    <geom friction="1.0 0.005 0.0001" rgba="0.75 0.75 0.75 1"/>
+  </default>
+  <worldbody>
+    <geom name="floor" type="plane" size="20 20 0.1" rgba="0.9 0.9 0.9 1"/>
+    <body name="pelvis" pos="0.0000 0.0000 0.9500">
+      <freejoint name="float"/>
+      <site name="imu" pos="0 0 0" size="0.01"/>
+      <geom type="box" size="0.1400 0.0800 0.0500" pos="0.0000 0.0000 0.0500" mass="3.500" rgba="0.6 0.6 0.6 1"/>
+      <site name="pelvis_impact" type="box" size="0.1500 0.0900 0.0600" pos="0.0000 0.0000 0.0500"/>
+      <body name="spine" pos="0.0000 0.0000 0.1000">
+        <joint name="spine_pitch" type="hinge" axis="1 0 0" range="-0.3491 0.6981" limited="true" damping="0.05" armature="0.0100"/>
+        <joint name="spine_roll" type="hinge" axis="0 1 0" range="-0.4363 0.4363" limited="true" damping="0.05" armature="0.0100"/>
+        <joint name="spine_yaw" type="hinge" axis="0 0 1" range="-0.7854 0.7854" limited="true" damping="0.05" armature="0.0100"/>
+      <geom type="box" size="0.1300 0.0800 0.2000" pos="0.0000 0.0000 0.2000" mass="3.500" rgba="0.55 0.58 0.62 1"/>
+        <site name="spine_impact" type="box" size="0.1400 0.0900 0.2100" pos="0.0000 0.0000 0.2000"/>
+        <body name="neck" pos="0.0000 0.0000 0.4500">
+          <joint name="neck_pitch" type="hinge" axis="1 0 0" range="-0.8727 0.8727" limited="true" damping="0.05" armature="0.0100"/>
+          <joint name="neck_roll" type="hinge" axis="0 1 0" range="-0.6109 0.6109" limited="true" damping="0.05" armature="0.0100"/>
+          <joint name="neck_yaw" type="hinge" axis="0 0 1" range="-1.3963 1.3963" limited="true" damping="0.05" armature="0.0100"/>
+      <geom type="capsule" size="0.0350" fromto="0.0000 0.0000 0.0350 0.0000 0.0000 0.0650" mass="0.300" rgba="0.66 0.62 0.60 1"/>
+          <body name="head" pos="0.0000 0.0000 0.1000">
+      <geom type="capsule" size="0.0800" fromto="0.0000 0.0000 0.0675 0.0000 0.0000 0.0825" mass="0.800" rgba="0.66 0.62 0.60 1"/>
+            <site name="head_impact" type="sphere" size="0.0900" pos="0.0000 0.0000 0.0750"/>
+          </body>
+        </body>
+        <body name="clavicle.L" pos="0.0200 0.0000 0.4000">
+      <geom type="capsule" size="0.0200" fromto="0.0200 0.0000 0.0000 0.1600 0.0000 0.0000" mass="0.200" rgba="0.6 0.6 0.6 1"/>
+          <body name="upperarm.L" pos="0.1800 0.0000 0.0000">
+            <joint name="upperarm.L_pitch" type="hinge" axis="1 0 0" range="-2.9671 0.7854" limited="true" damping="0.05" armature="0.0100"/>
+            <joint name="upperarm.L_roll" type="hinge" axis="0 1 0" range="-2.8798 0.5236" limited="true" damping="0.05" armature="0.0100"/>
+            <joint name="upperarm.L_yaw" type="hinge" axis="0 0 1" range="-1.3963 1.3963" limited="true" damping="0.05" armature="0.0100"/>
+      <geom type="capsule" size="0.0450" fromto="0.0000 0.0000 -0.0450 0.0000 0.0000 -0.2550" mass="0.900" rgba="0.55 0.58 0.62 1"/>
+            <body name="forearm.L" pos="0.0000 0.0000 -0.3000">
+              <joint name="forearm.L_pitch" type="hinge" axis="1 0 0" range="-2.4435 0.0000" limited="true" damping="0.05" armature="0.0100"/>
+              <joint name="forearm.L_yaw" type="hinge" axis="0 0 1" range="-1.3963 1.3963" limited="true" damping="0.05" armature="0.0100"/>
+      <geom type="capsule" size="0.0350" fromto="0.0000 0.0000 -0.0350 0.0000 0.0000 -0.2250" mass="0.900" rgba="0.62 0.60 0.52 1"/>
+              <body name="hand.L" pos="0.0000 0.0000 -0.2600">
+                <joint name="hand.L_pitch" type="hinge" axis="1 0 0" range="-1.2217 1.0472" limited="true" damping="0.05" armature="0.0100"/>
+                <joint name="hand.L_roll" type="hinge" axis="0 1 0" range="-0.2618 0.4363" limited="true" damping="0.05" armature="0.0100"/>
+      <geom type="box" size="0.0400 0.0150 0.0900" pos="0.0000 0.0000 -0.0900" mass="0.400" rgba="0.66 0.62 0.60 1"/>
+              </body>
+            </body>
+          </body>
+        </body>
+        <body name="clavicle.R" pos="-0.0200 0.0000 0.4000">
+      <geom type="capsule" size="0.0200" fromto="-0.0200 0.0000 0.0000 -0.1600 0.0000 0.0000" mass="0.200" rgba="0.6 0.6 0.6 1"/>
+          <body name="upperarm.R" pos="-0.1800 0.0000 0.0000">
+            <joint name="upperarm.R_pitch" type="hinge" axis="1 0 0" range="-2.9671 0.7854" limited="true" damping="0.05" armature="0.0100"/>
+            <joint name="upperarm.R_roll" type="hinge" axis="0 1 0" range="-0.5236 2.8798" limited="true" damping="0.05" armature="0.0100"/>
+            <joint name="upperarm.R_yaw" type="hinge" axis="0 0 1" range="-1.3963 1.3963" limited="true" damping="0.05" armature="0.0100"/>
+      <geom type="capsule" size="0.0450" fromto="0.0000 0.0000 -0.0450 0.0000 0.0000 -0.2550" mass="0.900" rgba="0.55 0.58 0.62 1"/>
+            <body name="forearm.R" pos="0.0000 0.0000 -0.3000">
+              <joint name="forearm.R_pitch" type="hinge" axis="1 0 0" range="-2.4435 0.0000" limited="true" damping="0.05" armature="0.0100"/>
+              <joint name="forearm.R_yaw" type="hinge" axis="0 0 1" range="-1.3963 1.3963" limited="true" damping="0.05" armature="0.0100"/>
+      <geom type="capsule" size="0.0350" fromto="0.0000 0.0000 -0.0350 0.0000 0.0000 -0.2250" mass="0.900" rgba="0.62 0.60 0.52 1"/>
+              <body name="hand.R" pos="0.0000 0.0000 -0.2600">
+                <joint name="hand.R_pitch" type="hinge" axis="1 0 0" range="-1.2217 1.0472" limited="true" damping="0.05" armature="0.0100"/>
+                <joint name="hand.R_roll" type="hinge" axis="0 1 0" range="-0.4363 0.2618" limited="true" damping="0.05" armature="0.0100"/>
+      <geom type="box" size="0.0400 0.0150 0.0900" pos="0.0000 0.0000 -0.0900" mass="0.400" rgba="0.66 0.62 0.60 1"/>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+      <body name="thigh.L" pos="0.1000 0.0000 0.0000">
+        <joint name="thigh.L_pitch" type="hinge" axis="1 0 0" range="-1.9199 0.2618" limited="true" damping="0.05" armature="0.0100"/>
+        <joint name="thigh.L_roll" type="hinge" axis="0 1 0" range="-0.6981 0.4363" limited="true" damping="0.05" armature="0.0100"/>
+        <joint name="thigh.L_yaw" type="hinge" axis="0 0 1" range="-0.6109 0.6109" limited="true" damping="0.05" armature="0.0100"/>
+      <geom type="capsule" size="0.0600" fromto="0.0000 0.0000 -0.0600 0.0000 0.0000 -0.3700" mass="2.200" rgba="0.55 0.58 0.62 1"/>
+        <body name="shank.L" pos="0.0000 0.0000 -0.4300">
+          <joint name="shank.L_pitch" type="hinge" axis="1 0 0" range="0.0000 2.3562" limited="true" damping="0.05" armature="0.0100"/>
+      <geom type="capsule" size="0.0500" fromto="0.0000 0.0000 -0.0500 0.0000 0.0000 -0.3900" mass="0.900" rgba="0.55 0.58 0.62 1"/>
+          <body name="foot.L" pos="0.0000 0.0000 -0.4400">
+            <joint name="foot.L_pitch" type="hinge" axis="1 0 0" range="-0.3491 0.6981" limited="true" damping="0.05" armature="0.0100"/>
+            <joint name="foot.L_roll" type="hinge" axis="0 1 0" range="-0.3491 0.2618" limited="true" damping="0.05" armature="0.0100"/>
+      <geom type="box" size="0.0500 0.1300 0.0200" pos="0.0000 -0.0800 -0.0400" mass="0.600" rgba="0.55 0.58 0.62 1"/>
+            <site name="foot.L_sole" type="box" size="0.0500 0.1300 0.006" pos="0.0000 -0.0800 -0.0600"/>
+          </body>
+        </body>
+      </body>
+      <body name="thigh.R" pos="-0.1000 0.0000 0.0000">
+        <joint name="thigh.R_pitch" type="hinge" axis="1 0 0" range="-1.9199 0.2618" limited="true" damping="0.05" armature="0.0100"/>
+        <joint name="thigh.R_roll" type="hinge" axis="0 1 0" range="-0.4363 0.6981" limited="true" damping="0.05" armature="0.0100"/>
+        <joint name="thigh.R_yaw" type="hinge" axis="0 0 1" range="-0.6109 0.6109" limited="true" damping="0.05" armature="0.0100"/>
+      <geom type="capsule" size="0.0600" fromto="0.0000 0.0000 -0.0600 0.0000 0.0000 -0.3700" mass="2.200" rgba="0.55 0.58 0.62 1"/>
+        <body name="shank.R" pos="0.0000 0.0000 -0.4300">
+          <joint name="shank.R_pitch" type="hinge" axis="1 0 0" range="0.0000 2.3562" limited="true" damping="0.05" armature="0.0100"/>
+      <geom type="capsule" size="0.0500" fromto="0.0000 0.0000 -0.0500 0.0000 0.0000 -0.3900" mass="0.900" rgba="0.55 0.58 0.62 1"/>
+          <body name="foot.R" pos="0.0000 0.0000 -0.4400">
+            <joint name="foot.R_pitch" type="hinge" axis="1 0 0" range="-0.3491 0.6981" limited="true" damping="0.05" armature="0.0100"/>
+            <joint name="foot.R_roll" type="hinge" axis="0 1 0" range="-0.2618 0.3491" limited="true" damping="0.05" armature="0.0100"/>
+      <geom type="box" size="0.0500 0.1300 0.0200" pos="0.0000 -0.0800 -0.0400" mass="0.600" rgba="0.55 0.58 0.62 1"/>
+            <site name="foot.R_sole" type="box" size="0.0500 0.1300 0.006" pos="0.0000 -0.0800 -0.0600"/>
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+  <actuator>
+    <position name="spine_pitch" joint="spine_pitch" kp="370.83" kv="27.788" ctrlrange="-0.3491 0.6981" ctrllimited="true" forcerange="-29.667 29.667" forcelimited="true"/>
+    <position name="spine_roll" joint="spine_roll" kp="370.83" kv="27.788" ctrlrange="-0.4363 0.4363" ctrllimited="true" forcerange="-29.667 29.667" forcelimited="true"/>
+    <position name="spine_yaw" joint="spine_yaw" kp="370.83" kv="27.788" ctrlrange="-0.7854 0.7854" ctrllimited="true" forcerange="-29.667 29.667" forcelimited="true"/>
+    <position name="neck_pitch" joint="neck_pitch" kp="1.85" kv="0.427" ctrlrange="-0.8727 0.8727" ctrllimited="true" forcerange="-0.740 0.740" forcelimited="true"/>
+    <position name="neck_roll" joint="neck_roll" kp="1.85" kv="0.427" ctrlrange="-0.6109 0.6109" ctrllimited="true" forcerange="-0.740 0.740" forcelimited="true"/>
+    <position name="neck_yaw" joint="neck_yaw" kp="11.56" kv="2.668" ctrlrange="-1.3963 1.3963" ctrllimited="true" forcerange="-1.850 1.850" forcelimited="true"/>
+    <position name="upperarm.L_pitch" joint="upperarm.L_pitch" kp="178.00" kv="16.598" ctrlrange="-2.9671 0.7854" ctrllimited="true" forcerange="-23.733 23.733" forcelimited="true"/>
+    <position name="upperarm.L_roll" joint="upperarm.L_roll" kp="178.00" kv="16.598" ctrlrange="-2.8798 0.5236" ctrllimited="true" forcerange="-23.733 23.733" forcelimited="true"/>
+    <position name="upperarm.L_yaw" joint="upperarm.L_yaw" kp="178.00" kv="16.598" ctrlrange="-1.3963 1.3963" ctrllimited="true" forcerange="-23.733 23.733" forcelimited="true"/>
+    <position name="upperarm.R_pitch" joint="upperarm.R_pitch" kp="178.00" kv="16.598" ctrlrange="-2.9671 0.7854" ctrllimited="true" forcerange="-23.733 23.733" forcelimited="true"/>
+    <position name="upperarm.R_roll" joint="upperarm.R_roll" kp="178.00" kv="16.598" ctrlrange="-0.5236 2.8798" ctrllimited="true" forcerange="-23.733 23.733" forcelimited="true"/>
+    <position name="upperarm.R_yaw" joint="upperarm.R_yaw" kp="178.00" kv="16.598" ctrlrange="-1.3963 1.3963" ctrllimited="true" forcerange="-23.733 23.733" forcelimited="true"/>
+    <position name="forearm.L_pitch" joint="forearm.L_pitch" kp="40.05" kv="12.976" ctrlrange="-2.4435 0.0000" ctrllimited="true" forcerange="-8.900 8.900" forcelimited="true"/>
+    <position name="forearm.L_yaw" joint="forearm.L_yaw" kp="17.44" kv="3.000" ctrlrange="-1.3963 1.3963" ctrllimited="true" forcerange="-4.153 4.153" forcelimited="true"/>
+    <position name="forearm.R_pitch" joint="forearm.R_pitch" kp="40.05" kv="12.976" ctrlrange="-2.4435 0.0000" ctrllimited="true" forcerange="-8.900 8.900" forcelimited="true"/>
+    <position name="forearm.R_yaw" joint="forearm.R_yaw" kp="17.44" kv="3.000" ctrlrange="-1.3963 1.3963" ctrllimited="true" forcerange="-4.153 4.153" forcelimited="true"/>
+    <position name="hand.L_pitch" joint="hand.L_pitch" kp="2.66" kv="0.615" ctrlrange="-1.2217 1.0472" ctrllimited="true" forcerange="-0.888 0.888" forcelimited="true"/>
+    <position name="hand.L_roll" joint="hand.L_roll" kp="2.66" kv="0.615" ctrlrange="-0.2618 0.4363" ctrllimited="true" forcerange="-0.888 0.888" forcelimited="true"/>
+    <position name="hand.R_pitch" joint="hand.R_pitch" kp="2.66" kv="0.615" ctrlrange="-1.2217 1.0472" ctrllimited="true" forcerange="-0.888 0.888" forcelimited="true"/>
+    <position name="hand.R_roll" joint="hand.R_roll" kp="2.66" kv="0.615" ctrlrange="-0.4363 0.2618" ctrllimited="true" forcerange="-0.888 0.888" forcelimited="true"/>
+    <position name="thigh.L_pitch" joint="thigh.L_pitch" kp="534.00" kv="40.015" ctrlrange="-1.9199 0.2618" ctrllimited="true" forcerange="-35.600 35.600" forcelimited="true"/>
+    <position name="thigh.L_roll" joint="thigh.L_roll" kp="801.00" kv="82.025" ctrlrange="-0.6981 0.4363" ctrllimited="true" forcerange="-53.400 53.400" forcelimited="true"/>
+    <position name="thigh.L_yaw" joint="thigh.L_yaw" kp="370.83" kv="27.788" ctrlrange="-0.6109 0.6109" ctrllimited="true" forcerange="-29.667 29.667" forcelimited="true"/>
+    <position name="thigh.R_pitch" joint="thigh.R_pitch" kp="534.00" kv="40.015" ctrlrange="-1.9199 0.2618" ctrllimited="true" forcerange="-35.600 35.600" forcelimited="true"/>
+    <position name="thigh.R_roll" joint="thigh.R_roll" kp="801.00" kv="82.025" ctrlrange="-0.4363 0.6981" ctrllimited="true" forcerange="-53.400 53.400" forcelimited="true"/>
+    <position name="thigh.R_yaw" joint="thigh.R_yaw" kp="370.83" kv="27.788" ctrlrange="-0.6109 0.6109" ctrllimited="true" forcerange="-29.667 29.667" forcelimited="true"/>
+    <position name="shank.L_pitch" joint="shank.L_pitch" kp="222.50" kv="24.822" ctrlrange="0.0000 2.3562" ctrllimited="true" forcerange="-29.667 29.667" forcelimited="true"/>
+    <position name="shank.R_pitch" joint="shank.R_pitch" kp="222.50" kv="24.822" ctrlrange="0.0000 2.3562" ctrllimited="true" forcerange="-29.667 29.667" forcelimited="true"/>
+    <position name="foot.L_pitch" joint="foot.L_pitch" kp="278.13" kv="51.399" ctrlrange="-0.3491 0.6981" ctrllimited="true" forcerange="-44.500 44.500" forcelimited="true"/>
+    <position name="foot.L_roll" joint="foot.L_roll" kp="278.13" kv="51.399" ctrlrange="-0.3491 0.2618" ctrllimited="true" forcerange="-44.500 44.500" forcelimited="true"/>
+    <position name="foot.R_pitch" joint="foot.R_pitch" kp="278.13" kv="51.399" ctrlrange="-0.3491 0.6981" ctrllimited="true" forcerange="-44.500 44.500" forcelimited="true"/>
+    <position name="foot.R_roll" joint="foot.R_roll" kp="278.13" kv="51.399" ctrlrange="-0.2618 0.3491" ctrllimited="true" forcerange="-44.500 44.500" forcelimited="true"/>
+  </actuator>
+  <sensor>
+    <framequat name="pelvis_quat" objtype="site" objname="imu"/>
+    <gyro name="pelvis_gyro" site="imu"/>
+    <accelerometer name="pelvis_acc" site="imu"/>
+    <touch name="foot.L_touch" site="foot.L_sole"/>
+    <touch name="foot.R_touch" site="foot.R_sole"/>
+    <touch name="head_impact" site="head_impact"/>
+    <touch name="spine_impact" site="spine_impact"/>
+    <touch name="pelvis_impact" site="pelvis_impact"/>
+    <actuatorfrc name="spine_pitch_tau" actuator="spine_pitch"/>
+    <actuatorfrc name="spine_roll_tau" actuator="spine_roll"/>
+    <actuatorfrc name="spine_yaw_tau" actuator="spine_yaw"/>
+    <actuatorfrc name="neck_pitch_tau" actuator="neck_pitch"/>
+    <actuatorfrc name="neck_roll_tau" actuator="neck_roll"/>
+    <actuatorfrc name="neck_yaw_tau" actuator="neck_yaw"/>
+    <actuatorfrc name="upperarm.L_pitch_tau" actuator="upperarm.L_pitch"/>
+    <actuatorfrc name="upperarm.L_roll_tau" actuator="upperarm.L_roll"/>
+    <actuatorfrc name="upperarm.L_yaw_tau" actuator="upperarm.L_yaw"/>
+    <actuatorfrc name="upperarm.R_pitch_tau" actuator="upperarm.R_pitch"/>
+    <actuatorfrc name="upperarm.R_roll_tau" actuator="upperarm.R_roll"/>
+    <actuatorfrc name="upperarm.R_yaw_tau" actuator="upperarm.R_yaw"/>
+    <actuatorfrc name="forearm.L_pitch_tau" actuator="forearm.L_pitch"/>
+    <actuatorfrc name="forearm.L_yaw_tau" actuator="forearm.L_yaw"/>
+    <actuatorfrc name="forearm.R_pitch_tau" actuator="forearm.R_pitch"/>
+    <actuatorfrc name="forearm.R_yaw_tau" actuator="forearm.R_yaw"/>
+    <actuatorfrc name="hand.L_pitch_tau" actuator="hand.L_pitch"/>
+    <actuatorfrc name="hand.L_roll_tau" actuator="hand.L_roll"/>
+    <actuatorfrc name="hand.R_pitch_tau" actuator="hand.R_pitch"/>
+    <actuatorfrc name="hand.R_roll_tau" actuator="hand.R_roll"/>
+    <actuatorfrc name="thigh.L_pitch_tau" actuator="thigh.L_pitch"/>
+    <actuatorfrc name="thigh.L_roll_tau" actuator="thigh.L_roll"/>
+    <actuatorfrc name="thigh.L_yaw_tau" actuator="thigh.L_yaw"/>
+    <actuatorfrc name="thigh.R_pitch_tau" actuator="thigh.R_pitch"/>
+    <actuatorfrc name="thigh.R_roll_tau" actuator="thigh.R_roll"/>
+    <actuatorfrc name="thigh.R_yaw_tau" actuator="thigh.R_yaw"/>
+    <actuatorfrc name="shank.L_pitch_tau" actuator="shank.L_pitch"/>
+    <actuatorfrc name="shank.R_pitch_tau" actuator="shank.R_pitch"/>
+    <actuatorfrc name="foot.L_pitch_tau" actuator="foot.L_pitch"/>
+    <actuatorfrc name="foot.L_roll_tau" actuator="foot.L_roll"/>
+    <actuatorfrc name="foot.R_pitch_tau" actuator="foot.R_pitch"/>
+    <actuatorfrc name="foot.R_roll_tau" actuator="foot.R_roll"/>
+    <jointlimitfrc name="spine_pitch_stop" joint="spine_pitch"/>
+    <jointlimitfrc name="spine_roll_stop" joint="spine_roll"/>
+    <jointlimitfrc name="spine_yaw_stop" joint="spine_yaw"/>
+    <jointlimitfrc name="neck_pitch_stop" joint="neck_pitch"/>
+    <jointlimitfrc name="neck_roll_stop" joint="neck_roll"/>
+    <jointlimitfrc name="neck_yaw_stop" joint="neck_yaw"/>
+    <jointlimitfrc name="upperarm.L_pitch_stop" joint="upperarm.L_pitch"/>
+    <jointlimitfrc name="upperarm.L_roll_stop" joint="upperarm.L_roll"/>
+    <jointlimitfrc name="upperarm.L_yaw_stop" joint="upperarm.L_yaw"/>
+    <jointlimitfrc name="upperarm.R_pitch_stop" joint="upperarm.R_pitch"/>
+    <jointlimitfrc name="upperarm.R_roll_stop" joint="upperarm.R_roll"/>
+    <jointlimitfrc name="upperarm.R_yaw_stop" joint="upperarm.R_yaw"/>
+    <jointlimitfrc name="forearm.L_pitch_stop" joint="forearm.L_pitch"/>
+    <jointlimitfrc name="forearm.L_yaw_stop" joint="forearm.L_yaw"/>
+    <jointlimitfrc name="forearm.R_pitch_stop" joint="forearm.R_pitch"/>
+    <jointlimitfrc name="forearm.R_yaw_stop" joint="forearm.R_yaw"/>
+    <jointlimitfrc name="hand.L_pitch_stop" joint="hand.L_pitch"/>
+    <jointlimitfrc name="hand.L_roll_stop" joint="hand.L_roll"/>
+    <jointlimitfrc name="hand.R_pitch_stop" joint="hand.R_pitch"/>
+    <jointlimitfrc name="hand.R_roll_stop" joint="hand.R_roll"/>
+    <jointlimitfrc name="thigh.L_pitch_stop" joint="thigh.L_pitch"/>
+    <jointlimitfrc name="thigh.L_roll_stop" joint="thigh.L_roll"/>
+    <jointlimitfrc name="thigh.L_yaw_stop" joint="thigh.L_yaw"/>
+    <jointlimitfrc name="thigh.R_pitch_stop" joint="thigh.R_pitch"/>
+    <jointlimitfrc name="thigh.R_roll_stop" joint="thigh.R_roll"/>
+    <jointlimitfrc name="thigh.R_yaw_stop" joint="thigh.R_yaw"/>
+    <jointlimitfrc name="shank.L_pitch_stop" joint="shank.L_pitch"/>
+    <jointlimitfrc name="shank.R_pitch_stop" joint="shank.R_pitch"/>
+    <jointlimitfrc name="foot.L_pitch_stop" joint="foot.L_pitch"/>
+    <jointlimitfrc name="foot.L_roll_stop" joint="foot.L_roll"/>
+    <jointlimitfrc name="foot.R_pitch_stop" joint="foot.R_pitch"/>
+    <jointlimitfrc name="foot.R_roll_stop" joint="foot.R_roll"/>
+  </sensor>
+</mujoco>
