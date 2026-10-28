@@ -148,4 +148,5 @@ CoM. That is filed as hub task `swing-leg-world-ik`.
 ## Next
 
 A world-frame swing-leg controller (hub task `swing-leg-world-ik`), then a second step (the left
-foot ahead of the right) to make a gait cycle, on the D-032 model.
+foot ahead of the right) to make a gait cycle, on the D-032 model. The swing leg is `18`; the step that
+stands on every variant is `19` (this doc's step is now `--open-swing`).

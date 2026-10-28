@@ -350,3 +350,17 @@ Alternative: a learned swing-leg policy on the stand-in (docs/17), with this IK 
 Reverses if: the bench robot's joint sensors and IMU are too noisy for a per-step IK at 1 kHz (then the IK
 runs on the planner's model and only the slow pelvis attitude is fed back).
 
+## D-034 (2026-10-28) The drums do not self-lock while the robot steps; the step's transfers come from planned geometry in stages
+
+Why: with locks on, the weight shift rocks the body foot to foot at 1 to 2 Hz (+-33 N per foot): a drum locks
+when its joint is still and on target and releases when the balance loop moves the target, a stick-slip cycle
+inside the loop. Turned off from the first weight shift to the end of the centring, the ripple drops to
++-5 N, the step becomes repeatable, and with the transfers rebuilt (`19`) it stands in 14 of 14 grid variants
+with both feet within 4 mm, no line above its rating, and 444 J instead of 1259 J. Locks stay the standing
+hold (zero power once the robot stands still).
+Alternative: keep locks and widen their hysteresis or lock only joints whose targets are steady (the ankle
+roll at 1 deg of tolerance cut the ripple to +-28 N only).
+Reverses if: the bench winch shows real holding current costs far above the model's, so that stepping
+unlocked drains the battery (then lock per joint, only the stance leg's unloaded axes), or the real drum
+releases without the stick-slip the model has.
+

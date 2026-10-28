@@ -415,3 +415,16 @@ free foot held in the world, the step's robustness grid (`tools/step_sweep.py`, 
 finding that most variants fall in the weight transfer, not the landing; the IK is in behind `SWING_IK`, off. The transfer was then traced fall by fall (release
 timing, floor reference, straight trailing leg, sliding foot), each finding a flag, off by default; the best
 configuration lands both feet within 10 mm in 4 of 6 variants but no configuration stands in more than 2 of 6.
+
+## P-027 (2026-10-28) Continue: the transfer for margin
+
+> continue
+
+Produced: hub task `transfer-for-margin` (claimed). The cause of the grid's scatter found: the drum locks rock
+the body foot to foot inside the balance loop (D-034); off while stepping, the step is repeatable. The
+transfer and the centring rebuilt in stages from planned geometry with the weight shift fed forward, the
+crouch kept for the level landing, damped IK. The step stands in 14 of 14 grid variants (docs/16's: 2 of 14),
+both feet within 4 mm, no line above its rating, 444 J. Made the default; the rest of the gauntlet unchanged
+to the joule. `19`, D-034, recording `docs/img/step-ik.gif`. Branch `feat/w-mini-25mm` merged to main and
+released as v0.2.0.
+

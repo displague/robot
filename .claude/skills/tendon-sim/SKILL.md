@@ -63,8 +63,13 @@ python tools/step_trace.py --from 13.5 --to 20 SWING_IK=True     # then trace a 
 The sweep runs every configuration on the D-032 baseline and `--stiff-mini` at 90, 100 and 110 mm steps in
 parallel; each cell is `S` or `F<phase>` (where the pelvis first tilted past 20 degrees), `g` if a lift gate
 timed out, and the two landing errors in mm. The trace prints loads, CoM error and velocity, pelvis attitude,
-hip shift, ankle positions and leg joints (measured/applied) every 0.1 s. Flags for the swing leg (docs/18):
-`SWING_IK`, `IK_LATERAL`, `SWING_IK_TAU`, `SWING_ROLL_TAU`, `ROLL_RESTORE`, `TRANSFER_BACK`, `KD_JOINT`.
+hip shift, ankle positions and leg joints (measured/applied) every 0.1 s. The default step is docs/19's (`SWING_IK`, `IK_LATERAL`, `TRANSFER_PLAN`, `STEP_LOCKS=False`); `--open-swing`
+runs docs/16's. The other flags of docs/18 and 19 stay for comparison. Use `--lengths 0.085,...,0.115` (14
+variants) when comparing configurations: 6 variants were too few to separate them.
+
+Lesson (docs/19): if a grid will not settle, look for a limit cycle before tuning stages. Run the scene
+that feeds the failing phase on its own, measure the ripple of a load or CoM error, and switch mechanisms
+off one at a time (drum locks, joint damping, ankle modes, loop gains); the drum locks were it.
 
 ## Recordings
 
