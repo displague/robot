@@ -16,6 +16,7 @@ continuous torque. Per test: does it stand, pelvis height and tilt.
 Run:  python tools/sim_tendon.py               (needs: pip install mujoco)
       python tools/sim_tendon.py --csv         also writes sim/out/<test>.csv time series
       python tools/sim_tendon.py --stiff-mini  variant: 25 mm W-mini pulleys, 25 % pretension
+      python tools/sim_tendon.py --open-swing  the step's swing foot placed open loop (docs/16) instead of by IK
 """
 import math
 import os
@@ -34,6 +35,7 @@ from export_mjcf import build   # noqa: E402
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 KG, KDG = 3.0, 0.02             # inner gear loop: volts-fraction per rad of gear error, per rad/s
 KQ, KI, TRIM_MAX = 0.5, 2.0, math.radians(10)   # outer joint loop: proportional, integral (1/s), trim clamp
+KD_JOINT = {}                    # s: joint-rate damping in the outer loop per bone (rad of target per rad/s; docs/18)
 OUTER_GAIN = {"foot": 0.15}      # per bone (only used when the balance loop is off: with it on, the ankle runs in
                                  # torque mode and carries no trim)
 LOCK_TOL, LOCK_RATE = math.radians(1.0), 0.3    # joint-equivalent tolerance and gear rate to switch off and lock
@@ -90,9 +92,24 @@ STAND_HIP = 0.076                # m: the hip is this far ahead of the ankle in 
 ARM_CLEAR = math.radians(10)     # rad: shoulder abduction that keeps the hands off the thighs while stepping
 LAND_LOAD = 0.15                 # of the weight: the swing foot counts as placed once it carries this much
 PLACE_T = 1.5                    # s: the swing leg unfolds onto the floor over this long (stops at touchdown)
+TRANSFER_BACK = 1.0              # the transfer onto the leading foot ends with the CoM this many half-steps behind its
+                                 # sole centre (the old fold swung the trailing leg's mass forward at lift-off)
 TRANSFER_T = 5.0                 # s: a weight transfer between staggered feet (the hip-roll shift is slow, docs/14)
 LAND_REACH = 0.02                # m: the landing pose aims this far below the floor; touchdown ends the placement
 HOVER_H, HOVER_T = 0.04, 1.0     # m, s: the swing foot is first carried level to this far above its mark, in this long
+SWING_IK = False                 # the swing leg placed by world-frame inverse kinematics (docs/18); False: the planner
+                                 # geometry of docs/16 (targets relative to the CoM and hips, open loop)
+TRACE = False
+SWING_KI, SWING_CMAX = 0.0, 0.05  # 1/s, m: the swing ankle's world-frame aim moves by the integral of its measured error
+                                 # from the path (the leg sags below its targets under its own weight), clamped
+SWING_IK_TAU = 0.3               # s: low-pass on the measured body pose the IK reads (the swing hip's reaction
+                                 # pitches the pelvis; read back unfiltered, the leg rang at 5 Hz, +-40 mm at the foot)
+IK_LATERAL = False               # True: the IK also holds the swing ankle's width and sole roll in the world frame;
+                                 # False: the swing hip roll follows the weight shift through SWING_ROLL_TAU (docs/18)
+SWING_ROLL_TAU = 0.5             # s: low-pass on the swing hip's parallel roll command (unfiltered it followed the
+                                 # stance loop's 3 Hz ripple and threw the free leg +-45 mm sideways)
+ROLL_RESTORE = 0.05              # rad/s: after an IK landing, the swing leg's roll targets return to their pre-lift
+                                 # values this fast during the transfer (the weight shift takes up the difference)
 PLAN_SLEW = 0.6                  # rad/s: fastest the planner moves a leg target during a transfer
 REACH_0 = 0.003                  # m: the bent leg of a staggered stance is planned this much long; its knee is a
                                  # torque source (the share of the weight the CoM implies), so the leg is a spring
@@ -173,6 +190,7 @@ class Rig:
         # balance state: ankle pitch/roll torque-equivalent offsets, hip pitch lean, hip roll shift, estimates
         self.ankle_offset, self.ankle_roll, self.hip_lean, self.hip_shift = pre, {"L": 0.0, "R": 0.0}, 0.0, 0.0
         self._single, self._shift_hold, self._swing_free = False, 0.0, False
+        self._swing_roll_f = None
         self._grounded, self._unload_t = [True, True], [0.0, 0.0]
         self._ank_w = [1.0, 1.0]         # each ankle's share of the sagittal balance torque (0 in the air)
         self._load_f = [0.5 * self.mass * 9.81] * 2    # filtered vertical load per foot (its force sensors)
@@ -353,6 +371,7 @@ class Rig:
             # point; the swing hip is eased to its plan once its foot has left the ground, and stays there
             if not self._single:
                 self._shift_hold, self._ss_i, self._swing_free = self.hip_shift, 0.0, False
+                self._swing_roll_f = None
             ex, vx = float(self._com_f[0]), float(self._com_v[0])
             self._ss_i = max(-ROLL_MAX, min(ROLL_MAX, self._ss_i + SS_KI * ex * dt))
             self.hip_shift = max(-ROLL_MAX, min(ROLL_MAX, self._shift_hold - SS_KP * (ex + vx / omega) - self._ss_i))
@@ -366,7 +385,11 @@ class Rig:
                     if load < GROUND_LOAD * mass * 9.81:
                         self._swing_free = True
                     if self.swing_land or self.swing_parallel:
-                        want = self.hip_shift            # parallel to the stance leg: it lands at stance width
+                        # parallel to the stance leg: it lands at stance width; low-passed (SWING_ROLL_TAU)
+                        b = dt / (SWING_ROLL_TAU + dt) if SWING_IK else 1.0
+                        self._swing_roll_f = cur if self._swing_roll_f is None else self._swing_roll_f
+                        self._swing_roll_f += b * (self.hip_shift - self._swing_roll_f)
+                        want = self._swing_roll_f
                     elif self._swing_free:
                         want = SWING_CLEAR
                     else:
@@ -451,7 +474,7 @@ class Rig:
             w["_trim"] = max(-TRIM_MAX, min(TRIM_MAX, w.get("_trim", 0.0) + g * KI * err * dt))
             # gear target from the loop geometry: +phi tightens line B, which pulls q positive
             ratio = p["tackle"] * p["r_p"] / p["r_d"]
-            phi_des = ratio * (tgt + g * KQ * err + w["_trim"])
+            phi_des = ratio * (tgt + g * KQ * err - g * KD_JOINT.get(bone, 0.0) * dq + w["_trim"])
             gerr = phi_des - phi
             ctrl = KG * gerr - KDG * dphi
             # lock with hysteresis: engage when the gear is on target and still, release when it has drifted
@@ -756,6 +779,99 @@ def scenarios():
         def anchor(name):
             return r.data.xanchor[mujoco.mj_name2id(r.model, mujoco.mjtObj.mjOBJ_JOINT, name)]
 
+        ik = mujoco.MjData(r.model)
+        swing_q = {}
+        body_f = None                                     # the low-passed measured pose the IK reads
+        aim = np.zeros(2)                                 # (y, z) correction of the swing ankle's aim, world frame
+        x0, att0 = [0.0, 0.0], [(0.0, 0.0), (0.0, 0.0)]   # each swing ankle's width and sole attitude, taken at lift-off
+        restore = {}                                      # roll targets to return to after an IK landing (docs/18)
+
+        def sole_att(dd, side):
+            # the sole's pitch (about +x) and roll (about +y) in the world, rad
+            R = dd.xmat[r.feet["LR".index(side)]].reshape(3, 3)
+            return math.atan2(R[2, 1], R[1, 1]), math.atan2(-R[2, 0], R[2, 2])
+
+        def ik_solve(side, x, y, z, att):
+            # world-frame IK on the model's own chain: from the measured pose (every joint and the floating pelvis,
+            # as the joint sensors and the IMU give it, low-passed), the swing leg's hip roll and pitch, knee and
+            # ankle pitch and roll that put its ankle joint at (x, y, z) in the world and the sole at `att` (its
+            # standing attitude: level). Gauss-Newton on finite differences, each evaluation one mj_kinematics on
+            # a scratch copy; the rest of the body stays where it is measured. Hip yaw is left where it is
+            names = ["thigh.%s_roll" % side, "thigh.%s_pitch" % side, "shank.%s_pitch" % side,
+                     "foot.%s_pitch" % side, "foot.%s_roll" % side]
+            if not IK_LATERAL:
+                names = names[1:4]                        # hip roll and ankle roll stay with the balance loop
+            adr = [r.by_name[n]["q"] for n in names]
+            aj = mujoco.mj_name2id(r.model, mujoco.mjtObj.mjOBJ_JOINT, "foot.%s_pitch" % side)
+            ik.qpos[:] = body_f
+            q = np.array([swing_q.get(n, r.data.qpos[a]) for n, a in zip(names, adr)])
+
+            def resid(qq):
+                for a, v in zip(adr, qq):
+                    ik.qpos[a] = v
+                mujoco.mj_kinematics(r.model, ik)
+                p_, r_ = sole_att(ik, side)
+                e = np.array([ik.xanchor[aj][0] - x, ik.xanchor[aj][1] - y, ik.xanchor[aj][2] - z,
+                              p_ - att[0], r_ - att[1]])
+                return e if IK_LATERAL else e[1:4]
+
+            lo = np.array([r.by_name[n]["lo"] for n in names])
+            hi = np.array([r.by_name[n]["hi"] for n in names])
+            nq = len(names)
+            for _ in range(3):
+                e = resid(q)
+                J = np.empty((nq, nq))
+                for j in range(nq):
+                    dq = np.zeros(nq)
+                    dq[j] = 1e-4
+                    J[:, j] = (resid(q + dq) - e) / 1e-4
+                q = np.clip(q - np.linalg.lstsq(J, e, rcond=None)[0], lo, hi)
+            return dict(zip(names, q))
+
+        def swing_ik(side, path, seconds, until=None):
+            # carry the swing ankle along path(g) -> (y, z), g from 0 to 1 over `seconds`, sole at its standing
+            # pitch, the targets solved every control step from the measured body (docs/18). The balance loop is
+            # free to move the body: the foot stays on its world path regardless
+            nonlocal body_f, aim
+            n = int(round(seconds / r.model.opt.timestep))
+            a = r.model.opt.timestep / max(SWING_IK_TAU, r.model.opt.timestep)
+            if body_f is None or len(swing_q) == 0:
+                body_f = r.data.qpos.copy()
+                aim[:] = 0.0
+            aj = mujoco.mj_name2id(r.model, mujoco.mjtObj.mjOBJ_JOINT, "foot.%s_pitch" % side)
+            dt = r.model.opt.timestep
+            for i in range(1, n + 1):
+                g = i / n
+                g = g * g * (3 - 2 * g)                   # smoothstep: no jerk at either end
+                # the body pose as the IK sees it: the measured one, low-passed (quaternion by normalised lerp)
+                body_f += a * (r.data.qpos - body_f)
+                body_f[3:7] /= np.linalg.norm(body_f[3:7])
+                y, z = path(g)
+                # the aim integrates the measured ankle's error from the path (joint sensors + kinematics); the IK
+                # has already taken out the body's motion, so what is left is the leg's own tracking error
+                err = np.array([y, z]) - r.data.xanchor[aj][1:3]
+                aim[:] = np.clip(aim + SWING_KI * err * dt, -SWING_CMAX, SWING_CMAX)
+                sol = ik_solve(side, x0["LR".index(side)], y + aim[0], z + aim[1], att0["LR".index(side)])
+                for k, v in sol.items():
+                    swing_q[k] = v
+                    # control() adds the trunk lean to every hip pitch target and the weight shift to every hip roll
+                    # (and takes it off the ankle roll: the parallelogram); the IK wants the joint angle itself
+                    off = {"thigh.%s_pitch" % side: r.hip_lean, "thigh.%s_roll" % side: r.hip_roll_cmd[side],
+                           "foot.%s_roll" % side: -r.hip_roll_cmd[side]}.get(k, 0.0)
+                    r.target[k] = v - off
+                r.step()
+                if TRACE and i % 100 == 0:
+                    an = r.data.xanchor[aj]
+                    print("     ik t=%.2f g=%.2f want (%.0f, %.0f, %.0f) ankle (%.0f, %.0f, %.0f) aim (%.0f, %.0f) | %s | load %.0f"
+                          % (r.data.time, g, 1e3 * x0["LR".index(side)], 1e3 * y, 1e3 * z, 1e3 * an[0], 1e3 * an[1],
+                             1e3 * an[2], 1e3 * aim[0], 1e3 * aim[1],
+                             " ".join("%s %.1f/%.1f" % (k.split(".")[1], math.degrees(v),
+                                                        math.degrees(r.data.qpos[r.by_name[k]["q"]])) for k, v in sol.items()),
+                             r.cop()[1]["LR".index(side)]))
+                if until is not None and until(r):
+                    return True
+            return False
+
         def com_ahead():
             # the CoM ahead of the left ankle's start (IMU + kinematics)
             return float(y_l0 - r.data.subtree_com[r.pelvis][1])
@@ -841,6 +957,10 @@ def scenarios():
                 # 17 mm off the floor it had just landed on
                 for k, v in legs(f, s, tall, reach=reach0 + (REACH_0 - reach0) * g, off=off).items():
                     r.target[k] += max(-PLAN_SLEW * dt, min(PLAN_SLEW * dt, v - r.target[k]))
+                # the IK left the landed leg's rolls at absolute angles; control() adds the weight shift on top, so
+                # held there they push the CoM sideways through the transfer (170 mm/s past the stance foot)
+                for k, v in restore.items():
+                    r.target[k] += max(-ROLL_RESTORE * dt, min(ROLL_RESTORE * dt, v - r.target[k]))
                 r.step()
             f_now[0] = f1
             measure(s)
@@ -861,10 +981,24 @@ def scenarios():
             f = com_ahead()
             r.swing, r.swing_land = swing, False
             r.set_phase("%s lift %s" % ("2" if swing == "R" else "5", swing))
-            # lift: fold the swing leg (sole level, foot up ahead); the stance leg straight at its lean
-            r.ramp(1.5, {"thigh.%s_pitch" % swing: -fold["hip"], "shank.%s_pitch" % swing: fold["knee"],
-                         "foot.%s_pitch" % swing: level(-fold["hip"], fold["knee"])} | legs(f, s, stance, stance))
-            r.run(0.5)
+            if SWING_IK:
+                # lift: the ankle straight up to HOVER_H above the floor, sole level, at its standing width (world
+                # frame, docs/18); the stance leg straight at its lean
+                swing_q.clear()
+                restore.clear()
+                if IK_LATERAL:
+                    restore.update({k: r.target[k] for k in ("thigh.%s_roll" % swing, "foot.%s_roll" % swing)})
+                r.ramp(0.3, legs(f, s, stance, stance))
+                a0 = anchor("foot.%s_pitch" % swing).copy()
+                x0[i], att0[i] = float(a0[0]), sole_att(r.data, swing)   # on the floor still: its width, sole level
+                z_f = anchor("foot.%s_pitch" % stance)[2]
+                swing_ik(swing, lambda g: (a0[1], a0[2] + (z_f + HOVER_H - a0[2]) * g), 1.2)
+                swing_ik(swing, lambda g: (a0[1], z_f + HOVER_H), 0.5)
+            else:
+                # lift: fold the swing leg (sole level, foot up ahead); the stance leg straight at its lean
+                r.ramp(1.5, {"thigh.%s_pitch" % swing: -fold["hip"], "shank.%s_pitch" % swing: fold["knee"],
+                             "foot.%s_pitch" % swing: level(-fold["hip"], fold["knee"])} | legs(f, s, stance, stance))
+                r.run(0.5)
             # place, in two moves: first carry the foot level to HOVER_H above its mark, then lower it straight
             # down onto a landing pose aimed LAND_REACH below the floor (the hip height moves with the stance
             # lean, so geometry alone leaves the sole hovering); the foot sensors end it at touchdown. In one
@@ -875,10 +1009,21 @@ def scenarios():
             s2 = list(s)
             s2[i] = s_new
             f = com_ahead()
-            r.ramp(HOVER_T, legs(f, s2, stance, swing, reach=-HOVER_H))
-            r.run(0.3)
-            land = legs(f, s2, stance, swing, reach=LAND_REACH)
-            landed = r.ramp(PLACE_T, land, until=lambda r: r.cop()[1][i] > LAND_LOAD * r.mass * 9.81)
+            touch = lambda r: r.cop()[1][i] > LAND_LOAD * r.mass * 9.81
+            if SWING_IK:
+                # the same two moves in the world frame: the mark is fixed on the floor relative to the left ankle's
+                # start, the foot's height relative to the floor the stance ankle stands on
+                a0 = anchor("foot.%s_pitch" % swing).copy()
+                y_m, z_f = y_l0 - s_new, anchor("foot.%s_pitch" % stance)[2]
+                swing_ik(swing, lambda g: (a0[1] + (y_m - a0[1]) * g, a0[2] + (z_f + HOVER_H - a0[2]) * g), HOVER_T)
+                swing_ik(swing, lambda g: (y_m, z_f + HOVER_H), 0.3)
+                landed = swing_ik(swing, lambda g: (y_m, z_f + HOVER_H - (HOVER_H + LAND_REACH) * g), PLACE_T,
+                                  until=touch)
+            else:
+                r.ramp(HOVER_T, legs(f, s2, stance, swing, reach=-HOVER_H))
+                r.run(0.3)
+                land = legs(f, s2, stance, swing, reach=LAND_REACH)
+                landed = r.ramp(PLACE_T, land, until=touch)
             r.swing, r.swing_land = None, False
             measure(s)
             print("   %s foot %s at t=%.2f s, %.0f mm ahead of the other (planned %.0f)"
@@ -906,7 +1051,7 @@ def scenarios():
         # (the targets come from the feet as measured: the leading foot slid 46 mm forward during this transfer
         # once, and a plan from the stale position landed the next foot behind it and the CoM on a heel)
         r.set_phase("4 transfer onto R")
-        move_com(TRANSFER_T, s[1] + sole - half, s, "L", weight=(0.0, 1.0), hold=1.0, release="L")
+        move_com(TRANSFER_T, s[1] + sole - TRANSFER_BACK * half, s, "L", weight=(0.0, 1.0), hold=1.0, release="L")
         unloaded(r, 0)
         r.knee_tau["R"] = None                            # the right leg is the stance now: position mode
         measure(s)
@@ -937,6 +1082,12 @@ def main():
     if "--hip50" in sys.argv:
         import export_mjcf
         export_mjcf.HIP_ROLL_60 = False      # the 50 mm, tackle 2 hip roll of docs/14, for comparison
+    if "--trace" in sys.argv:
+        global TRACE
+        TRACE = True
+    if "--open-swing" in sys.argv:
+        global SWING_IK
+        SWING_IK = False                     # the open-loop placement of docs/16, for comparison
     rig = Rig()
     print("mujoco %s: %d bodies, %d DOF (%d joint + %d winch), %d tendons, %d motors, mass %.1f kg"
           % (mujoco.__version__, rig.model.nbody, rig.model.nv, len(rig.w), 2 * len(rig.w), rig.model.ntendon,

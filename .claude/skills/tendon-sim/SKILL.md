@@ -50,6 +50,22 @@ Do not edit the repo to try a value. In a scratchpad script: `sys.path.insert(0,
 `rig.report(title, top=N)` returns the table rows (name at index 1, peak 2, cont 3) and `rig.standing()`
 the verdict. Run several variants as parallel processes. Commit the chosen values, not the sweep script.
 
+## The step: judge changes on the grid, not one run
+
+The step is deterministic and sits on a knife edge: one millimetre flips a run. Any change to the step,
+the balance loop or the leg drive trains is judged with
+
+```bash
+python tools/step_sweep.py "before: SWING_IK=False" "after: SWING_IK=True IK_LATERAL=True"
+python tools/step_trace.py --from 13.5 --to 20 SWING_IK=True     # then trace a failing row
+```
+
+The sweep runs every configuration on the D-032 baseline and `--stiff-mini` at 90, 100 and 110 mm steps in
+parallel; each cell is `S` or `F<phase>` (where the pelvis first tilted past 20 degrees), `g` if a lift gate
+timed out, and the two landing errors in mm. The trace prints loads, CoM error and velocity, pelvis attitude,
+hip shift, ankle positions and leg joints (measured/applied) every 0.1 s. Flags for the swing leg (docs/18):
+`SWING_IK`, `IK_LATERAL`, `SWING_IK_TAU`, `SWING_ROLL_TAU`, `ROLL_RESTORE`, `TRANSFER_BACK`, `KD_JOINT`.
+
 ## Recordings
 
 ```bash

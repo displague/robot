@@ -410,4 +410,6 @@ simulation and the release steps are found by the next session; `cad/blender/ren
 uncommitted scratch render script (single assemblies and the gallery). On branch `feat/w-mini-25mm`:
 D-032, neck pitch/roll 25 mm lugs and wrist 18 mm in `chain.py` and the model; the neck within its rating
 standing; the 40 N push now stands; the first static step falls on this model, which the swing-leg
-controller has to fix before the branch merges.
+controller has to fix before the branch merges. Then the world-frame swing-leg controller (`18`, D-033): accurate landings, steady single support with the
+free foot held in the world, the step's robustness grid (`tools/step_sweep.py`, `tools/step_trace.py`), and the
+finding that most variants fall in the weight transfer, not the landing; the IK is in behind `SWING_IK`, off.

@@ -336,3 +336,17 @@ on the ring primitive (D-023's alternative), not needed at this load.
 Reverses if: the printed neck's mass at real infill exceeds the skeleton's 0.3 kg budget enough to move
 the head's CoM, or the bench test of the W-mini line rating comes in well above 37 N.
 
+## D-033 (2026-10-28) The swing leg is placed by world-frame IK on the model's own chain; step changes are judged on a 6-variant grid
+
+Why: placing the swing foot from the planner's geometry relative to the CoM and hips lands it 18 to 29 mm
+long, and correcting it from the measured foot fought the balance loop (`16`). IK on a scratch copy of the
+model from the low-passed measured pose puts the ankle on a path fixed on the floor; landings come within 0
+to 13 mm. Holding the free foot's width in the world as well removes the 3 Hz lateral ring of single support
+that the parallel-roll scheme fed. Judging on one deterministic run misled every earlier step change: the
+open-loop step stands in 1 to 2 of 6 variants of model and step length, so `tools/step_sweep.py` is the test.
+The IK stays off by default (`SWING_IK`) until the step stands on the grid, because the weight transfer, not
+the landing, is where most variants fall (`18`).
+Alternative: a learned swing-leg policy on the stand-in (docs/17), with this IK as its teacher.
+Reverses if: the bench robot's joint sensors and IMU are too noisy for a per-step IK at 1 kHz (then the IK
+runs on the planner's model and only the slow pelvis attitude is fed back).
+

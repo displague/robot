@@ -46,6 +46,8 @@ Goal ordering, in case they conflict: **cheap > simple to build > human range of
 | `docs/15-one-foot-hold.md` | The one-foot hold passes (Phase 5 exit test in simulation): the seven things it took, what the stance hip actually does, the 60 mm hip-roll pulley (D-027, D-028) |
 | `docs/16-first-step.md` | The first static step completes (Phase 6a in simulation): per-phase line readout, the exit test verdict, what it took, the observer bug (D-029, D-030) |
 | `docs/17-learned-control.md` | Learned control: the fast stand-in, the sibling's model core as a PPO actor, the hand-written controller as teacher, the first ladder (cloning: 90 % standing under pushes), the failing gate on the tendon model, why get-up needs a kneeling curriculum (D-031) |
+| `docs/18-swing-leg-world-frame.md` | The swing leg by world-frame IK (accurate landings, steady single support with the free foot held in the world), and the finding that the step has no margin: most variants fall in the weight transfer, whatever the swing leg does (in progress) |
+| `tools/step_sweep.py`, `tools/step_trace.py` | The step's robustness grid (two models x three step lengths, landing errors, fall phase) and the per-0.1 s trace falls are found with |
 | `docs/references.md` | External projects to borrow test scenarios and tooling from (primo, microban, Isaac Lab, DreamDojo, LeRobot, the sibling ai-embedded-dynamic-diversity) |
 | `cad/blender/ring.py`, `cad/blender/winch_bank.py` | Ring-joint generator; N-winch bank generator |
 | `cad/blender/render.py` | Headless PNG renders: one generated assembly, or the gallery of every STL in `cad/out` |
