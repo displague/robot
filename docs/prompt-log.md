@@ -369,3 +369,24 @@ superseded; alerts now 0); #52 `rl/render.py`, the release GIFs, version 0.3.0; 
 trained policies, logs and the forgetting cross-eval attached. Issues #8, #9, #13, #16, #17, #18 triaged and
 kept open as not on the grounded-body path; #48-#51 opened for the next steps (stand-in gap, get-up
 curriculum, rehearsal and regression gate, seeds). Here: this entry, `docs/17` and references updated.
+
+## P-025 (2026-10-28) Hub access restored; merged branches deleted
+
+> Mcp reconnected?
+
+> continue (should have agenthub access restoredtoo)
+
+> the merged branches can be deleted. you should be in the workspace now, with that record moved.
+
+> i meant you can delete the merged github remote branches
+
+> keep the local trained checkpoints, etc.
+
+Produced: in the hub, the re-authenticated agent (a new subject) joined, wrote
+`records/robot-learned-control-v030-20261028` (moved by the owner into `robot`), finished
+`policy-training-humanoid-tendon32` with the v0.3.0 results and gaps, and filed `standin-tendon-gap`,
+`getup-kneeling-curriculum`, `rehearsal-regression-gate`, `rl-seeds`; `isaac-lab-conversion` left pending as
+D-031's fallback. In the sibling: the ten merged remote branches deleted; the seven merged-branch worktrees
+removed after their trained checkpoints, logs and RPO meshes were copied into the main checkout
+(`artifacts/rl`, `third_party/roboparty_rpo/meshes`), which is now on master; the three remote branches of
+unmerged, closed PRs kept.
