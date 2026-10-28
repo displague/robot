@@ -93,7 +93,11 @@ landed foot's actual contact (heel, toe or flat) first.
 | `SWING_IK IK_LATERAL RELEASE_SETTLED` | 2 | 0 |
 | `SWING_IK IK_LATERAL TRANSFER_SWAP` (hold 2 s) | 1 | 4 |
 
-## Where this leaves the hub task
+## Where this leaves the hub task (superseded by `19`)
+
+`19` found the reason the grid would not settle (the drum locks rock the body foot to foot inside the balance
+loop) and rebuilt the transfer; the step now stands in 14 of 14 variants with both feet within 4 mm. What
+follows is the state at the end of this doc.
 
 The swing leg does what the task asked: the IK lands the feet within 10 mm in most variants. The exit test
 (the step completing on both models) is not met, and it cannot be met by the swing leg: on this grid the
