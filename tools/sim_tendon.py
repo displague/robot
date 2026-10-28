@@ -94,6 +94,20 @@ LAND_LOAD = 0.15                 # of the weight: the swing foot counts as place
 PLACE_T = 1.5                    # s: the swing leg unfolds onto the floor over this long (stops at touchdown)
 TRANSFER_BACK = 1.0              # the transfer onto the leading foot ends with the CoM this many half-steps behind its
                                  # sole centre (the old fold swung the trailing leg's mass forward at lift-off)
+FIXED_FLOOR = False              # the planner's leg heights from the floor (the ankles' standing height, measured once)
+                                 # rather than from the tall foot's ankle, which rises as that foot unloads and fed the
+                                 # leading leg's bend back into itself (docs/18)
+RELEASE_SETTLED = False          # the transfer declares the trailing foot the swing foot only once the lateral CoM has
+                                 # settled as the lift gate requires (|e_x| < 10 mm, |v_x| < 20 mm/s), not at the first
+                                 # dip of its load below a tenth of the weight (docs/18)
+WIDTH_FROM_STANCE = False        # IK_LATERAL lands the foot at the standing spacing from the stance foot (True) or at
+                                 # its own lift-off width (False); see docs/18 for why True is not yet better
+TRANSFER_SWAP, TRAIL_LIFT = False, 0.015   # through the transfer's hold the leading leg becomes the straight one and
+                                 # the trailing leg is planned TRAIL_LIFT short, so its knee bends and its foot unloads
+                                 # (a straight trailing leg sets the hip height and cannot unload; docs/18)
+STAGGER_ONLY, STAGGER_HOLD = False, 8.0   # the `stagger` scene: first placement, then hold the staggered stance
+TRANSFER_KNEE = True             # the leading knee is a torque source through the transfer (docs/16 item 6)
+TRANSFER_HOLD = 1.0              # s: the transfer onto the leading foot holds its end point this long
 TRANSFER_T = 5.0                 # s: a weight transfer between staggered feet (the hip-roll shift is slow, docs/14)
 LAND_REACH = 0.02                # m: the landing pose aims this far below the floor; touchdown ends the placement
 HOVER_H, HOVER_T = 0.04, 1.0     # m, s: the swing foot is first carried level to this far above its mark, in this long
@@ -882,8 +896,10 @@ def scenarios():
                 s[i] = y_l0 - anchor("foot.%s_pitch" % side)[1]
 
         def hip_height(side, floor):
-            # that side's hip above the floor, the floor being the `floor` foot's ankle (joint sensors + kinematics)
-            return anchor("thigh.%s_pitch" % side)[2] - anchor("foot.%s_pitch" % floor)[2]
+            # that side's hip above the floor, the floor being the `floor` foot's ankle (joint sensors + kinematics),
+            # or with FIXED_FLOOR the ankles' standing height
+            z = z_floor[0] if FIXED_FLOOR and z_floor else anchor("foot.%s_pitch" % floor)[2]
+            return anchor("thigh.%s_pitch" % side)[2] - z
 
         def hip_offsets():
             # each hip ahead of the CoM, measured
@@ -910,7 +926,8 @@ def scenarios():
                 out["thigh.%s_pitch" % side], out["shank.%s_pitch" % side], out["foot.%s_pitch" % side] = t, k, a
             return out
 
-        def move_com(seconds, f1, s, tall, weight=None, hold=0.0, reach0=LAND_REACH, release=None, knee=True):
+        def move_com(seconds, f1, s, tall, weight=None, hold=0.0, reach0=LAND_REACH, release=None, knee=True,
+                     swap=False):
             # the planner's transfer: the CoM target, the weight share and the leg targets move together over
             # `seconds` (then `hold`), the legs recomputed every step from the measured hip height (a closed
             # chain: targets set once at the start press one foot into the floor or lift it as the lean
@@ -931,7 +948,8 @@ def scenarios():
             knee_j = mujoco.mj_name2id(r.model, mujoco.mjtObj.mjOBJ_JOINT, "shank.%s_pitch" % lead)
             for i in range(1, n + 1):
                 g = min(1.0, i * dt / seconds)
-                if (release and g >= 1.0 and r.swing != release
+                settled = (not RELEASE_SETTLED or (abs(r._com_f[0]) < 0.01 and abs(r._com_v[0]) < 0.02))
+                if (release and g >= 1.0 and r.swing != release and settled
                         and r.cop()[1]["LR".index(release)] < 0.1 * r.mass * 9.81):
                     # the transfer has taken the weight off this foot: the planner declares it the swing foot
                     # now, so the controller enters single support once. Left to the load debounce, a foot
@@ -951,11 +969,17 @@ def scenarios():
                 # with the feet level both legs are nearly straight: a straight knee has no lever to push with
                 # and the torque mode left the leg weak (the foot hopped 0 to 150 N and slid 75 mm), so a level
                 # stance runs both knees in position mode, as the plain weight shift does
-                r.knee_tau[lead] = -share * r.mass * 9.81 * arm if knee else None
+                gh = max(0.0, (i * dt - seconds) / hold) if (swap and hold > 0) else 0.0   # hold progress
+                r.knee_tau[lead] = -share * r.mass * 9.81 * arm if (knee and gh == 0.0) else None
                 # the reach eases from the landing pose's (the foot was aimed below the floor and has just
                 # touched it) to the planted value: jumping straight to the planted value lifted the new foot
                 # 17 mm off the floor it had just landed on
-                for k, v in legs(f, s, tall, reach=reach0 + (REACH_0 - reach0) * g, off=off).items():
+                if gh > 0.0:
+                    # the leading leg straight and setting the height; the trailing leg bent TRAIL_LIFT short
+                    plan = legs(f, s, lead, reach=-TRAIL_LIFT * min(1.0, 2.0 * gh), off=off)
+                else:
+                    plan = legs(f, s, tall, reach=reach0 + (REACH_0 - reach0) * g, off=off)
+                for k, v in plan.items():
                     r.target[k] += max(-PLAN_SLEW * dt, min(PLAN_SLEW * dt, v - r.target[k]))
                 # the IK left the landed leg's rolls at absolute angles; control() adds the weight shift on top, so
                 # held there they push the CoM sideways through the transfer (170 mm/s past the stance foot)
@@ -990,7 +1014,12 @@ def scenarios():
                     restore.update({k: r.target[k] for k in ("thigh.%s_roll" % swing, "foot.%s_roll" % swing)})
                 r.ramp(0.3, legs(f, s, stance, stance))
                 a0 = anchor("foot.%s_pitch" % swing).copy()
-                x0[i], att0[i] = float(a0[0]), sole_att(r.data, swing)   # on the floor still: its width, sole level
+                # the mark's width: the stance foot's lateral position plus the standing spacing (the trailing foot
+                # can slide inward through a transfer; landing it where it slid to narrows the stance step by step)
+                k = 1 - i
+                x0[i] = (float(anchor("foot.%s_pitch" % stance)[0]) + (width0[i] - width0[k]) if WIDTH_FROM_STANCE
+                         else float(a0[0]))
+                att0[i] = sole_att(r.data, swing)              # on the floor still: the sole level
                 z_f = anchor("foot.%s_pitch" % stance)[2]
                 swing_ik(swing, lambda g: (a0[1], a0[2] + (z_f + HOVER_H - a0[2]) * g), 1.2)
                 swing_ik(swing, lambda g: (a0[1], z_f + HOVER_H), 0.5)
@@ -1031,6 +1060,8 @@ def scenarios():
                      1e3 * (s_new - s[1 - i])))
 
         y_l0 = anchor("foot.L_pitch")[1]
+        z_floor = []
+        width0 = [0.0, 0.0]
         s = [0.0, 0.0]                                    # ankles ahead of the left ankle's start
         f0 = sole                                         # standing: CoM over the sole centres
         f_now = [f0]                                      # where the planner has put the CoM
@@ -1042,16 +1073,24 @@ def scenarios():
         # the arms held 10 deg clear of the thighs: hanging, the hands rest on the thighs and the wrist and
         # shoulder roll lines carry the legs' sway (wrist rolls above their rating for 4 s, shoulder roll 283 N)
         r.move({"upperarm.L_roll": -ARM_CLEAR, "upperarm.R_roll": ARM_CLEAR}, 1.0)
+        z_floor.append(0.5 * (anchor("foot.L_pitch")[2] + anchor("foot.R_pitch")[2]))   # both feet flat on the floor
+        width0[:] = [float(anchor("foot.%s_pitch" % side)[0]) for side in "LR"]          # their standing widths
         shift(r, 2.0)                                                               # weight onto the left foot
         unloaded(r, 1)
         place("R", s, STEP_LEN)                           # right foot a step ahead, knee bent to reach
+        if STAGGER_ONLY:
+            # the staggered stance on its own (docs/18): the CoM to the middle of the two soles, an even share, held
+            r.set_phase("4 stagger hold")
+            move_com(TRANSFER_T, 0.5 * (s[0] + s[1]) + sole, s, "L", weight=(0.5, 0.5), hold=STAGGER_HOLD)
+            return
         # onto the right foot, the pelvis half a step forward (the CoM half a step behind the right sole centre:
         # the heel margin is 80 mm, and the next lift swings the left leg's mass forward); the left leg stays
         # straight and sets the height, the right knee follows
         # (the targets come from the feet as measured: the leading foot slid 46 mm forward during this transfer
         # once, and a plan from the stale position landed the next foot behind it and the CoM on a heel)
         r.set_phase("4 transfer onto R")
-        move_com(TRANSFER_T, s[1] + sole - TRANSFER_BACK * half, s, "L", weight=(0.0, 1.0), hold=1.0, release="L")
+        move_com(TRANSFER_T, s[1] + sole - TRANSFER_BACK * half, s, "L", weight=(0.0, 1.0), hold=TRANSFER_HOLD, release="L",
+                 knee=TRANSFER_KNEE, swap=TRANSFER_SWAP)
         unloaded(r, 0)
         r.knee_tau["R"] = None                            # the right leg is the stance now: position mode
         measure(s)
@@ -1070,6 +1109,9 @@ def scenarios():
             ("onefoot", "one-foot stance: right foot lifted, held 10 s", "Phase 5 exit test (docs/06)", onefoot),
             ("step", "first static step: right foot 100 mm ahead, then the left level with it",
              "Phase 6a (docs/06): shift, lift, place, shift, lift, place, centre", take_step)]
+    if STAGGER_ONLY:
+        out = [("stagger", "staggered stance: right foot placed ahead, CoM to the middle, held",
+                "the transfer's stance on its own (docs/18)", take_step)]
     return out
 
 

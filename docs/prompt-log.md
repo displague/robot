@@ -412,4 +412,6 @@ D-032, neck pitch/roll 25 mm lugs and wrist 18 mm in `chain.py` and the model; t
 standing; the 40 N push now stands; the first static step falls on this model, which the swing-leg
 controller has to fix before the branch merges. Then the world-frame swing-leg controller (`18`, D-033): accurate landings, steady single support with the
 free foot held in the world, the step's robustness grid (`tools/step_sweep.py`, `tools/step_trace.py`), and the
-finding that most variants fall in the weight transfer, not the landing; the IK is in behind `SWING_IK`, off.
+finding that most variants fall in the weight transfer, not the landing; the IK is in behind `SWING_IK`, off. The transfer was then traced fall by fall (release
+timing, floor reference, straight trailing leg, sliding foot), each finding a flag, off by default; the best
+configuration lands both feet within 10 mm in 4 of 6 variants but no configuration stands in more than 2 of 6.
