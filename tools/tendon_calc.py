@@ -14,6 +14,7 @@ Formulas
 
 Run:  python tools/tendon_calc.py          (prints the reference scenarios quoted in docs/)
       python tools/tendon_calc.py --json   (machine-readable)
+      python tools/tendon_calc.py --ranges (each winch class at the low / nom / high of sim/motor_ranges.json, docs/24)
 
 All motor figures are BALLPARK catalogue values. Measure the motors you actually buy.
 """
@@ -56,6 +57,10 @@ def motor_peak_power_w(m: Motor, eta: float) -> float:
 
 
 MOTORS = {
+    # These are the figures the committed model runs on. Sourced low / nom / high for the ones the model uses are in
+    # sim/motor_ranges.json (D-040, docs/24) and differ: Pololu 298:1 HP is 0.39 N m stall now (0.49 was the
+    # pre-2020 figure), JGB37 1:90 1.1 N m (0.77 to 1.47) at 2.4 A, the 775 is 66 A at stall (Kt 0.0095, not 25 A),
+    # the worm is gear-limited at 3.9 to 6.9 N m. Run them with ROBOT_MOTORS=low|nom|high, or --ranges here.
     # Pololu-class HP N20 at 6 V; cheap no-name N20s run ~60-70% of these numbers.
     "N20_30:1":    Motor("N20 micro gearmotor 30:1 6V",   0.064, 1000, 1.6, 6,  10,  4.0),
     "N20_100:1":   Motor("N20 micro gearmotor 100:1 6V",  0.21,   320, 1.6, 6,  10,  4.0),
@@ -218,7 +223,42 @@ SCENARIOS = [
 ]
 
 
+def ranges_table():
+    """--ranges: each winch class of the model (export_mjcf.CLASSES) on the model's figures and on the low / nom /
+    high cases of sim/motor_ranges.json (D-040, docs/24). The clutch and the label are the builder's settings and
+    stay put; the motor, gearbox and the line's real strength move."""
+    import export_mjcf as em
+    rows = []
+    for case in ("model", "low", "nom", "high"):
+        motors, lines, eta = em.motor_case("" if case == "model" else case)
+        for cls, c in em.CLASSES.items():
+            m, r = motors[c["motor"]], c["r_drum"]
+            t_stall = m.stall_torque_nm * eta[cls]
+            f_stall = t_stall / r
+            brk, label = lines[c["line"]][1], em.LINES_MODEL[c["line"]][1]
+            f_slip = min(em.CLUTCH_LINE_FRACTION * label, 0.95 * f_stall)
+            v0 = m.noload_rpm / 60 * 2 * math.pi * r * 1000
+            amps = m.stall_current_a * f_slip / f_stall          # current to hold the line at the clutch (brushed)
+            row = dict(case=case, cls=cls, motor=c["motor"], t_stall=t_stall, f_stall=f_stall,
+                       f_cont=f_stall * m.cont_fraction, f_slip=f_slip, brk=brk, sf_slip=brk / f_slip, v0=v0,
+                       amps=amps)
+            if cls == "W-max":       # docs/21's walking points, drum-side: ankle push-off 213 N, hip swing 210 N
+                row["ankle_mm_s"] = v0 * max(0.0, 1 - 213 / f_stall)
+                row["hip_mm_s"] = v0 * max(0.0, 1 - 210 / f_stall)
+            rows.append(row)
+    return rows
+
+
 def main():
+    if "--ranges" in sys.argv:
+        print("class   case   T_stall drum (N m)  F_stall  F_cont  F_clutch  break  SF@clutch  no-load mm/s  A@clutch"
+              "  ankle 213 N mm/s (need 312)  hip 210 N mm/s (need 168)")
+        for r in sorted(ranges_table(), key=lambda r: r["cls"]):
+            print("%-7s %-6s %8.3f %16.0f %7.0f %7.0f %6.0f %8.1f %12.0f %10.1f   %s" % (
+                r["cls"], r["case"], r["t_stall"], r["f_stall"], r["f_cont"], r["f_slip"], r["brk"], r["sf_slip"],
+                r["v0"], r["amps"],
+                "%5.0f %26.0f" % (r["ankle_mm_s"], r["hip_mm_s"]) if "ankle_mm_s" in r else ""))
+        return
     rows = [evaluate(s) for s in SCENARIOS]
     if "--json" in sys.argv:
         print(json.dumps(rows, indent=2))

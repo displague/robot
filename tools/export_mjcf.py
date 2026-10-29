@@ -31,13 +31,15 @@ Run:  python tools/export_mjcf.py [--table]   -> sim/robot.xml (and the per-DOF 
       python tools/sim_tendon.py              -> stand, push, hold tests with tendon readouts
 """
 import json
+import dataclasses
 import math
 import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from export_urdf import expand, sub, FOOT_BOX, FOOT_OFFSET, WORLD_AXIS   # noqa: E402
-from tendon_calc import MOTORS, LINES                                     # noqa: E402
+from tendon_calc import MOTORS as MOTORS_MODEL, LINES as LINES_MODEL      # noqa: E402
+MOTORS, LINES = dict(MOTORS_MODEL), dict(LINES_MODEL)   # the figures in use: tendon_calc's, or a ROBOT_MOTORS case
 
 # ------------------------------------------------------------------- winch classes (docs/01 table)
 # rotor_J: motor rotor inertia (kg m^2), ballpark from rotor mass and radius; reflected through the
@@ -82,6 +84,48 @@ STIFF_MINI = False   # variant: every W-mini pulley at least 25 mm (docs/13 find
                      # in the baseline and the wrist at 18, so this now only raises the wrist)
 TORSO_WORM = bool(os.environ.get("ROBOT_TORSO_WORM"))   # variant: spine and shoulders on W-worm (docs/20; hub
                      # record worm-gearmotor-options-20261028); an environment variable so step_sweep's children see it
+MOTOR_SET = os.environ.get("ROBOT_MOTORS")   # variant (D-040, docs/24): low | nom | high of sim/motor_ranges.json, or
+                     # <file.json>[:case]; every drive's stall torque, speed, current, continuous fraction and gearbox
+                     # efficiency, and every line's break strength, at that end of its sourced range (low = the
+                     # pessimistic end of each figure). Unset: tendon_calc's figures. Applied at import and by build().
+ETA_MODEL = {k: c["eta"] for k, c in CLASSES.items()}
+
+
+def motor_case(spec):
+    """(MOTORS, LINES, {class: eta}) for a ROBOT_MOTORS value; tendon_calc's own figures for an empty one."""
+    motors, lines, eta = dict(MOTORS_MODEL), dict(LINES_MODEL), dict(ETA_MODEL)
+    if not spec:
+        return motors, lines, eta
+    path, case = spec, "nom"
+    if spec in ("low", "nom", "high"):
+        path, case = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "sim",
+                                  "motor_ranges.json"), spec
+    elif ":" in os.path.basename(spec):
+        path, case = spec.rsplit(":", 1)
+    with open(path) as f:
+        ranges = json.load(f)
+    fields = ("stall_torque_nm", "noload_rpm", "stall_current_a", "cont_fraction", "mass_g", "kv", "r_ohm")
+    for name, r in ranges["motors"].items():
+        if name in motors:
+            motors[name] = dataclasses.replace(motors[name], **{k: r[k][case] for k in fields if k in r})
+        for cls, c in CLASSES.items():            # the gearbox efficiency of the drive this motor sits in
+            if c["motor"] == name and "eta" in r:
+                eta[cls] = r["eta"][case]
+    for name, r in ranges.get("lines", {}).items():
+        if name in lines:
+            lines[name] = (lines[name][0], r["break_n"][case])
+    return motors, lines, eta
+
+
+def use_motor_case(spec):
+    """Point this module's MOTORS, LINES and CLASSES[...]["eta"] at a ROBOT_MOTORS case."""
+    global MOTORS, LINES
+    MOTORS, LINES, eta = motor_case(spec)
+    for cls, e in eta.items():
+        CLASSES[cls]["eta"] = e
+
+
+use_motor_case(MOTOR_SET)   # at import too: export_standin and wmax_options call winch_params without build()
 HIP_ROLL_60 = True   # hip roll on the 60 mm pulley with tackle 3 (D-028, docs/15); False restores the 50 mm, tackle 2 of docs/14
 
 
@@ -103,10 +147,15 @@ def winch_params(joint_name, axis, cls_name):
     w_noload = m.noload_rpm / 60 * 2 * math.pi               # drum-side no-load speed
     f_stall = t_stall / r_d                                  # line force at stall (before the clutch)
     f_cont = f_stall * m.cont_fraction
-    ea = brk / (4 * STRETCH_AT_QUARTER_BREAK)                # N, line axial stiffness per unit length
+    # What the builder sets (pretension, clutch slip) and the line's stretch come from the model's own figures
+    # (tendon_calc: the spool label, the nominal motor), so a ROBOT_MOTORS case changes the parts, not the settings:
+    # a weaker line then shows as a lower safety factor at the same clutch, a weaker motor as less margin over it.
+    m0, brk0 = MOTORS_MODEL[c["motor"]], LINES_MODEL[c["line"]][1]
+    f_cont0 = m0.stall_torque_nm * ETA_MODEL[cls_name] / r_d * m0.cont_fraction
+    ea = brk0 / (4 * STRETCH_AT_QUARTER_BREAK)               # N, line axial stiffness per unit length
     k = ea / (n * j["bowden"])                                # N/m, measured along the drum-side line
-    pre = pre_frac * f_cont                                   # N on each line at rest
-    t_clutch = CLUTCH_LINE_FRACTION * brk * r_d              # drum torque at slip
+    pre = pre_frac * f_cont0                                  # N on each line at rest (barrel adjuster)
+    t_clutch = CLUTCH_LINE_FRACTION * brk0 * r_d             # drum torque at slip, set against the label
     return dict(cls=cls_name, motor=m, tackle=n, r_p=r_p, r_d=r_d, line=c["line"], break_n=brk,
                 t_stall=t_stall, w_noload=w_noload, f_stall=f_stall, f_cont=f_cont, k=k, pre=pre,
                 t_clutch=min(t_clutch, 0.95 * t_stall), t_hold=c["hold"] * t_stall,
@@ -247,6 +296,7 @@ MASSES = os.environ.get("ROBOT_MASSES")   # variant: a JSON file {bone: kg per s
 
 def build():
     root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    use_motor_case(MOTOR_SET)
     with open(os.path.join(root, "cad", "skeleton.json")) as f:
         data = json.load(f)
     if MASSES:

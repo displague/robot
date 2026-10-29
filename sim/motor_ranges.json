@@ -1,0 +1,150 @@
+{
+  "about": "Sourced ranges for every drive and line figure the model uses (D-040, docs/24-motor-sources.md). Keys under motors are tools/tendon_calc.py MOTORS names; fields are the Motor fields in the same units and convention (stall torque and no-load speed at the gearbox output, stall_torque_nm before the class's gearbox efficiency eta). Each figure has three cases: low = the pessimistic end of that figure (for stall_current_a that is the most amps per newton metre, which costs energy), nom = the best sourced estimate, high = the optimistic end. ROBOT_MOTORS=low|nom|high (tools/export_mjcf.py) runs the model on one case for every drive at once. eta is the gearbox efficiency the model multiplies stall_torque_nm by; it is 1.0 where the source figure is measured or stated at the output with the gearbox losses already in it. Line break_n is the effective strength of the line as terminated (wrapped on the drum and pulley before the crimp), not the spool label.",
+  "date": "2026-10-29",
+  "motors": {
+    "N20_298:1": {
+      "part": "Pololu 298:1 Micro Metal Gearmotor HP 6V, extended shaft (#2218), 6 V",
+      "stall_torque_nm": {"low": 0.31, "nom": 0.39, "high": 0.49},
+      "noload_rpm": {"low": 80, "nom": 100, "high": 120},
+      "stall_current_a": {"low": 1.6, "nom": 1.6, "high": 1.6},
+      "cont_fraction": {"low": 0.16, "nom": 0.23, "high": 0.30},
+      "eta": {"low": 1.0, "nom": 1.0, "high": 1.0},
+      "mass_g": {"low": 10.0, "nom": 9.5, "high": 9.5},
+      "gear_limit_nm": 0.196,
+      "notes": "Pololu's 2020+ dynamometer datasheet (rev 6.2): 40 kg mm (0.39 N m) stall, extrapolated, measured at the output, so eta 1.0. 0.49 N m is the pre-2020 figure (70 oz in), still on resellers. Low: Pololu says units stall well before the extrapolated point as they heat; taken as 0.8 x (the +-20 % speed tolerance applied to torque). Continuous: Pololu advises 25 % of stall current or less: 0.4 A gives 9.0 kg mm on the measured current line (0.23 of stall); low is the max-efficiency point 6.5 kg mm (0.16); high is the model's 0.30. Gearbox limit 20 kg mm (0.196 N m), instantaneous: keep loads well under it. No measured comparison of no-name N20 298:1 against Pololu was found; vendor claims are 33 to 75 % of Pololu's stall.",
+      "sources": [
+        "https://www.pololu.com/file/0J1487/pololu-micro-metal-gearmotors-rev-6-2.pdf",
+        "https://www.pololu.com/product/2218/specs",
+        "https://www.pololu.com/category/60/micro-metal-gearmotors",
+        "https://www.pololu.com/blog/762/performance-graphs-for-our-micro-metal-gearmotors",
+        "https://core-electronics.com.au/298-1-micro-metal-gearmotor-hp.html"
+      ]
+    },
+    "N20_100:1": {
+      "part": "Pololu 100:1 Micro Metal Gearmotor HP 6V (#2214); hands and face, not in the model yet",
+      "stall_torque_nm": {"low": 0.13, "nom": 0.167, "high": 0.21},
+      "noload_rpm": {"low": 250, "nom": 310, "high": 370},
+      "stall_current_a": {"low": 1.6, "nom": 1.6, "high": 1.6},
+      "cont_fraction": {"low": 0.16, "nom": 0.23, "high": 0.30},
+      "eta": {"low": 1.0, "nom": 1.0, "high": 1.0},
+      "mass_g": {"low": 10.0, "nom": 9.5, "high": 9.5},
+      "notes": "Pololu rev 6.2: 17 kg mm stall, 310 rpm; low 0.8 x, high the old figure (0.21). Continuous as the 298:1.",
+      "sources": ["https://www.pololu.com/file/0J1487/pololu-micro-metal-gearmotors-rev-6-2.pdf"]
+    },
+    "JGB37_1:90": {
+      "part": "JGB37-520 12 V 1:90 '110 rpm' (about 10 000 rpm motor) with hall encoder",
+      "stall_torque_nm": {"low": 0.77, "nom": 1.10, "high": 1.47},
+      "noload_rpm": {"low": 94, "nom": 110, "high": 127},
+      "stall_current_a": {"low": 3.2, "nom": 2.4, "high": 2.3},
+      "cont_fraction": {"low": 0.33, "nom": 0.245, "high": 0.20},
+      "eta": {"low": 1.0, "nom": 1.0, "high": 1.0},
+      "mass_g": {"low": 170, "nom": 160, "high": 144},
+      "notes": "Seller tables: Hiwonder JGB37-520R90-12 15 kg cm stall at 3.2 A, 2.6 kg cm rated; NFP JGB37-520-12100 12 kg cm stall at 2.4 A, 3.0 kg cm rated, +-15 % speed; RAM e-shop 15 kg cm max at 2.3 A. Hiwonder's 1:90 / 1:30 stall ratio (2.59 for 3) shows its figures carry the gearbox loss, so they are taken at the output (eta 1.0). NFP's table scales stall exactly with ratio (motor x ratio, no loss): low is NFP's 1.18 N m x 0.65 (gearbox efficiency derived from a supplier stall table across ratios and Maxon's 4 to 5 stage spur gearheads, 0.59 to 0.66). Nom 1.10 between the two readings. Continuous: rated torque 0.255 / 0.27 / 0.294 N m (Hiwonder, mid, NFP) as fractions of each case's stall. Mass: NFP 144 to 170 g, Yahboom MD520 150 g; Hiwonder's 200 g is shipping weight. The model's 1.7 N m and 3.5 A are above every source. A 6000 rpm winding sold under the same name gives 66 rpm and 8 kg cm at 1:90: check the listing says 110 rpm.",
+      "sources": [
+        "https://www.hiwonder.com/products/hall-encoder-dc-geared-motor",
+        "https://precisionminidrives.com/product/37mm-diameter-miniature-dc-gear-motor-nfp-jgb37-520-dc-6v-12v-24v",
+        "https://www.ram-e-shop.com/shop/dc-jgb37-12v-set-110rpm-jgb37-520-dc-geared-motor-12vdc-110-rpm-complete-set-with-encoder-9326",
+        "https://category.yahboom.net/products/md520",
+        "https://rcdrone.top/products/jgb37-520-dc-gear-motor",
+        "https://www.maxongroup.com/maxon/view/product/143767",
+        "https://www.openimpulse.com/blog/jgb37-520-gearmotor-selector/"
+      ]
+    },
+    "775_PLAN40": {
+      "part": "775 brushed, 12 V, rated about 12 000 rpm at 12 V, ball bearing, on a printed two-stage 1:40 planetary",
+      "stall_torque_nm": {"low": 16.0, "nom": 24.8, "high": 32.0},
+      "noload_rpm": {"low": 270, "nom": 300, "high": 325},
+      "stall_current_a": {"low": 45.0, "nom": 66.0, "high": 87.0},
+      "cont_fraction": {"low": 0.125, "nom": 0.13, "high": 0.16},
+      "eta": {"low": 0.35, "nom": 0.50, "high": 0.65},
+      "mass_g": {"low": 366, "nom": 350, "high": 337},
+      "motor_kt_nm_per_a": {"low": 0.0088, "nom": 0.0095, "high": 0.0100},
+      "motor_r_ohm": {"low": 0.28, "nom": 0.18, "high": 0.14},
+      "notes": "Motor x 40. Kt is settled by the speed: 12 000 rpm at 12 V is Kv 1000 rpm/V, Kt = 60 / (2 pi Kv) = 0.0095 N m/A; on nine 775-class sheets (VEX 775pro, AndyMark RedLine, Banebots RS775-18 and -12, Kinmore RS-775PH and RS-770PHF, Techtonics, NFP 775SHP, Handsontec) the stall-point Kt is 0.86 to 1.05 x the speed one. The motor constant Km = Kt / sqrt(R) of those sheets is 0.018 to 0.028 N m/sqrt(W), which with Kt 0.0095 gives R 0.28 / 0.18 / 0.14 ohm, stall current 12 / R = 45 / 66 / 87 A and stall torque Kt (I - I0) = 0.40 / 0.62 / 0.80 N m (Handsontec's 12 000 rpm 775: 0.66 N m at 12 V; RS775-18 at 12 V: 0.80 N m, 86.7 A). So the model's 0.6 N m is right and its 25 A is not: the current at a given torque is 2.6 x the model's. Speed: Handsontec 12 000, RS775-18 at 12 V 13 000, -10 % tolerance (AndyMark). Continuous: no source rates a cheap 775; a stalled 775 tolerates about 11 to 25 W of copper loss (Chief Delphi locked-rotor reports), 8 to 12 A at 0.18 ohm, 15 A with the fan turning: 7 / 10 / 15 A, Kt (I - I0) as fractions of each case's stall. Gearbox: printed two-stage planetary 0.35 / 0.50 / 0.65 (COMPAct dyno: single PLA stage 0.60 to 0.80, compound 14:1 about 0.60; a GitHub 16:1 two-stage about 0.50; squared single stages 0.36 to 0.64). No dynamometer test of a printed 1:40 exists.",
+      "sources": [
+        "https://www.handsontec.com/dataspecs/motor_fan/775-Motor.pdf",
+        "https://banebots.com/m7-rs775-18/",
+        "https://banebots.com/m7-rs775-12/",
+        "https://wiki.penfieldrobotics.com/wiki/images/1/10/2012_MotorInfo.pdf",
+        "https://www.chiefdelphi.com/uploads/default/original/3X/0/2/02a0dc9f352a3d7bf4d126012baef9d037ee2393.pdf",
+        "https://cdn.andymark.com/am-3775a",
+        "https://kinmore.com/products/rs-770-775h/",
+        "https://techtonics.in/product/rs-775-motor-7000-rpm-12v-high-torque/",
+        "https://nfpshop.com/product/42mm-12v-18v-24v-ball-bearing-775-performance-motor-used-for-robotics-quadcopter-industrials",
+        "https://www.chiefdelphi.com/t/stall-testing-775-pro-surprisingly-poor-result/166538",
+        "https://arxiv.org/html/2510.07197v2",
+        "https://github.com/jagathsrujan/3d-printable-planetary-gearbox",
+        "https://howtomechatronics.com/how-it-works/what-is-the-best-3d-printed-drive-for-your-next-robotic-project/"
+      ]
+    },
+    "WORM_10RPM": {
+      "part": "12 V worm gearmotor 5840-31ZY class, 58 mm gearbox, 8 mm shaft, 10 rpm 1:634 (Greartisan B07YBXMTWC)",
+      "stall_torque_nm": {"low": 3.92, "nom": 5.4, "high": 6.9},
+      "noload_rpm": {"low": 8.5, "nom": 10, "high": 11.5},
+      "stall_current_a": {"low": 1.55, "nom": 1.8, "high": 2.25},
+      "cont_fraction": {"low": 0.75, "nom": 0.73, "high": 0.57},
+      "eta": {"low": 1.0, "nom": 1.0, "high": 1.0},
+      "mass_g": {"low": 380, "nom": 370, "high": 360},
+      "notes": "Greartisan: rated 40 kg cm (3.92 N m) at 1.4 A (+-10 %), 1:634. The electrical stall of the 31ZY motor through 1:634 is far above the gear's strength (35 to 42 kg cm per amp, 3.8 to 6.5 A stall: 125 to 220 kg cm), so the usable stall is the gearbox limit: NFP 5840-31ZY-S caps stall at 40 kg cm for every ratio from 54:1, NFP 5840-31ZY-DSH gives 70 kg cm max: low 3.92, high 6.9 N m, nom between. The model's 7.84 N m (twice rated) is above every source. Current at each torque on Greartisan's line (0.25 A + 35 kg cm/A, +10 % at low). Continuous: rated 3.92 N m (low: 75 % of it, in a closed torso, unsourced derating). Figures at the output: eta 1.0. Mass: NFP 360 g, Amazon 13.1 oz (371 g).",
+      "sources": [
+        "https://www.amazon.com/clp/B07YBXMTWC",
+        "https://www.amazon.com/Greartisan-3-250RPM-Self-Locking-Reversible-Reduction/dp/B07YBXP9C4",
+        "https://nfpmotor.com/6v-12v-24v-dc-single-output-shaft-reversible-electric-gear-motor-model-nfp-5840-31zy-s",
+        "https://nfpmotor.com/5840-gear-motor-of-high-torque-with-self-locking-double-shafts-model-nfp-5840-31zy-dsh",
+        "https://nfpshop.com/product/greartisan-12v-24v-dc-dual-shaft-gear-motor-self-locking-reversible-model-nfp-5840-31zys-d",
+        "https://www.robotshop.com/products/dyna-engine-high-torque-dual-shaft-12v-12rpm-5840-31zy-worm-gear-reduction-motor"
+      ]
+    },
+    "5010_PLAN16": {
+      "part": "generic 12N14P 5010 360 KV outrunner (RCTimer / Readytosky class, about 92 g) on FOC at a 20 A driver peak + printed 1:16 planetary, 12 V",
+      "stall_torque_nm": {"low": 6.69, "nom": 7.36, "high": 8.16},
+      "noload_rpm": {"low": 219, "nom": 243, "high": 267},
+      "stall_current_a": {"low": 20.0, "nom": 20.0, "high": 20.0},
+      "cont_fraction": {"low": 0.15, "nom": 0.30, "high": 0.45},
+      "eta": {"low": 0.35, "nom": 0.50, "high": 0.65},
+      "kv": {"low": 324, "nom": 360, "high": 396},
+      "r_ohm": {"low": 0.35, "nom": 0.26, "high": 0.20},
+      "mass_g": {"low": 100, "nom": 92, "high": 80},
+      "notes": "Kt per amp of phase-current amplitude = 8.27 / Kv (15 sqrt(3) / pi / Kv, ODrive's torque constant); 9.55 / Kv is per DC (six-step ESC) amp, confirmed within 7 % by T-Motor MN501-S thrust-stand data. Kv +-10 %: Kt 0.0209 / 0.0230 / 0.0255; x 20 A x 16. Resistance: 0.24 ohm measured line to line on a generic 5010 360 KV (SimpleFOC forum), RCTimer 5010 siblings scaled by 1/Kv^2 0.275 to 0.35; the model's 0.15 is below every generic source. The premium 24N28P class (T-Motor MN501-S 360 KV) is 0.045 ohm and 175 g: a different motor. Continuous without airflow: 3 / 6 / 9 A amplitude (SimpleFOC guess 3 A; 6 and 9 A from an assumed 4 to 5 K/W winding-to-air, unsourced). Speed 0.9 Kv V / 16. Gearbox as the 775's printed planetary.",
+      "sources": [
+        "https://community.simplefoc.com/t/what-current-and-voltage-limits-to-use-for-this-motor/4245",
+        "https://rctimer.com/rctimer-5010-360kv-multicopter-brushless-motor-p0233.html",
+        "https://rctimer.com/rctimer-5010-260kv-multirotor-brushless-motor40mm-shaft-p0132.html",
+        "https://www.rcshopbd.com/product/5010-360kv-high-efficiency-brushless-motor/",
+        "https://www.ligpower.com/product/mn501-s-kv360-motor-navigator-type.html",
+        "https://discourse.odriverobotics.com/t/question-about-torque-calculation/4295"
+      ]
+    },
+    "5010_PLAN25_24V": {
+      "part": "the same 5010 on a printed 1:25 planetary, 24 V (6S)",
+      "stall_torque_nm": {"low": 10.45, "nom": 11.5, "high": 12.75},
+      "noload_rpm": {"low": 280, "nom": 311, "high": 342},
+      "stall_current_a": {"low": 20.0, "nom": 20.0, "high": 20.0},
+      "cont_fraction": {"low": 0.15, "nom": 0.30, "high": 0.45},
+      "eta": {"low": 0.35, "nom": 0.50, "high": 0.65},
+      "kv": {"low": 324, "nom": 360, "high": 396},
+      "r_ohm": {"low": 0.35, "nom": 0.26, "high": 0.20},
+      "mass_g": {"low": 100, "nom": 92, "high": 80},
+      "notes": "As 5010_PLAN16, x 25 and 0.9 Kv 24 V / 25.",
+      "sources": ["https://community.simplefoc.com/t/what-current-and-voltage-limits-to-use-for-this-motor/4245"]
+    }
+  },
+  "lines": {
+    "braid_50lb": {"label_n": 222, "break_n": {"low": 160, "nom": 200, "high": 244}},
+    "braid_100lb": {"label_n": 445, "break_n": {"low": 320, "nom": 400, "high": 490}},
+    "braid_200lb": {"label_n": 890, "break_n": {"low": 641, "nom": 801, "high": 979}},
+    "notes": "Effective strength = label x line factor x termination factor. Line: branded braid tests 1.04 to 2.0 x label at 20 lb, 1.12 (Sufix 832 40 lb) and 1.26 (50 lb) on Instron; a cheap Chinese '50 lb' 0.86; no tests at 100 or 200 lb: 0.85 / 1.0 / 1.25 x label. Termination: the line wrapped at least three turns round the drum (and round the joint pulley) before its crimp or knot, so the capstan effect leaves 6 to 15 % of the tension at the crimp and the limit is the line bent on the drum at D/d 17 to 40 (HMPE keeps full strength above 8:1): 0.85 / 0.9 / 0.9 x. Low 0.72, nom 0.90, high 1.10 x label. A knot or crimp carrying the full load is 0.3 / 0.5 / 0.75 x label (Sport Fishing Instron knot tests; crimps on bare braid slip, no numbers) and is not allowed: at 0.3 it breaks below the 1/3 clutch.",
+    "sources": [
+      "https://www.sportfishingmag.com/?p=46781",
+      "https://www.sportfishingmag.com/best-fishing-knots-main-line-to-terminal-gear/",
+      "https://www.sportfishingmag.com/?p=45256",
+      "https://tackletour.com/reviewsufix832braid.html",
+      "https://www.tackletour.com/reviewsufix832braidpg2.html",
+      "https://nesa.co.uk/threads/cheap-braid-test.152946",
+      "https://www.rya.org.uk/knowledge/safety/look-after-yourself/hmpe-rope",
+      "https://sailmagazine.com/cruising/knots-great-beware-limitations/",
+      "https://spearfishing.world/thread/5702-crimping-spectra/",
+      "https://fishtalkmag.com/blog/fishing-line-stretch-test-stretching-truth"
+    ]
+  }
+}

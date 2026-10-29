@@ -437,3 +437,18 @@ only recommended if the walk, the one-foot hold and the push set stand at the pe
 The bench tests (`bench-load-tests`) become checks after purchase, not gates before it.
 Alternative: buy one of each motor and measure (the owner declined: cost and time before the design is sure).
 Reverses if: the owner gets the parts in hand; then the measured values replace the ranges.
+
+## D-041 (2026-10-29) A motor case moves the parts, not the settings; lines are anchored by wraps, not knots
+
+Why: docs/24 (P-038). With `ROBOT_MOTORS=low|nom|high` the model runs every drive and line at one end of its
+sourced range. What the builder sets stays put across the cases: the pretension (barrel adjuster, from the model's
+continuous rating), the clutch's slip force (a third of the spool label, or 0.95 of the motor's stall) and the
+line stiffness. So a weaker line shows as a lower safety factor at the same clutch, and a weaker motor as less
+margin over it, instead of the model quietly re-tuning itself. And since a knot carrying the load keeps 0.3 to
+0.75 of the label (Instron knot tests) and a crimp on bare braid slips, every line is wrapped at least three turns
+on the drum and on the joint pulley before its crimp; the line's effective strength is then 0.72 / 0.90 / 1.10 of
+the label, never under 2.2 times the clutch force.
+Alternative: the clutch and pretension re-derived from each case's figures (hides the weak-line case); knots or
+bare crimps (at 0.3 of label the line breaks before the clutch slips).
+Reverses if: a bench check after purchase shows the wrapped anchor slipping or the braid failing on the drum
+before the knot figures would.

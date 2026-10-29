@@ -551,3 +551,9 @@ wind from any direction, the stand, step and walk swept over speed and gust stre
 Produced: release v0.3.0 (github.com/displague/robot/releases/tag/v0.3.0, `docs/releases.md`). D-040: motor
 figures become sourced ranges and a build is recommended only if it stands at the pessimistic end; the
 bench tests become post-purchase checks.
+
+Then (branch `feat/motor-ranges`): `docs/24-motor-sources.md` and `sim/motor_ranges.json`, sourced low / nom /
+high for every drive and line with URLs; `ROBOT_MOTORS=low|nom|high|<file>` in `export_mjcf` and
+`tendon_calc.py --ranges`; D-041. The 775's Kt is 0.0095 N m/A (66 A stall, not 25). At low the gauntlet loses
+push 40 and the walk, the walk grid stands 20 of 42 (sourced nom 36, model 42); the W-max (775 on the printed
+1:40) is the limit and needs about 8.8 N m at the drum (a gearbox of at least 0.55).

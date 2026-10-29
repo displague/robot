@@ -42,6 +42,10 @@ Buying notes:
 - **Not hobby N20s for the neck and wrist.** Retail "N20 with magnetic encoder" motors (the Adafruit family,
   for example) draw about 0.2 A at stall, against 1.6 A for the HP motor the model uses: a fraction of the
   torque.
+- **Sourced ranges (`24`, D-040).** The 775 draws about 66 A at stall (Kt 0.0095), not 25: holding the clutch
+  limit takes 24 A (36 A at the pessimistic end), above what `21` sized the VNH5019 for. The JGB37-520 1:90 is
+  1.1 N m stall (0.77 to 1.47), not 1.7, and is also sold with a 66 rpm winding: buy the 110 rpm one. At the
+  pessimistic end the 775 on the printed 1:40 does not walk; it needs a gearbox of at least 0.55 efficiency.
 - **W-max is still provisional** (D-006): the printed planetary must pass the Phase 2 rope-brake test before
   buying 21. Buy two 775s for that test first.
 
