@@ -41,6 +41,8 @@ Cost per node: about $40 in electronics for an arm node before motors. BLDC-base
 - 1 kHz inner loop per channel: PWM from a PI current/torque estimate (bus current or H-bridge
   sense), clamped to a per-channel hold limit.
 - 200 Hz outer loop: PID on joint angle from the AS5600, feed-forward from the motor encoder.
+- Balance (D-044, docs/26): the leg nodes run the balance loop at about 1 kHz, IMU and foot loads to motor
+  command within 5 ms. In simulation a 10 ms delay loses the 40 N push; 5 ms stands.
 - Modes per channel: `position` (go to angle), `tension` (hold tendon force, used for grasp and
   for pretension), `limp` (coast), `hold` (brake at current position, drive to zero current if
   the stage is self-locking).

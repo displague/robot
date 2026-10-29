@@ -576,3 +576,16 @@ forecast is about 1.7 times higher (12 m/s here is a 20 m/s forecast). Foot fric
 robot uses 0.15 to 0.28. At 0.4 the step falls in gusty wind, at 0.3 the step and walk fall without wind. The
 soft contact creeps (78 mm in 20 s in a 10 m/s wind). With the no-slip solver (`NOSLIP`, new, with `FLOOR_MU`)
 standing and the wind map hold but the step grid stands 23 of 42 and the walk 16: the next work.
+
+## P-040 (2026-10-29) Shape, friction, weight, wind dynamics; sensors; postures; silicone pad feet; Blender
+
+> (are these accurate representations of the shape, friction, weight, and wind dynamics? do our sensors detect window (the force or movement pattern thereof, enough to dynamically adjust and balance - does the system bow, bend, or turn-in hands to reduce contact (whatever it can do, is it able to do that with the constraints in time, is it effective)? for the feet, we can assume a cheap non-slip adhessive. 0.04" thickness adhesive backed silicone non-slip pads, diy cut-out, 5"x40" 6.3oz costs $10 - upc 717018793922 on amazon, 3m double coated tissue tape 9448a)
+
+> have our wind simulations also been processed using blender's forces on rigid bodies? (trying to understand how many ways we're testing/verifying results)
+
+Produced: `26`, D-044, `tools/sensor_sweep.py`, `tools/posture_wind.py`, the 1 kHz balance-loop note in `04`. The
+26 kg roll-up stands 14 m/s head-on and 12 from the side (20 kg: 12 and 10). On modelled sensors the wind map is
+unchanged; a 10 ms loop delay loses the 40 N push (5 ms stands); uncalibrated FSRs stop the step. Bowing 35 deg
+adds 2 m/s head-on if started within about a second; squat, arms, hands and twist do not help. The silicone pad
+shears by microns (held feet are right) at friction 0.5 to 1.2. Blender is not used for physics: every wind
+result is MuJoCo plus hand checks; a second engine, CFD or a leaf-blower test would be independent.

@@ -485,3 +485,19 @@ Alternative: an elliptic cone with impratio 10 (5 mm of creep, no extra cost), k
 too slow for the teacher data. A compliant sole in the model (a few mm of elastic shear) is the physical middle
 and may replace both.
 Reverses if: a printed sole on a bench shows centimetres of creep under a steady side load (it should not).
+
+## D-044 (2026-10-29) Silicone pad feet, a 1 kHz balance loop, and bowing as the next wind strategy
+
+Why: P-040 (docs/26). (1) Feet: an adhesive silicone non-slip pad (1 mm, bonded with 3M 9448A on its adhesive
+side) on every sole, friction low / nom / high 0.5 / 0.9 / 1.2 (sourced from rubber figures; no silicone figure
+found). It shears by microns, so the held-feet model (`NOSLIP=5`, D-043) is the right one. (2) Sensors: on
+modelled sensors (`tools/sensor_sweep.py`) the wind is felt as well as from the simulator's truth; what breaks is
+latency: 10 ms loses the 40 N push, 5 ms stands. The balance loop runs at about 1 kHz on the leg nodes, IMU and
+foot loads to motor command within 5 ms (docs/04's 200 Hz loop stays for the joints). Calibrated FSRs and load
+cells score the same; uncalibrated FSRs (15 %) stop the step at the lift gate. (3) Wind: bowing 35 deg into a
+head wind raises standing from 12 to 14 m/s steady and 10 to 12 with gusts, if begun within about a second of
+the lean nearing its limit and done in 0.5 s; squatting, folding the arms, turning the hands and twisting do not
+help. A bow reflex is the next wind work; nothing posture-based helps from the side.
+Alternative: FSR 402s alone (their 20 N range needs a load-sharing pad and per-sensor calibration); a load cell
+per corner is the safer part, decided after the step works on held feet.
+Reverses if: the pad measures under 0.5 on a ramp, or the balance loop cannot close in 5 ms on the ESP32.

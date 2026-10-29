@@ -97,6 +97,20 @@ The default contact is MuJoCo's soft one with friction 1.0, and a loaded foot cr
 `step_sweep.py ... "held: NOSLIP=5"` and `"hard: NOSLIP=5 FLOOR_MU=0.4"`. Today these stand 23 and 40 of 42 (step)
 and 16 and 13 (walk), against 42 on soft contact.
 
+## Sensors and postures (docs/26, D-044)
+
+```bash
+python tools/sensor_sweep.py sweep cases=truth,lc_fast,fsr_fast,fsr_bad scenes=push40,step winds=0:0:head,10:0:head
+python tools/posture_wind.py static                                   # drag and CoM offset needed per posture
+python tools/posture_wind.py sweep postures=stand,bow35 speeds=12,14 dirs=head,left gusts=0,1.5
+T0=2.5 python tools/posture_wind.py one bow35 14 0 head 0.5           # a posture started after the wind
+```
+
+`sensor_sweep.py` subclasses `Rig`: the balance loop and the planner read a CoM with delay, bias, wander and noise
+and 4 corner load sensors per sole with gain, hysteresis, drift and saturation (`CASES`; `only_<error>` and
+`delay<ms>` isolate one error). `lc_fast` (1 kHz, 3 ms, load cells) is the build's target. Judge a controller
+change on it as well as on truth: a 10 ms delay already loses push 40.
+
 ## Reading a scene's table
 
 `== <scene>: t, pelvis height, tilt -> STANDS|FALLS; electrical energy (mean W)`, then lines worst first:

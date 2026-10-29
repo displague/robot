@@ -190,6 +190,8 @@ not (bench supply, wire, connector kit, crimpers, scales; 16 kg PETG).
 | 44 | M5 barrel adjusters (40) | [10-pack](https://www.amazon.com/dp/B07FDZYB9Z) x 4 | 0.70 | 27.96 | |
 | 45 | Elastics | [silicone tube](https://www.amazon.com/dp/B08PTXMNCN) + [cord](https://www.amazon.com/dp/B0CBTRJV19) | | 16.18 | |
 | 46 | Scales | [10 N spring](https://www.amazon.com/dp/B00VYNT6Q6) + [50 kg luggage](https://www.amazon.com/dp/B09PQB73JD) | | 19.97 | |
+| 47 | Sole pads | silicone non-slip sheet, adhesive backed, 0.04 in, 5 x 40 in (the owner's pick, UPC 717018793922) | | ~10 | cut to the soles; friction 0.5 to 1.2 (D-044, docs/26); not in the total above |
+| 48 | Pad tape | 3M 9448A double coated tissue tape (acrylic) | | | on the pad's adhesive side only, it does not stick to bare silicone; not priced, not in the total |
 
 Options: 5010 360 KV x 21 [GoolRC](https://www.amazon.com/dp/B0C2YRNX1Z) $587.58; SimpleFOC Mini x 21
 [listing](https://www.amazon.com/dp/B0DRV88Z16) $167.79. Phase 4: Pi 5 8 GB, camera, USB-CAN about $256
