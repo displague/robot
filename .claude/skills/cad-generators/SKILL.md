@@ -41,7 +41,9 @@ B="/c/Program Files/Blender Foundation/Blender 5.1/blender.exe"
   1.2 mm solid, 25 % infill by default; `--infill`, `--wall`), the parts with no generator yet (estimates),
   and the bought parts, per body segment against `cad/skeleton.json`. `--build` runs the generators first
   (into `--stl`, default `cad/out`); `--json masses.json` writes per-bone masses for the model variant
-  `ROBOT_MASSES=masses.json` (tendon-sim skill); `--torso-worm` rolls up the worm-gearmotor torso variant. A new generator part must be added to `PARTS` (count and
+  `ROBOT_MASSES=masses.json` (tendon-sim skill); `--torso-worm` rolls up the worm-gearmotor torso variant; `--wmax-driver small` puts the 775s on a VNH5019-class
+  driver (10 g) instead of the BTS7960 (65 g); `--wmax bldc` makes the W-max a 5010 + B-G431B-ESC1 + printed 1:16
+  (docs/21). The flags combine. A new generator part must be added to `PARTS` (count and
   segment) or `IGNORE`, or the tool lists it as unmatched.
 - Every export is re-imported and its non-manifold edges counted; anything but `non-manifold 0` is a bug.
   The boolean lessons (odd segment counts, no coplanar unions, spun cylinders) are at the end of

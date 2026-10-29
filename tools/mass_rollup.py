@@ -8,6 +8,7 @@ The generators' own "mass" figures are solid PETG (100 %).
 
 Run:
     python tools/mass_rollup.py [--stl cad/out] [--build] [--infill 0.25] [--wall 1.2] [--md out.md]
+                                [--torso-worm] [--wmax 775|bldc] [--wmax-driver bts7960|small]
 
 --build runs the Blender generators into --stl first (chain, ring, winch_bank). Every STL must be matched by
 PARTS below (or IGNORE); an unmatched one is reported, so a new generator part cannot be left out silently.
@@ -77,6 +78,8 @@ PVC_KG_M = {"1": 0.446, "1-1/4": 0.605, "1-1/2": 0.722, "2": 0.970}   # Schedule
 
 
 TORSO_WORM = False   # --torso-worm: spine and shoulders on a bought worm gearmotor (export_mjcf ROBOT_TORSO_WORM)
+WMAX = "775"         # --wmax 775 | bldc: the W-max motor (docs/21; bldc = 5010 360 KV + B-G431B-ESC1 + 1:16 planetary)
+WMAX_DRIVER = "bts7960"   # --wmax-driver bts7960 | small: the 775's H-bridge (small = VNH5019 class, docs/21)
 
 
 def wmax_at():
@@ -92,8 +95,16 @@ def bought():
     for seg, n in wmax_at().items():
         if not n:
             continue
-        add("775 motor 12 V 12000 rpm", seg, n, 354, "listing")
-        add("BTS7960 driver with heatsink", seg, n, 65, "listing")
+        if WMAX == "bldc":
+            add("5010 360 KV outrunner", seg, n, 109, "listing (docs/05), not weighed")
+            add("B-G431B-ESC1 FOC driver", seg, n, 9.2, "ST spec")
+            add("AS5048A motor encoder", seg, n, 3, "est")
+        else:
+            add("775 motor 12 V 12000 rpm", seg, n, 354, "listing")
+            if WMAX_DRIVER == "small":
+                add("VNH5019-class H-bridge, no heatsink (with headers, wires)", seg, n, 10, "Pololu 6.5 g + est")
+            else:
+                add("BTS7960 driver with heatsink", seg, n, 65, "listing")
         add("608 bearings in the gearbox, 2 per W-max", seg, 2 * n, 11.9, "listing")
     if TORSO_WORM:
         add("12 V 10 rpm worm gearmotor (spine, shoulders)", "spine", 9, 380, "listing, likely shipping weight")
@@ -184,10 +195,16 @@ def main():
     ap.add_argument("--wall", type=float, default=1.2, help="mm of solid walls and skins (3 lines of 0.4 mm)")
     ap.add_argument("--md", help="also write the tables as Markdown to this file")
     ap.add_argument("--torso-worm", action="store_true", help="spine and shoulders on the 10 rpm worm gearmotor")
+    ap.add_argument("--wmax", choices=("775", "bldc"), default="775",
+                    help="W-max motor: 775 + printed 1:40, or 5010 BLDC + B-G431B-ESC1 + printed 1:16 (docs/21)")
+    ap.add_argument("--wmax-driver", choices=("bts7960", "small"), default="bts7960",
+                    help="the 775's H-bridge: BTS7960 with heatsink (65 g) or a VNH5019-class module (10 g)")
     ap.add_argument("--json", help="write {bone: kg per side} for the model (ROBOT_MASSES=<file>, export_mjcf.py)")
     args = ap.parse_args()
     global TORSO_WORM
     TORSO_WORM = args.torso_worm
+    global WMAX, WMAX_DRIVER
+    WMAX, WMAX_DRIVER = args.wmax, args.wmax_driver
     if args.build:
         build(args.stl)
 
@@ -242,6 +259,8 @@ def main():
                 put(ws, "est", g * n)
             g *= sum(wm.values())
             name = name.replace("x21", "x%d" % sum(wm.values()))
+            if WMAX == "bldc":
+                name = name.replace("1:40", "1:16")
             s = "with the W-max"
             if TORSO_WORM:
                 tot_ungen += 9 * 60

@@ -54,7 +54,9 @@ BLDC alternative for W-max (the D-006 fallback, back-drivable):
 | Encoder | AS5048A | 21 | ~$8, estimate | $170 |
 
 It replaces the 775s, their bearings and the BTS7960s (about +$300 net). The SimpleFOCMini is a small
-driver (a few amps); the ankles' ~65 W walking peak needs a larger board, so this table is a floor.
+driver (a few amps); the ankles' ~65 W walking peak needs a larger board, so this table is a floor. `21` sizes it:
+a 5010 on a printed 1:25 at 24 V with an ST B-G431B-ESC1 (40 A peak, 9.2 g, $19 to $39) per drive, 19.9 kg in all.
+For the 775, `21` recommends a VNH5019-class driver (12 A / 30 A, 6.5 g) in place of the BTS7960 (-1.2 kg).
 
 ## Electronics
 
