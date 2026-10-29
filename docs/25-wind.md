@@ -127,6 +127,71 @@ only 21 N.
   and bit-identical when off. Each variant has its own mean, direction and gusts, and the privileged observation
   gets the wind. `tendon_eval` has `wind5` and `wind8` scenes.
 
+## How close is this to real wind, and to real feet (P-039, D-043)
+
+**The drag force** is about right in size and placement:
+
+| Check | Result |
+| --- | --- |
+| Drag area | MuJoCo's equivalent inertia boxes give 0.436 m^2 head-on; the printed shells' own silhouettes are 0.484 m^2. The boxes are 10 % smaller (a capsule's equivalent box is 1.73 r wide, not 2 r). |
+| Drag coefficient | The boxes use Cd 1. Short cylinders (limbs, length/diameter 3 to 6, Reynolds number 2e4 to 1e5) are 0.7 to 1.0; the trunk box is about 1.05; long cylinders 1.2. Both errors together put the drag within about 25 % of the real shape's. |
+| Missing | Shielding (from the side the far leg sits in the near leg's wake, so side drag is overstated); vortex shedding (side forces on a limb at 25 Hz at 10 m/s, small and uncorrelated between limbs); lift. The air's added mass is negligible. Viscous skin friction (`opt.viscosity` 0) is under 1 % of the pressure drag at these Reynolds numbers. |
+| Included | Drag on the relative velocity: the robot's own motion through the air is damped. Rotational drag of each box. |
+
+**The wind speed is the speed at the robot, not a weather report.** The model blows the same speed at the feet as
+at the head. Real wind near the ground follows a log profile. A forecast or anemometer quotes the speed at 10 m
+height, and at 1 m it is lower:
+
+| Ground (roughness z0) | Speed at 1 m for 10 m/s at 10 m | Drag on the robot | Centre of drag |
+| --- | --- | --- | --- |
+| uniform, as modelled | 10 m/s | 26.2 N | 0.95 m |
+| open grass (0.03 m) | 6.0 m/s | 8.8 N | 1.07 m |
+| rough field (0.1 m) | 5.0 m/s | 6.0 N | 1.12 m |
+| suburb (0.5 m) | 2.3 m/s | 1.6 N | 1.21 m |
+
+So the 12 m/s the robot stands in is about a 20 m/s forecast over open grass, a gale. The 3 m/s it walks in
+is a 5 m/s forecast, a light breeze. The profile also lowers the drag on the legs more than on the trunk,
+so the centre of drag rises by 0.1 to 0.25 m. A `WIND` profile (`z0`) is listed under Not yet. Gusts near the
+ground are relatively stronger than aloft: turbulence intensity at 1 to 2 m is 15 to 25 % in the open and
+30 % or more between buildings. The 1.5 m/s gust at 8 m/s is 19 %; 3 m/s is 37 %, a built-up site. The 2 s time
+constant matches an integral length of about 15 m at 8 m/s. The OU spectrum falls as f^-2 where real turbulence
+falls as f^-5/3, so it is slightly short of fast buffeting.
+
+**Foot friction.** Every contact has sliding friction 1.0 (MuJoCo's default, `export_mjcf`), on a pyramidal
+cone with soft constraints. Real soles: a TPU sole on dry concrete or wood is 0.6 to 0.9, PLA on smooth tile
+0.3 to 0.4, any sole on a wet or dusty floor 0.2 to 0.4. Measured from the contact forces (20 kg model):
+
+- **The friction the robot uses** (horizontal over vertical force at a loaded foot, 99th percentile) is about
+  0.15 standing still, 0.16 in a 10 m/s head wind, and 0.21 to 0.28 when stepping in wind. The feet push
+  outward against each other even without wind. On a floor of 0.4 the one-foot hold and standing in 10 m/s
+  wind are unchanged. The step falls in 3 m/s with gusts (phase 7). At 0.3 the step and the walk fall with no
+  wind.
+- **The feet creep.** MuJoCo's soft contact lets a foot under a steady side load slide slowly, at any
+  friction coefficient. In a 10 m/s head wind both feet slid 78 mm downwind in 20 s at 4 mm/s, with no
+  pitch, using 16 % of a friction of 1.0. A real sole does not move. Its shear compliance gives a few mm
+  that spring back. Without wind the creep is 5 mm per 20 s standing, and 7 to 12 mm per stance in the
+  step and the walk.
+- **The no-slip solver removes it.** `NOSLIP = 5` (MuJoCo's noslip iterations) holds the same feet to
+  1.6 mm. An elliptic cone with impratio 10 brings it to 5 mm. The no-slip run is about 40 % slower.
+  `FLOOR_MU` sets the friction for a floor test.
+
+With the feet held, D-043:
+
+| Check | Soft contact (the results above) | `NOSLIP=5` | `NOSLIP=5 FLOOR_MU=0.4` |
+| --- | --- | --- | --- |
+| gauntlet scenes (stand, push 20 / 40, lean15, arm, squat, shift, one-foot, gust) | all stand | all stand | |
+| standing and the one-foot hold in wind (head and left, 8 and 10 m/s with 1.5 m/s gusts, seeds 0 and 1; steady to 12 m/s) | | the same cell by cell | |
+| step grid, 42 variants | 42 | **23** | 40 |
+| walk grid, 42 variants | 42 | **16** | 13 |
+
+- **Standing and the wind map** are unchanged, seed by seed.
+- **The step and the walk depended on the creep.** They fail mostly on the two rolled-up mass sets, in the
+  transfer, with the lift gate timed out (`F4g`): the trailing foot never unloads enough to lift. With both
+  feet held, the legs' internal push against each other carries load the planner expects to move. A slipperier
+  floor (0.4) lets the feet settle and the step stands 40 of 42 again, but the walk does not.
+- The cause is not traced yet. The fix belongs to the transfer (unload the trailing foot by force, not by
+  waiting for the creep), and then every step and walk grid runs with `NOSLIP=5`.
+
 ## Not yet
 
 - **Walking in wind** above 3 m/s: the planner's gates and stages are geometry for still air. The transfer onto
@@ -134,15 +199,20 @@ only 21 N.
 - **Gusts beyond the sole:** the answer is a stepping strategy (a capture step downwind), which a static walker
   does not have.
 - **The arm scene's sway** is worse with the lean (`22`'s limit cycle).
+- **The step and the walk on held feet** (`NOSLIP=5`): 23 and 16 of 42; they relied on the contact creep.
 - **Simplifications:**
-  - Drag is per body box, Cd 1. No shielding of one body by another, no lift, no ground boundary layer
-    (wind speed is the same at the feet as at the head).
+  - Drag is per body box, Cd 1 (within about 25 %). No shielding of one body by another, no lift, no ground
+    boundary layer: the wind speed is the same at the feet as at the head, so a speed here is a forecast about
+    1.7 times higher over open ground.
+  - Contacts: friction 1.0 on every surface, soft contact that creeps under a sustained side load.
   - The wind's direction is fixed in a run. The sibling's stand-in fixes it per variant.
 - **Not run in wind:** the rolled-up masses and the pessimistic motors (`24`). The 26 kg build has more weight
   for the same area, so it should carry more wind; the low motors less.
 
 ## Next
 
-Walking in wind: gate the transfer stages on the leaned CoM, not the still-air plan, and judge it on the walk
+First the step and the walk on held feet (`NOSLIP=5`, and `FLOOR_MU=0.4` for a hard floor): trace an `F4g`
+row, unload the trailing foot by force, then make `NOSLIP=5` the default and re-run every grid and the wind map
+on it. Walking in wind: gate the transfer stages on the leaned CoM, not the still-air plan, and judge it on the walk
 map at 5 and 7 m/s. Then a capture step for gusts, and wind for the learned controller in the sibling (clone
 from the new teacher data, train with `--wind-mean 0,8`).

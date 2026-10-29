@@ -88,6 +88,15 @@ releases when the disturbance estimate moves (`LOCK_RELEASE_D`). `record_teacher
 episodes in random winds. The sibling's stand-in has the same wind (`EnvConfig.wind_mean`, `wind_gust`;
 `--wind-mean lo,hi --wind-gust lo,hi`; sibling PR #54).
 
+## Contacts (D-043, docs/25)
+
+The default contact is MuJoCo's soft one with friction 1.0, and a loaded foot creeps under a sustained side load
+(78 mm in 20 s in a 10 m/s wind). `NOSLIP=5` (noslip solver iterations, about 40 % slower) holds the feet;
+`FLOOR_MU=0.4` sets every contact's friction (a hard floor). Both are module constants, so they work as K=V on
+`step_sweep.py` and `wind_sweep.py`. Any change to the step or the walk is also judged on
+`step_sweep.py ... "held: NOSLIP=5"` and `"hard: NOSLIP=5 FLOOR_MU=0.4"`. Today these stand 23 and 40 of 42 (step)
+and 16 and 13 (walk), against 42 on soft contact.
+
 ## Reading a scene's table
 
 `== <scene>: t, pelvis height, tilt -> STANDS|FALLS; electrical energy (mean W)`, then lines worst first:

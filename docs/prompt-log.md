@@ -565,3 +565,14 @@ leans into a sustained force and the lock gate releases when the disturbance mov
 the step and the walk 3 m/s with gusts from any side (the walk is the limit). No-wind gates unchanged: gauntlet,
 step and walk grids 42 of 42, 199 of 200 pushes. Teacher data re-recorded with 60 wind episodes (272 episodes).
 Sibling: wind in the stand-in env (issue #53, PR #54, merged). `25`, `docs/img/gust.gif`.
+
+## P-039 (2026-10-29) Is the wind an accurate representation of the forces? Rigid body friction?
+
+> continue - is the wind an accurate representation of the force(s)? rigid body friction considered?
+
+Produced: `25`'s accuracy section and D-043. The drag is within about 25 % (inertia boxes 10 % under the shells'
+silhouettes, Cd 1 against 0.7 to 1.2). The model's wind speed is at the robot's height: over open grass a
+forecast is about 1.7 times higher (12 m/s here is a 20 m/s forecast). Foot friction: 1.0 everywhere, and the
+robot uses 0.15 to 0.28. At 0.4 the step falls in gusty wind, at 0.3 the step and walk fall without wind. The
+soft contact creeps (78 mm in 20 s in a 10 m/s wind). With the no-slip solver (`NOSLIP`, new, with `FLOOR_MU`)
+standing and the wind map hold but the step grid stands 23 of 42 and the walk 16: the next work.

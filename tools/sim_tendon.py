@@ -184,6 +184,8 @@ LEAN_SLEW = 0.1                  # rad/s: how fast the ankle lean may change
 LEAN_TAU_X = 1.5                 # s: the lateral lean's low-pass (slower: at 0.4 s a short side push moved the hips; 192 of 200 pushes)
 LEAN_LATERAL = True              # the same on the lateral loops (hip-roll shift)
 AIR_DENSITY = 1.2                # kg/m^3
+NOSLIP = 0                       # noslip solver iterations: 0 lets a foot creep under a sustained side load (docs/25)
+FLOOR_MU = None                  # sliding friction of every contact (the model's is 1.0); a floor test sets it lower
 WIND_DIRS = {"head": 0.0, "left": 90.0, "tail": 180.0, "right": 270.0}
 GEAR_FRICTION = 0.02             # of stall: running friction of the gear train when powered
 CURRENT_LIMIT = 0.9              # of the clutch slip torque: the driver's current limit
@@ -219,6 +221,9 @@ class Rig:
         self.pelvis = mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_BODY, "pelvis")
         self.feet = [mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_BODY, b) for b in ("foot.L", "foot.R")]
         self.floor = mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_GEOM, "floor")
+        m.opt.noslip_iterations = NOSLIP
+        if FLOOR_MU is not None:
+            m.geom_friction[:, 0] = FLOOR_MU
         self.mass = float(sum(m.body_mass))
         self.reset()
         mujoco.mj_forward(m, self.data)

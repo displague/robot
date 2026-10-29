@@ -471,3 +471,17 @@ Alternative tried: the lean through the integral alone, faster integral gains (n
 and pushes cost 10 to 20 % more); a 0.4 s lateral lean (192 of 200 random pushes).
 Reverses if: a learned controller carries wind better, or a stepping strategy (a capture step downwind) replaces
 the lean for gusts beyond the sole.
+
+## D-043 (2026-10-29) Contact creep is a model artifact: the step and the walk are judged with the feet held
+
+Why: P-039 (docs/25). MuJoCo's soft contact lets a loaded foot slide slowly under a sustained side force, at any
+friction: in a 10 m/s head wind both feet slid 78 mm in 20 s at 16 % of a friction of 1.0, which a real sole does
+not do. With the no-slip solver (`NOSLIP=5`, 1.6 mm) the gauntlet and the standing wind map are unchanged, seed by
+seed, but the step grid stands 23 of 42 and the walk 16 of 42: the transfer relied on the feet
+creeping apart. Until the transfer is fixed, the default stays the soft contact and its results stand with this
+caveat. A step or walk change from here on is also run with `NOSLIP=5` and `FLOOR_MU=0.4` (a hard floor's
+friction). Once the step passes those grids, `NOSLIP=5` becomes the default.
+Alternative: an elliptic cone with impratio 10 (5 mm of creep, no extra cost), kept as a fallback if no-slip is
+too slow for the teacher data. A compliant sole in the model (a few mm of elastic shear) is the physical middle
+and may replace both.
+Reverses if: a printed sole on a bench shows centimetres of creep under a steady side load (it should not).
