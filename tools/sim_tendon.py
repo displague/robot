@@ -110,6 +110,10 @@ STEP_LOCKS = False               # False: the drums do not self-lock from the st
                                  # balance loop rocks the body foot to foot at 1-2 Hz, +-33 N; docs/19)
 LAT_FF = False                   # the double-support weight shift with a geometric feed-forward base (docs/19)
 IK_DAMP, IK_STEP = 0.01, 0.15   # the swing IK's damping (m-rad mixed) and largest joint step per iteration (rad)
+TP_SETTLE = "load"               # the transfer first settles the landing as the centring does (docs/20): hold the landed
+                                 # foot pressed until it carries LAND_LOAD and the CoM is still (or 3 s) before the CoM moves
+TP_PRESS_RATE = 0.02             # m/s: how fast TP_SETTLE="load" deepens the landed leg's press while it is unloaded
+TP_START_REACH = None            # m: the transfer's landed-leg press starts here (None: LAND_REACH, as in docs/19)
 TP_LAND_REACH = 0.0              # m: the centring starts the landed leg's press here, not at the landing's 20 mm below the
                                  # floor (pressing an outward-leaning leg shoves the hip over the stance foot; docs/19)
 TP_KEEP_CROUCH = True            # TRANSFER_PLAN: the stance leg stays crouched through the next swing so a level landing
@@ -1000,6 +1004,39 @@ def scenarios():
             f0, off, w0 = com_ahead(), hip_offsets(), r.weight
             for k in ("L", "R"):
                 r.knee_tau[k] = None
+            if TP_START_REACH is not None:
+                reach0 = TP_START_REACH
+            if TP_SETTLE == "load":
+                # the landed leg's press found from its load, not set: start unpressed and deepen the press while the
+                # landed foot carries less than LAND_LOAD (a heavier body sags further on its lines, so a fixed 20 mm
+                # press shoves it over at 26 kg and is needed at 20); hold once loaded and the CoM is still
+                t0, still, press = r.data.time, 0.0, 0.0
+                target = LAND_LOAD * r.mass * 9.81
+                while True:
+                    load = r.cop()[1][it]
+                    press = float(np.clip(press + TP_PRESS_RATE * dt * np.clip((target - load) / target, -1, 1),
+                                          0.0, LAND_REACH))
+                    slew(planned_legs(f0, s, 0.0, {to: press, frm: REACH_0}, off), dt)
+                    restore_rolls(to, dt)
+                    r.step()
+                    still = still + dt if (load > target and np.linalg.norm(r._com_v) < 0.02) else 0.0
+                    if still > 0.3 or r.data.time - t0 > 3.0:
+                        break
+                measure(s)
+                f0, w0, reach0 = com_ahead(), r.weight, press
+            elif TP_SETTLE:
+                t0 = r.data.time
+                while True:
+                    g = min(1.0, (r.data.time - t0) / 1.0)
+                    g = g * g * (3 - 2 * g)
+                    slew(planned_legs(f0, s, 0.0, {to: reach0 + (REACH_0 - reach0) * g, frm: REACH_0}, off), dt)
+                    restore_rolls(to, dt)
+                    r.step()
+                    if g >= 1.0 and ((r.cop()[1][it] > LAND_LOAD * r.mass * 9.81 and np.linalg.norm(r._com_v) < 0.02)
+                                     or r.data.time - t0 > 3.0):
+                        break
+                measure(s)
+                f0, w0, reach0 = com_ahead(), r.weight, REACH_0
             nA = int(round(TP_A / dt))
             for i in range(1, nA + int(round(TP_HOLD / dt)) + 1):
                 g = min(1.0, i / nA)

@@ -7,3 +7,4 @@ cad/out/*
 !cad/out/.gitkeep
 sim/out/
 MUJOCO_LOG.TXT
+.claude/worktrees/

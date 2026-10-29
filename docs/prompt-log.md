@@ -508,3 +508,16 @@ Produced: the hub record (weight and torque per speed of two worm gearmotor fami
 its own roll-up the step grid drops to 4 of 14, which crossing the runs traces to the lighter torso, not the
 drive (worm on the 775 roll-up's masses: 12 of 14). `20`, skills.
 
+## P-035 (2026-10-28) The full plan: a step for any mass, the W-max options
+
+> go ahead with the full plan and continue
+
+> continue
+
+Produced: hub task `step-mass-robust` (claimed). `step_sweep.py --masses` (grid over mass sets; the rolled-up
+sets kept in `sim/masses/`). The cause traced: on the heavier builds the landing's fixed 20 mm press kicks
+the landed foot back up. `TP_SETTLE = "load"`: the press found from the foot's load; the step stands 42 of 42
+(was 27), the rest of the gauntlet unchanged (D-037, `19`). In parallel a delegated agent worked
+`wmax-mass-down` on a branch: `21`, `tools/wmax_options.py`, 5010 entries in `tendon_calc.py`, roll-up flags
+(VNH5019 driver 25.0 kg, 5010 brushless at 24 V 19.9 kg, lead screws heavier) and the finding that the
+model's 775 figures are inconsistent (Kt from 12 000 rpm at 12 V is 0.0095 N m/A, not 0.024); merged.

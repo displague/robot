@@ -7,6 +7,7 @@ A single run of the step is deterministic and sits on a knife edge (the open-loo
 Run:
     python tools/step_sweep.py "open: SWING_IK=False" "ik: SWING_IK=True" ["name: K=V K=V ..."]
     python tools/step_sweep.py --lengths 0.09,0.10,0.11 --models base,stiff "ik: SWING_IK=True"
+    python tools/step_sweep.py --masses 20kg=,775=m775.json,worm=mworm.json "now: "   # x mass distributions
 
 Each K=V sets a module constant of sim_tendon before the rig is built (V is a Python expression). Models:
 base (the D-032 baseline), stiff (--stiff-mini). Output, one row per configuration:
@@ -70,16 +71,24 @@ def main():
         i = argv.index("--models")
         models = argv[i + 1].split(",")
         del argv[i:i + 2]
+    masses = [("", os.environ.get("ROBOT_MASSES", ""))]
+    if "--masses" in argv:                     # name=path,... ; an empty path is skeleton.json's masses
+        i = argv.index("--masses")
+        masses = [tuple(x.split("=", 1)) for x in argv[i + 1].split(",")]
+        del argv[i:i + 2]
+    models = [(m, mn, mp) for mn, mp in masses for m in models]
     cfgs = [(c.split(":", 1)[0].strip(), c.split(":", 1)[1].split() if ":" in c else []) for c in argv]
     jobs = {}
     for name, kv in cfgs:
         for model in models:
             for L in lengths:
-                cmd = [sys.executable, os.path.abspath(__file__), "--one", model] + kv + ["STEP_LEN=%r" % L]
+                cmd = [sys.executable, os.path.abspath(__file__), "--one", model[0]] + kv + ["STEP_LEN=%r" % L]
+                env = dict(os.environ, ROBOT_MASSES=os.path.abspath(model[2]) if model[2] else "")
                 jobs[(name, model, L)] = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                                                          text=True, cwd=os.path.dirname(HERE))
+                                                          text=True, cwd=os.path.dirname(HERE), env=env)
     width = max(len(n) for n, _ in cfgs)
-    print("models %s, step lengths %s m" % (" ".join(models), " ".join("%.2f" % L for L in lengths)))
+    print("models %s, step lengths %s m" % (" ".join(m + ("@" + mn if mn else "") for m, mn, _ in models),
+                                            " ".join("%.3f" % L for L in lengths)))
     for name, _ in cfgs:
         cells, n_ok, worst = [], 0, 0
         for model in models:

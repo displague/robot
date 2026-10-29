@@ -389,3 +389,14 @@ Alternative: switch the model to the rolled-up masses now and re-tune the step a
 Reverses if: mass comes off to about 22 kg or less (then the model moves to the roll-up), or the parts are
 built and weighed.
 
+## D-037 (2026-10-28) The landed leg's press is found from the foot's load, not set
+
+Why: hub task `step-mass-robust` (P-035). A fixed 20 mm press on landing was right only for the 20 kg model:
+on the rolled-up masses (`20`) it kicked the landed foot back up and rolled the body over the stance foot
+(11 and 2 of 14 grid variants), and a zero press broke the 20 kg model. The transfer now settles the landing
+first, deepening the press while the landed foot carries less than 15 % of the weight and holding it once
+the foot is loaded and the CoM still. The step stands in 42 of 42 variants (2 models x 7 lengths x 3 mass
+sets), landings within 4 mm; the rest of the gauntlet is unchanged.
+Alternative: a press scaled by the measured stance-leg sag, or a press per mass set.
+Reverses if: the real foot's load sensor (FSRs, docs/07) is too noisy or slow to close this loop; then the
+press from the measured hip height above the stance ankle.

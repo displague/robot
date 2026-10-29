@@ -68,6 +68,32 @@ The rest of the gauntlet is unchanged to the joule: every flag below acts only i
 shift's ripple, but it changes every scene that shifts weight; it stays off until the gauntlet is re-baselined
 on it.
 
+## The landing press found from the foot's load (P-035, D-037)
+
+`20` showed the step depends on the mass: on the masses rolled up from the parts it stood in 11 of 14
+variants (the 775 build) and 2 to 4 of 14 (the worm-torso build). Traced on the worm build: the heavier
+trunk sways more on one foot, the right foot touches down with the CoM moving 22 mm/s sideways, and the
+transfer's first stage pressed the landed leg from 20 mm below the floor at once. The foot kicked back up
+(55 N to 0) and the body rolled over the stance foot. A fixed press is right for one mass only: starting it
+at zero fixed both rolled-up builds (14 of 14 each) and broke the 20 kg model (0 of 14, the second lift).
+
+Now (`TP_SETTLE = "load"`, the default) the transfer first settles the landing: the landed leg starts
+unpressed and its press deepens at `TP_PRESS_RATE` (20 mm/s) while the foot carries less than LAND_LOAD (15 %
+of the weight), up to 20 mm, and holds once the foot is loaded and the CoM is still for 0.3 s (or 3 s). That
+press is where the transfer's first stage starts.
+
+| Configuration, grid of 2 models x 7 lengths x 3 mass sets (`step_sweep.py --masses`) | 20 kg | 775 roll-up | worm roll-up | Stands |
+| --- | --- | --- | --- | --- |
+| docs/19 as it was | 14 | 11 | 2 | 27 of 42 |
+| press started at zero | 0 | 14 | 14 | 28 of 42 |
+| settle, then a fixed press | 6 | 10 | 0 | 16 of 42 |
+| settle with the press at zero | 11 | 13 | 11 | 35 of 42 |
+| **press found from the load** | **14** | **14** | **14** | **42 of 42**, landings within 4 mm |
+| the same at half the press rate | 14 | 14 | 14 | 42 of 42 |
+
+On the 20 kg model the rest of the gauntlet is unchanged to the joule; the step stands with no flags,
+471 J (444 before), worst leg line 192 of 288 N, 47 s (the settle adds up to 3 s).
+
 ## Not yet
 
 - **Locks and the rest of the gauntlet.** The one-foot hold still runs with locks (811 J, 41 W) and probably

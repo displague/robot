@@ -114,6 +114,10 @@ So the worm torso is no worse for the balance (the spine and shoulders are not i
 energy, but it saves only ~1.1 kg and its 9 deg/s spine and shoulders make the arms slow. Its stall torque, the
 real (unpacked) weight and whether one purchase is one motor are still to check on the bench.
 
+Since D-037 the step no longer depends on the mass distribution: it stands in all 42 variants of the
+grid over the three mass sets (`19`). The one-foot hold on the rolled-up masses (ankle line at 306 of 288 N)
+is still the case for taking mass off.
+
 ## Not yet
 
 - The pelvis and torso frames, head, soles and W-max gearbox have no generator; they are 5.7 kg of guesses.

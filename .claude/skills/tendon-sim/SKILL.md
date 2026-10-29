@@ -76,6 +76,9 @@ timed out, and the two landing errors in mm. The trace prints loads, CoM error a
 hip shift, ankle positions and leg joints (measured/applied) every 0.1 s. The default step is docs/19's (`SWING_IK`, `IK_LATERAL`, `TRANSFER_PLAN`, `STEP_LOCKS=False`); `--open-swing`
 runs docs/16's. The other flags of docs/18 and 19 stay for comparison. Use `--lengths 0.085,...,0.115` (14
 variants) when comparing configurations: 6 variants were too few to separate them.
+Add `--masses 20kg=,775=sim/masses/rollup_775.json,worm=sim/masses/rollup_worm.json` (42 variants) for any
+change to the step or the balance: the step once stood on one mass set only (docs/19, D-037). The sweep
+starts every run at once (42 processes per configuration), so run configurations one after another.
 
 Lesson (docs/19): if a grid will not settle, look for a limit cycle before tuning stages. Run the scene
 that feeds the failing phase on its own, measure the ripple of a load or CoM error, and switch mechanisms
