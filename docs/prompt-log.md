@@ -467,3 +467,14 @@ entry test, line break, crimps and clutch, each against the model's figure), `re
 `printed-mass-rollup` (every generated part against the 20 kg budget and the model) and `winch-drum-sensor`
 (AS5600 pocket at the W-mini drum end).
 
+## P-031 (2026-10-28) Continue: the mass roll-up
+
+> continue. (more details were added to agenthub from the other session)
+
+Produced: the hub note on `printed-mass-rollup` (bought-part weights from the Amazon listings) read; the task
+claimed. `tools/mass_rollup.py`: every generated part rebuilt and weighed at print settings, the parts with no
+generator estimated, the bought parts from the listings, per segment against `cad/skeleton.json`. About 26 kg
+against 20 (the W-max drives 12.4 kg); the 13 kg joint-end figure in `05` was solid PETG, 5.8 kg printed.
+`ROBOT_MASSES` model variant: on the real masses the gauntlet stands, the one-foot ankle line peaks at 306 of
+288 N with clutch slip, the step grid 11 of 14. `20`, D-036, `05` mass section, skills.
+

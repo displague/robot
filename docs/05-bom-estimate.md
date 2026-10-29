@@ -80,7 +80,7 @@ The foot load sensors and IMUs were in `07` but not in this list before; the bal
 
 | Item | Recommended part | Qty | Total |
 | --- | --- | --- | --- |
-| PETG filament | any reputable 1 kg spools | 12 to 15 kg (the joint ends alone are ~13 kg in the generators; see Mass) | $145 to $200 |
+| PETG filament | any reputable 1 kg spools | about 13 kg (`20`: printed parts at 25 % infill + 15 %) | $145 to $200 |
 | TPU filament | 95A | 1 kg | $25 |
 | Bones (D-019) | Schedule 40 PVC or ABS DWV: 1" (humerus, forearm, neck), 1-1/4" (tibia), 1-1/2" (femur), 2" (spine) | ~2.5 m | $30, estimate |
 | Ring-joint balls (D-018) | 6 mm and 8 mm airsoft BBs (seamless) | ~200 | $15, estimate |
@@ -115,11 +115,11 @@ bearings/hardware + 1 kg battery + 0.5 kg electronics = **~20 kg**. On budget, w
 Shaving the structure to 5 kg and the W-max count to 17 (fixed ankle inversion, fixed spine
 lateral) is the first thing to try if the first leg comes out heavy.
 
-**Open: the printed parts look heavier than this.** The masses the generators report for the joint ends
-alone (`09`, `11`; the large presets already hollow) add up to about 13 kg: knees 3.0, hips 1.8, waist 1.5,
-shoulders 1.2, ankles 1.2, elbows 1.1, ring joints 1.8. That is before the feet, pelvis, torso, head and
-winch banks, and twice the 6 kg above. The 10 to 12 kg filament figure was written before the pipe bones
-(D-019) and never revisited. A full roll-up (every generated part against the model's masses) is next.
+**Superseded by the roll-up (`20`, `tools/mass_rollup.py`): about 26 kg as specified.** Printed parts 11.5 kg
+at 25 % infill (5.8 kg of it from the generators, 5.7 kg estimated for parts with no generator), bought parts
+14.6 kg. The W-max drive alone (775, BTS7960 with heatsink, bearings, printed gearbox) is 12.4 kg against the
+9.5 kg above. The 13 kg figure that stood here was the generators' solid-PETG mass; printed, the joint ends
+are 5.8 kg.
 
 ## Motor encoders and the drum sensor
 

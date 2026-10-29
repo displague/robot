@@ -48,7 +48,9 @@ Goal ordering, in case they conflict: **cheap > simple to build > human range of
 | `docs/17-learned-control.md` | Learned control: the fast stand-in, the sibling's model core as a PPO actor, the hand-written controller as teacher, the first ladder (cloning: 90 % standing under pushes), the failing gate on the tendon model, why get-up needs a kneeling curriculum (D-031) |
 | `docs/18-swing-leg-world-frame.md` | The swing leg by world-frame IK (accurate landings, steady single support with the free foot held in the world), and the finding that the step has no margin: most variants fall in the weight transfer, whatever the swing leg does (in progress) |
 | `docs/19-transfer-for-margin.md` | The step with margin: no drum locks while stepping, staged transfers from planned geometry, the shift fed forward; stands in 14 of 14 grid variants, landings within 4 mm, 444 J (D-034) |
+| `docs/20-mass-rollup.md` | Mass roll-up of every printed and bought part: about 26 kg against the 20 kg budget; the model on those masses (the ankle at its rating, the step 11 of 14); where mass can come off (D-036) |
 | `tools/step_sweep.py`, `tools/step_trace.py` | The step's robustness grid (two models x three step lengths, landing errors, fall phase) and the per-0.1 s trace falls are found with |
+| `tools/mass_rollup.py` | Printed (from the generators' STLs at print settings), estimated and bought mass per body segment against `cad/skeleton.json`; `--json` feeds the `ROBOT_MASSES` model variant |
 | `docs/references.md` | External projects to borrow test scenarios and tooling from (primo, microban, Isaac Lab, DreamDojo, LeRobot, the sibling ai-embedded-dynamic-diversity) |
 | `cad/blender/ring.py`, `cad/blender/winch_bank.py` | Ring-joint generator; N-winch bank generator |
 | `cad/blender/render.py` | Headless PNG renders: one generated assembly, or the gallery of every STL in `cad/out` |

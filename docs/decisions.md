@@ -376,3 +376,16 @@ Alternative: every W-mini a no-name N20 (~$1,750), with the neck and wrist re-ra
 Reverses if: the Phase 0/1 bench test measures a no-name 298:1 N20 at the model's stall torque (then buy
 budget motors throughout), or a part in the model changes (then its row in `05` changes in the same commit).
 
+## D-036 (2026-10-28) The mass is rolled up from the parts, not budgeted; the 20 kg model stays the baseline until mass comes off
+
+Why: hub task `printed-mass-rollup` (P-031). `tools/mass_rollup.py` adds every generated part at print
+settings, the parts with no generator yet and the bought parts' listed weights: about 26 kg against the 20 kg
+budget, half of it the 21 W-max drives (12.4 kg). On those masses (`ROBOT_MASSES`) the model stands through
+the gauntlet, but the one-foot hold's stance ankle line peaks at 306 of 288 N and its clutch slips, and the
+step stands in 11 of 14 grid variants (14 of 14 at 20 kg). The controllers were tuned at 20 kg, so the
+committed model keeps `skeleton.json`'s masses; every change to the legs or the balance is also run with
+`ROBOT_MASSES` on the roll-up, and the mass budget is now the roll-up's total.
+Alternative: switch the model to the rolled-up masses now and re-tune the step and the hold on them.
+Reverses if: mass comes off to about 22 kg or less (then the model moves to the roll-up), or the parts are
+built and weighed.
+

@@ -235,10 +235,19 @@ def mjcf(links, data):
     return "".join(out), winches
 
 
+MASSES = os.environ.get("ROBOT_MASSES")   # variant: a JSON file {bone: kg per side} (tools/mass_rollup.py --json)
+                                          # replacing skeleton.json's mass_kg; children of step_sweep inherit it
+
+
 def build():
     root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     with open(os.path.join(root, "cad", "skeleton.json")) as f:
         data = json.load(f)
+    if MASSES:
+        with open(MASSES) as f:
+            masses = json.load(f)
+        for b in data["bones"]:
+            b["mass_kg"] = masses.get(b["name"], b["mass_kg"])
     links = expand(data)
     xml, winches = mjcf(links, data)
     return xml, winches, links

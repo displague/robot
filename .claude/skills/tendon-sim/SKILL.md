@@ -16,7 +16,11 @@ python tools/sim_tendon.py           # the full gauntlet, several minutes; one l
 python tools/sim_tendon.py --only stand,push30      # scene keys from sim_tendon.scenarios()
 python tools/sim_tendon.py --stiff-mini             # variant: every W-mini pulley at least 25 mm
 python tools/sim_tendon.py --csv                    # also sim/out/<scene>.csv time series
+ROBOT_MASSES=masses.json python tools/sim_tendon.py # variant: per-bone masses from tools/mass_rollup.py --json
 ```
+
+`ROBOT_MASSES` is read by `export_mjcf.build()`, so it also applies to `step_sweep.py` (its children inherit
+the environment) and `step_trace.py`.
 
 Scene keys: stand, push10, push20, push30, push40, sustained, arm, squat, shift, onefoot, step. Run long
 gauntlets in the background with output to a file in the scratchpad, and keep working meanwhile.
