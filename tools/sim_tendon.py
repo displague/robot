@@ -59,6 +59,13 @@ COP_DS_X = 0.035                           # m: in double support each ankle onl
 COP_HIP, HIP_GAIN, HIP_RATE, HIP_LEAK, HIP_MAX = 0.04, 0.0, 0.0, 0.2, math.radians(25)  # m, rad per m of excess,
                                  # rad/s per m of excess (integral), 1/s (leak of the integral), rad (clamp)
 HIP_SLEW = 0.35                  # rad/s: the trunk lean moves no faster than this (a fast lean throws the hips)
+LOCK_STILL = 0.5                 # s: the drums may lock only once the CoM has moved under LOCK_STILL_V for this long, and
+LOCK_STILL_BONES = None          # the drums the gate applies to (None: all). Legs only stood 197/200 pushes and kept the
+                                 # neck flags; all drums 199/200 (docs/22)
+LOCK_RELEASE_V = 0.08           # m/s: the gate resets only above this (a 10 N push gives ~0.1); between the two the
+                                 # stillness timer holds, so a slow sway under an arm load does not keep the legs unlocked
+LOCK_STILL_V = 0.02              # every lock releases the moment it moves faster (a push): locks hold a still robot at zero
+                                 # power and stay out of any balancing (D-034, D-038). None: the per-drum rule alone (docs/19)
 ANKLE_QUIET = 1.0                # s: the ankle may lock once its torque demand has been steady this long
 ROLL_KP, ROLL_KI, ROLL_KD = 0.2, 0.5, 0.2     # hip-roll shift: rad per m of lateral error, per m s, per m/s (the
                                  # closed chain of two planted feet moves ~35 mm of CoM per degree of hip roll)
@@ -105,6 +112,8 @@ WIDTH_FROM_STANCE = False        # IK_LATERAL lands the foot at the standing spa
 TRANSFER_PLAN = True             # the transfers by planned geometry in stages (docs/19): CoM forward at an even share
                                  # with a small crouch, then the weight across, the trailing leg shortened as the CoM
                                  # arrives, released when settled, the stance leg straightened; the centring likewise
+BALANCE_LOCKS = False            # False: no drum self-locks while the weight shift and the one-foot hold run (D-034's
+                                 # finding beyond the step); "ramp": off only while the share ramps, on in the hold
 STEP_LOCKS = False               # False: the drums do not self-lock from the step's weight shift to the end of its
                                  # centring (locks hold poses at zero power; engaging and releasing them inside the
                                  # balance loop rocks the body foot to foot at 1-2 Hz, +-33 N; docs/19)
@@ -238,6 +247,7 @@ class Rig:
         self.hip_roll_cmd = {"L": 0.0, "R": 0.0}   # per hip: the shift (double support) or the levelling (stance)
         self.applied = dict(self.target)  # per DOF: the joint target control() applied last step, balance terms in
         self._quiet, self._off_prev, self._hip_i = 0.0, pre, 0.0
+        self._still = 0.0
         self._v_prev, self._dist = np.zeros(2), np.zeros(2)
         self._com_f, self._com_v, self._cp_i, self._roll_i = None, np.zeros(2), np.zeros(2), 0.0
         self.weight = (0.5, 0.5)         # planner: desired share of the weight on (left, right)
@@ -380,6 +390,8 @@ class Rig:
             self.ankle_off[side] = self.torque_to_angle("foot.%s_pitch" % side, tau_y * share[i] / tot if tot > 0 else 0.0)
         self.ankle_offset = self.torque_to_angle("foot.L_pitch", tau_y / len(grounded))
         self._quiet = self._quiet + dt if abs(self.ankle_offset - self._off_prev) < math.radians(0.02) else 0.0
+        v = np.linalg.norm(self._com_v)
+        self._still = 0.0 if v > LOCK_RELEASE_V else (self._still + dt if v < LOCK_STILL_V else self._still)
         self._off_prev = self.ankle_offset
         # excess beyond the ankle's comfortable CoP goes to the hip as a trunk lean (+ hip pitch = trunk back),
         # integrated, leaking back toward upright
@@ -521,7 +533,9 @@ class Rig:
             # lock with hysteresis: engage when the gear is on target and still, release when it has drifted
             was = w.get("_locked", False)
             tol = LOCK_TOL * LOCK_TOL_SCALE.get(w["name"].split(".")[0].split("_")[0], 1.0)
-            locked = (self.lock_enabled and abs(dphi) < LOCK_RATE and abs(err) < 3 * LOCK_TOL
+            locked = (self.lock_enabled and (LOCK_STILL is None or (LOCK_STILL_BONES is not None and bone not in LOCK_STILL_BONES)
+                                             or self._still > LOCK_STILL)
+                      and abs(dphi) < LOCK_RATE and abs(err) < 3 * LOCK_TOL
                       and (not torque_mode or self._quiet > ANKLE_QUIET)
                       and abs(gerr) < (tol * ratio * (2 if was else 1)))
             if locked:
@@ -739,14 +753,20 @@ def scenarios():
 
     def shift(r, hold=2.0):
         r.run(1.5)
+        if BALANCE_LOCKS is not True:
+            r.lock_enabled = False
         n = int(3.0 / r.model.opt.timestep)
         for i in range(n):
             r.weight = (0.5 + 0.5 * (i + 1) / n, 0.5 - 0.5 * (i + 1) / n)
             r.step()
+        if BALANCE_LOCKS == "ramp":
+            r.lock_enabled = True
         r.run(hold)
 
     def onefoot(r):
         shift(r, 2.0)
+        if BALANCE_LOCKS is not True:
+            r.lock_enabled = False                        # on one foot the balance loop is never still
         # the planner lifts only once the right foot carries under a tenth of the weight (foot sensors) and
         # the CoM is within 10 mm of the left sole centre (IMU + kinematics), then tells the balance loop
         for _ in range(6000):

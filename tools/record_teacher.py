@@ -31,7 +31,7 @@ import sim_tendon as st   # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RATE_HZ = 50
-SKIP = {"push40"}          # falls
+SKIP = set()               # scenarios to leave out; falls are left out anyway (the 40 N push stands since D-038)
 
 
 def _push_scenario(seed):

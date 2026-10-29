@@ -521,3 +521,12 @@ the landed foot back up. `TP_SETTLE = "load"`: the press found from the foot's l
 `wmax-mass-down` on a branch: `21`, `tools/wmax_options.py`, 5010 entries in `tendon_calc.py`, roll-up flags
 (VNH5019 driver 25.0 kg, 5010 brushless at 24 V 19.9 kg, lead screws heavier) and the finding that the
 model's 775 figures are inconsistent (Kt from 12 000 rpm at 12 V is 0.0095 N m/A, not 0.024); merged.
+
+## P-036 (2026-10-28) Locks off while balancing
+
+> (continuing P-035: "go ahead with the full plan and continue")
+
+Produced: hub task `locks-off-while-balancing` (claimed). `BALANCE_LOCKS`, the whole-body lock gate
+(`LOCK_STILL`, `LOCK_STILL_V`, `LOCK_RELEASE_V`): 200 random pushes 199 stand (184 with the per-drum rule),
+energy down in 9 of 11 scenes, the one-foot hold 562 J (811), step grid 42 of 42. Teacher data re-recorded
+with 200 pushes: 210 episodes, 65 787 steps. `22`, D-038.

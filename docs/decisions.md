@@ -400,3 +400,16 @@ sets), landings within 4 mm; the rest of the gauntlet is unchanged.
 Alternative: a press scaled by the measured stance-leg sag, or a press per mass set.
 Reverses if: the real foot's load sensor (FSRs, docs/07) is too noisy or slow to close this loop; then the
 press from the measured hip height above the stance ankle.
+
+## D-038 (2026-10-28) The drums lock only when the whole robot is still, and every lock releases on a push
+
+Why: hub task `locks-off-while-balancing` (P-036). D-034's finding holds beyond the step: the per-drum lock
+rule hurts any active balancing. With locks as they were the hand-written controller stood 184 of 200 random
+pushes; with none, 199. Now no locks while the weight shift and the one-foot hold run, and a whole-body gate
+(`LOCK_STILL`): a drum may lock only after the CoM has moved under 20 mm/s for 0.5 s, and every lock releases
+once it moves over 80 mm/s. 199 of 200 pushes stand, every gauntlet scene stands, energy is lower in 9 of 11
+scenes (the one-foot hold 562 J against 811; standing 12 J against 21), the step grid stays 42 of 42. The
+arm-with-a-load scene costs more (162 J against 114): unlocked, the balance loop sways under the load.
+Alternative: the gate on the legs only (197 of 200) or on all but the arms (198 of 200).
+Reverses if: the real drums' hold current or lock wear makes frequent release costly, or the IMU-based CoM
+speed is too noisy to gate on.
