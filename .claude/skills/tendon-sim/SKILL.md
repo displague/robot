@@ -18,11 +18,31 @@ python tools/sim_tendon.py --stiff-mini             # variant: every W-mini pull
 python tools/sim_tendon.py --csv                    # also sim/out/<scene>.csv time series
 ROBOT_MASSES=masses.json python tools/sim_tendon.py # variant: per-bone masses from tools/mass_rollup.py --json
 ROBOT_TORSO_WORM=1 python tools/sim_tendon.py        # variant: spine and shoulders on the 10 rpm worm gearmotor
+ROBOT_MOTORS=low python tools/sim_tendon.py         # variant: every drive and line at the pessimistic end of its sourced range
+ROBOT_MOTORS=high | nom | <file.json>[:case]         # the optimistic end, the sourced nominal, or a file in the same format
 ```
 
-`ROBOT_MASSES` and `ROBOT_TORSO_WORM` are read by `export_mjcf`, so they also apply to `step_sweep.py` (its
-children inherit the environment) and `step_trace.py`. Running `export_mjcf.py` with either set rewrites
-`sim/robot.xml` as the variant: re-run it without them before committing.
+`ROBOT_MASSES`, `ROBOT_TORSO_WORM` and `ROBOT_MOTORS` are read by `export_mjcf`, so they also apply to `step_sweep.py`
+(its children inherit the environment) and `step_trace.py`. Running `export_mjcf.py` with any of them set rewrites
+`sim/robot.xml` as the variant: re-run it without them before committing, and check `git diff sim/robot.xml` is empty.
+
+## Motor and line ranges (D-040, docs/24)
+
+`sim/motor_ranges.json` holds low / nom / high for every drive figure (stall torque, no-load speed, stall current,
+continuous fraction, gearbox efficiency `eta`, mass; kv and r_ohm for the brushless) keyed by `tendon_calc.MOTORS`
+names, and the effective break strength of each line (as terminated: wrapped on drum and pulley), each with its
+sources. `low` is the pessimistic end of every figure at once (for stall current the most amps per N m). Unset,
+the model runs on `tendon_calc`'s own figures (the committed `sim/robot.xml`); `nom` is the sourced estimate,
+which is not the same (the 775's 66 A stall, eta 0.5). A case moves the parts only: pretension, the clutch's
+slip force (a third of the spool label) and the line stiffness stay at the model's settings, so a weaker line
+shows as a lower SF and a weaker motor as less margin. `python tools/tendon_calc.py --ranges` prints each winch
+class per case (drum stall, continuous and clutch line force, SF at the clutch, current at the clutch, the W-max
+walking-point speeds). Every new motor or line figure goes into the JSON with a source URL or a derivation.
+
+To find which part limits a failing case, write mixed files in the scratchpad (a copy of the JSON whose `nom`
+is nominal except the parts under test at their `low`) and run them as `ROBOT_MOTORS=<file>` on the failing
+scenes, then on the walk grid. A build is recommended only if the walk grid, the one-foot hold and push40
+stand at `low` (D-040).
 
 Scene keys: stand, push10, push20, push30, push40, lean15, arm, squat, shift, onefoot, step, walk (docs/23,
 about 95 s; judge it with `step_sweep.py --scene walk`). Run long
@@ -38,13 +58,15 @@ in `05` in the same commit; `python tools/export_mjcf.py --table` gives the per-
 ## Drive options off the model (desk calculations)
 
 ```bash
+python tools/tendon_calc.py --ranges     # each winch class at the model's figures and at low / nom / high (docs/24)
 python tools/tendon_calc.py              # scenarios; MOTORS has 5010_PLAN16 / 5010_PLAN25_24V (brushless: kv, r_ohm, ratio)
 python tools/wmax_options.py [--drum|--screw]   # W-max drives on the 15 mm drum vs the walking points; lead-screw winch per joint
 ```
 
 For a `Motor` with `kv` set, `stall_torque_nm` is the torque at the driver's peak current and peak power is taken
 along the voltage line at that current (`motor_peak_power_w`). `wmax_options.py` carries the 775 twice: the model's
-figures (Kt 0.024) and Kt from its 12 000 rpm (0.0095, so ~18 A at the D-021 limit, docs/21). Neither tool touches
+figures (Kt 0.024) and Kt from its 12 000 rpm (0.0095, so ~18 A at the D-021 limit, docs/21); docs/24 settled
+it at 0.0095 (0.0088 to 0.0100) from nine 775 datasheets, so the second reading is the real one. Neither tool touches
 `sim/robot.xml`; a brushless W-max class in the model does not exist yet.
 
 ## Reading a scene's table
