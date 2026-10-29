@@ -192,6 +192,37 @@ With the feet held, D-043:
 - The cause is not traced yet. The fix belongs to the transfer (unload the trailing foot by force, not by
   waiting for the creep), and then every step and walk grid runs with `NOSLIP=5`.
 
+## Held feet: the landing press (P-042, hub task `step-on-held-feet`)
+
+`step_trace.py` on a failing row (the 26 kg worm mass set, `NOSLIP=5`) showed:
+
+- **The landing.** The swing foot counts as placed at the first contact spike (15 % of the weight). A heavier body
+  sags on its stance leg, so the landed leg touches down with the knee still bent 9 to 13 deg.
+- **The press.** The transfer planned that leg from its unpressed straight length and straightened it within
+  0.3 s. With held feet the lightly loaded foot was levered up and out, 20 to 45 mm, and the pelvis rolled over.
+  With the soft contact the foot slid instead.
+- **The fix** (`TP_PRESS_FROM_LANDED`): the press starts from the landed leg's measured length and catches up at
+  `TP_PRESS_CATCHUP` (0.05 m/s) until it reaches the plan, then deepens by load as before. The centring's press
+  starts from the measured length too.
+
+| Grid, 42 variants | Before, held | Fix, held | Before, held, mu 0.4 | Fix, held, mu 0.4 | Before, soft | Fix, soft |
+| --- | --- | --- | --- | --- | --- | --- |
+| step | 23 | **40** | 40 | 38 | 42 | 42 |
+| walk | 16 | **23** | 13 | 12 | 42 | 39 |
+
+The catch-up rate was swept on the held step grid: 0.02 m/s stands 27, 0.05 stands 40, 0.1 stands 39.
+
+- **Default.** The fix is off by default. It costs the soft-contact walk 3 variants, and soft contact is still the
+  default (D-043).
+- **The walk on held feet still fails** in its later transfers (`w3`, `w4`) on the rolled-up mass sets, at the
+  lift gate. The landed foot is pushed sideways 20 mm while lightly loaded.
+- **What did not help:**
+  - Counting touchdown only after the load is held 0.05 or 0.15 s: the walk then fails from the second transfer.
+  - Taking the stance leg's crouch from measurement instead of the plan: it fails one transfer earlier.
+
+The lateral push is the open problem. Its likely source is the roll side of the transfer, which the press does not
+plan.
+
 ## Not yet
 
 - **Walking in wind** above 3 m/s: the planner's gates and stages are geometry for still air. The transfer onto
@@ -199,7 +230,9 @@ With the feet held, D-043:
 - **Gusts beyond the sole:** the answer is a stepping strategy (a capture step downwind), which a static walker
   does not have.
 - **The arm scene's sway** is worse with the lean (`22`'s limit cycle).
-- **The step and the walk on held feet** (`NOSLIP=5`): 23 and 16 of 42; they relied on the contact creep.
+- **The step and the walk on held feet** (`NOSLIP=5`): 23 and 16 of 42; they relied on the contact creep. With
+  `TP_PRESS_FROM_LANDED` the step stands 40 and the walk 23; the walk's later transfers push the landed foot
+  sideways.
 - **Simplifications:**
   - Drag is per body box, Cd 1 (within about 25 %). No shielding of one body by another, no lift, no ground
     boundary layer: the wind speed is the same at the feet as at the head, so a speed here is a forecast about

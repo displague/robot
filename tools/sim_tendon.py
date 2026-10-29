@@ -131,6 +131,10 @@ WALK_STEPS = 4                   # the walk scene's steps (docs/23); the step sc
 TP_SETTLE = "load"               # the transfer first settles the landing as the centring does (docs/20): hold the landed
                                  # foot pressed until it carries LAND_LOAD and the CoM is still (or 3 s) before the CoM moves
 TP_PRESS_RATE = 0.02             # m/s: how fast TP_SETTLE="load" deepens the landed leg's press while it is unloaded
+TP_PRESS_FROM_LANDED = False     # the press starts from the landed leg's measured length, not the plan's unpressed
+                                 # length: a heavier body lands with the knee still bent, and straightening it at once
+                                 # rolls the pelvis and kicks the lightly loaded foot out when it cannot slide (D-043)
+TP_PRESS_CATCHUP = 0.05          # m/s: the press's rate while it is still shorter than the plan's unpressed length
 TP_START_REACH = None            # m: the transfer's landed-leg press starts here (None: LAND_REACH, as in docs/19)
 TP_LAND_REACH = 0.0              # m: the centring starts the landed leg's press here, not at the landing's 20 mm below the
                                  # floor (pressing an outward-leaning leg shoves the hip over the stance foot; docs/19)
@@ -1136,11 +1140,18 @@ def scenarios():
                 # landed foot carries less than LAND_LOAD (a heavier body sags further on its lines, so a fixed 20 mm
                 # press shoves it over at 26 kg and is needed at 20); hold once loaded and the CoM is still
                 t0, still, press = r.data.time, 0.0, 0.0
+                lo = 0.0
+                if TP_PRESS_FROM_LANDED:
+                    d = {sd: f0 + off[sd] - s[j] for j, sd in enumerate("LR")}
+                    h = min(math.sqrt(max(0.0, big * big - d[sd] ** 2)) for sd in "LR") - c0
+                    h_to = float(anchor("thigh.%s_pitch" % to)[2] - anchor("foot.%s_pitch" % to)[2])
+                    press = lo = float(np.clip(h_to - h, -0.05, 0.0))
                 target = LAND_LOAD * r.mass * 9.81
                 while True:
                     load = r.cop()[1][it]
-                    press = float(np.clip(press + TP_PRESS_RATE * dt * np.clip((target - load) / target, -1, 1),
-                                          0.0, LAND_REACH))
+                    rate = TP_PRESS_CATCHUP if (TP_PRESS_FROM_LANDED and press < 0.0) else TP_PRESS_RATE
+                    press = float(np.clip(press + rate * dt * np.clip((target - load) / target, -1, 1),
+                                          lo, LAND_REACH))
                     slew(planned_legs(f0, s, c0, {to: press, frm: REACH_0}, off), dt)
                     restore_rolls(to, dt)
                     r.step()
@@ -1215,12 +1226,20 @@ def scenarios():
             f0, off, w0 = com_ahead(), hip_offsets(), r.weight
             press = {"L": REACH_0, "R": REACH_0}
             il = "LR".index(landed)
+            r0 = TP_LAND_REACH
+            if TP_PRESS_FROM_LANDED:
+                # from the landed leg's measured length, as in the transfer (D-043)
+                d = {sd: f0 + off[sd] - s[j] for j, sd in enumerate("LR")}
+                h = (min(math.sqrt(max(0.0, big * big - d[sd] ** 2)) for sd in "LR")
+                     - (TP_CROUCH if TP_KEEP_CROUCH else 0.0))
+                h_l = float(anchor("thigh.%s_pitch" % landed)[2] - anchor("foot.%s_pitch" % landed)[2])
+                r0 = float(np.clip(h_l - h, -0.05, TP_LAND_REACH))
             t0 = r.data.time
             while True:
                 g = min(1.0, (r.data.time - t0) / 1.0)
                 g = g * g * (3 - 2 * g)
                 slew(planned_legs(f0, s, TP_CROUCH * (1.0 if TP_KEEP_CROUCH else g),
-                                  {landed: TP_LAND_REACH + (REACH_0 - TP_LAND_REACH) * g, "LR"[1 - il]: REACH_0}, off), dt)
+                                  {landed: r0 + (REACH_0 - r0) * g, "LR"[1 - il]: REACH_0}, off), dt)
                 restore_rolls(landed, dt)
                 r.step()
                 if g >= 1.0 and ((r.cop()[1][il] > 0.15 * r.mass * 9.81 and np.linalg.norm(r._com_v) < 0.02)

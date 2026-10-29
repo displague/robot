@@ -602,3 +602,13 @@ Produced: `27`, D-045, `tools/energy_report.py`, the measured power note in `04`
 the sourced figures: 59 W mean, 700 W peak, about 18 m and 1.2 h on the 111 Wh pack (64 m on the model's old
 775 figures); wind changes it by under 10 %. Power banks: logic supply only. The latency of D-044 is the control
 loop's (sensor to command), not the drives'; a dedicated balance node is the fix and costs about 0.3 W.
+
+## P-042 (2026-10-29) Pick up the hub tasks
+
+> Pick up your tasks
+
+Produced (hub task `step-on-held-feet`, claimed): the cause of the held-feet step failures is traced. The landed
+leg touches down bent, and the transfer's press straightened it at once and kicked the light foot out. The fix,
+`TP_PRESS_FROM_LANDED` with `TP_PRESS_CATCHUP`, is off by default. On held feet it raises the step grid from 23 to
+40 and the walk from 16 to 23 (`25`). The walk's later transfers still push the landed foot sideways. Two other
+attempts are recorded as not helping.

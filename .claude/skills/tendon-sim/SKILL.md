@@ -96,6 +96,9 @@ The default contact is MuJoCo's soft one with friction 1.0, and a loaded foot cr
 `step_sweep.py` and `wind_sweep.py`. Any change to the step or the walk is also judged on
 `step_sweep.py ... "held: NOSLIP=5"` and `"hard: NOSLIP=5 FLOOR_MU=0.4"`. Today these stand 23 and 40 of 42 (step)
 and 16 and 13 (walk), against 42 on soft contact.
+`TP_PRESS_FROM_LANDED=True` (with `TP_PRESS_CATCHUP`, 0.05 m/s) starts the landed leg's press from its measured
+length. On held feet the step then stands 40 and the walk 23; it is off by default because the soft-contact walk
+drops to 39 (docs/25, P-042).
 
 ## Sensors and postures (docs/26, D-044)
 
