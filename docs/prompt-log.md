@@ -487,3 +487,12 @@ Produced: the worm gearmotor is a candidate for the torso W-max (spine and shoul
 self-locking, small driver) but not the legs (about 14 deg/s at the joint); it needs its torque and weight
 before modelling. The TT motor is below the N20 100:1's torque; the 5 rpm micro motor is too slow for any
 drive. Recorded as a hub note on `wmax-mass-down`.
+
+## P-033 (2026-10-28) Linear versus rotary actuators, frameless motors
+
+> any relevance with these? https://humanoid.guide/linear-vs-rotary-actuators-humanoid-joints/ https://jupitermotor.en.alibaba.com/productgrouplist-931411639/Frameless_Motors.html
+
+Produced: the article's screw actuators suggest a lead-screw winch in place of the printed W-max planetary
+(a 775 on a T8 2 mm screw: ~660 N, ~400 mm/s, self-locking, ~120 g of screw; the catch is 160 to 260 mm of
+stroke); frameless BLDC kits are for joint-integrated motors and add little over a 5010 outrunner for winch
+banks (the Alibaba page could not be read). Recorded as a hub note on `wmax-mass-down`.
