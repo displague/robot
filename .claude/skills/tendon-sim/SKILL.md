@@ -24,7 +24,8 @@ ROBOT_TORSO_WORM=1 python tools/sim_tendon.py        # variant: spine and should
 children inherit the environment) and `step_trace.py`. Running `export_mjcf.py` with either set rewrites
 `sim/robot.xml` as the variant: re-run it without them before committing.
 
-Scene keys: stand, push10, push20, push30, push40, sustained, arm, squat, shift, onefoot, step. Run long
+Scene keys: stand, push10, push20, push30, push40, lean15, arm, squat, shift, onefoot, step, walk (docs/23,
+about 95 s; judge it with `step_sweep.py --scene walk`). Run long
 gauntlets in the background with output to a file in the scratchpad, and keep working meanwhile.
 
 Always regenerate both models after touching `tools/export_mjcf.py`, `cad/skeleton.json` or a preset, and
@@ -105,6 +106,7 @@ judged on the 200 random pushes of `record_teacher.py` (199 stand).
 python tools/sim_video.py --gif                                   # docs/img/gauntlet.mp4 + .gif (ffmpeg on PATH)
 python tools/sim_video.py --only shift,onefoot --gif --out onefoot
 python tools/sim_video.py --only step --gif --out step
+python tools/sim_video.py --only walk --gif --out walk     # then re-encode the GIF at 4x (docs/img/walk.gif: ffmpeg setpts=0.25*PTS, fps 12, 480 wide)
 ```
 
 Line tension, drum state, CoM and CoP are drawn into the frames. Re-record a scene whose behaviour a

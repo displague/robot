@@ -8,6 +8,7 @@ Run:
     python tools/step_sweep.py "open: SWING_IK=False" "ik: SWING_IK=True" ["name: K=V K=V ..."]
     python tools/step_sweep.py --lengths 0.09,0.10,0.11 --models base,stiff "ik: SWING_IK=True"
     python tools/step_sweep.py --masses 20kg=,775=m775.json,worm=mworm.json "now: "   # x mass distributions
+    python tools/step_sweep.py --scene walk ...                                     # the walk (docs/23)
 
 Each K=V sets a module constant of sim_tendon before the rig is built (V is a Python expression). Models:
 base (the D-032 baseline), stiff (--stiff-mini). Output, one row per configuration:
@@ -44,7 +45,7 @@ def one(args):
             fell.append(r.phase.split(" ")[0])
 
     for key, title, note, fn in st.scenarios():
-        if key != "step":
+        if key != os.environ.get("STEP_SWEEP_SCENE", "step"):
             continue
         rig.reset()
         rig.hook = hook
@@ -70,6 +71,10 @@ def main():
     if "--models" in argv:
         i = argv.index("--models")
         models = argv[i + 1].split(",")
+        del argv[i:i + 2]
+    if "--scene" in argv:                      # step (default) or walk (docs/23)
+        i = argv.index("--scene")
+        os.environ["STEP_SWEEP_SCENE"] = argv[i + 1]
         del argv[i:i + 2]
     masses = [("", os.environ.get("ROBOT_MASSES", ""))]
     if "--masses" in argv:                     # name=path,... ; an empty path is skeleton.json's masses

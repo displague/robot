@@ -119,6 +119,12 @@ STEP_LOCKS = False               # False: the drums do not self-lock from the st
                                  # balance loop rocks the body foot to foot at 1-2 Hz, +-33 N; docs/19)
 LAT_FF = False                   # the double-support weight shift with a geometric feed-forward base (docs/19)
 IK_DAMP, IK_STEP = 0.01, 0.15   # the swing IK's damping (m-rad mixed) and largest joint step per iteration (rad)
+WALK_BACK = TRANSFER_BACK        # the walk's transfers end with the CoM this many half-steps behind the new lead sole
+WALK_CROUCH = None               # m: the walk's transfers crouch this much (None: TP_CROUCH); the next swing leg reaches
+                                 # a step ahead of the lead foot, a step and a half ahead of the CoM (docs/23)
+PLACE_SINK = 0.0                 # m: the most the stance hip may sink while a straight swing leg cannot reach the floor
+PLACE_SINK_RATE = 0.02           # m/s (docs/23)
+WALK_STEPS = 4                   # the walk scene's steps (docs/23); the step scene is one
 TP_SETTLE = "load"               # the transfer first settles the landing as the centring does (docs/20): hold the landed
                                  # foot pressed until it carries LAND_LOAD and the CoM is still (or 3 s) before the CoM moves
 TP_PRESS_RATE = 0.02             # m/s: how fast TP_SETTLE="load" deepens the landed leg's press while it is unloaded
@@ -806,7 +812,7 @@ def scenarios():
         # (foot back): the sole follows the shank, which leans by the pelvis pitch plus both
         return STAND_LEAN - knee - thigh
 
-    def take_step(r):
+    def take_step(r, n_steps=1):
         """The first static step (docs/06 Phase 6a): shift left, lean half a step forward, lift the right and place
         it STEP_LEN ahead, shift onto it, move the pelvis back half a step, lift the left and place it level with
         the right, centre. Geometry (docs/16): the leg leaning most is straight and sets the hip height, every
@@ -893,7 +899,7 @@ def scenarios():
                 q = np.clip(q - dq, lo, hi)
             return dict(zip(names, q))
 
-        def swing_ik(side, path, seconds, until=None):
+        def swing_ik(side, path, seconds, until=None, each=None):
             # carry the swing ankle along path(g) -> (y, z), g from 0 to 1 over `seconds`, sole at its standing
             # pitch, the targets solved every control step from the measured body (docs/18). The balance loop is
             # free to move the body: the foot stays on its world path regardless
@@ -924,6 +930,8 @@ def scenarios():
                     off = {"thigh.%s_pitch" % side: r.hip_lean, "thigh.%s_roll" % side: r.hip_roll_cmd[side],
                            "foot.%s_roll" % side: -r.hip_roll_cmd[side]}.get(k, 0.0)
                     r.target[k] = v - off
+                if each is not None:
+                    each(g, z + aim[1])
                 r.step()
                 if TRACE and i % 100 == 0:
                     an = r.data.xanchor[aj]
@@ -1011,7 +1019,7 @@ def scenarios():
                 for k, v in restore.items():
                     r.target[k] += max(-ROLL_RESTORE * dt, min(ROLL_RESTORE * dt, v - r.target[k]))
 
-        def transfer_plan(f1, s, to, reach0=LAND_REACH):
+        def transfer_plan(f1, s, to, reach0=LAND_REACH, crouch=None):
             # onto the `to` foot in stages (docs/19), each a quantity the balance loop has already shown it holds:
             # A, the CoM forward to f1 at an even weight share while both hips sink TP_CROUCH (the staggered stance
             # holds, docs/18); B, the share ramped onto `to` as the first weight shift does it, the trailing leg
@@ -1020,6 +1028,11 @@ def scenarios():
             dt = r.model.opt.timestep
             it = "LR".index(to)
             frm = "LR"[1 - it]
+            cr = TP_CROUCH if crouch is None else crouch
+            # the crouch the stance leg has when the transfer starts: none after the first lift, the last transfer's
+            # (kept) after a walk step, plus whatever the landing sank it by (docs/23); the transfer starts there
+            c0 = (cr if crouched[0] else 0.0) + sink_carry[0]
+            sink_carry[0] = 0.0
             measure(s)
             f0, off, w0 = com_ahead(), hip_offsets(), r.weight
             for k in ("L", "R"):
@@ -1036,7 +1049,7 @@ def scenarios():
                     load = r.cop()[1][it]
                     press = float(np.clip(press + TP_PRESS_RATE * dt * np.clip((target - load) / target, -1, 1),
                                           0.0, LAND_REACH))
-                    slew(planned_legs(f0, s, 0.0, {to: press, frm: REACH_0}, off), dt)
+                    slew(planned_legs(f0, s, c0, {to: press, frm: REACH_0}, off), dt)
                     restore_rolls(to, dt)
                     r.step()
                     still = still + dt if (load > target and np.linalg.norm(r._com_v) < 0.02) else 0.0
@@ -1065,7 +1078,7 @@ def scenarios():
                 set_weight(tuple(w0[j] + (0.5 - w0[j]) * g for j in range(2)))
                 r.com_bias = np.asarray(bias(f, s, r.weight), dtype=float)
                 reach = {to: reach0 + (REACH_0 - reach0) * g, frm: REACH_0}
-                slew(planned_legs(f, s, TP_CROUCH * g, reach, off), dt)
+                slew(planned_legs(f, s, c0 + (cr - c0) * g, reach, off), dt)
                 restore_rolls(to, dt)
                 r.step()
             nB = int(round(TP_B / dt))
@@ -1085,7 +1098,7 @@ def scenarios():
                     r.swing = frm
                 straight = (0.0 if TP_KEEP_CROUCH else min(1.0, (r.data.time - t_rel) / 1.5)) if released else 0.0
                 reach = {to: REACH_0, frm: REACH_0 - (REACH_0 + TRAIL_LIFT) * (1.0 if released else arrived)}
-                slew(planned_legs(f1, s, TP_CROUCH * (1.0 - straight), reach, off,
+                slew(planned_legs(f1, s, cr * (1.0 - straight), reach, off,
                                   grounded=to if released else "LR"), dt)
                 restore_rolls(to, dt)
                 r.step()
@@ -1093,13 +1106,14 @@ def scenarios():
                         or i * dt > TP_B + 10.0):
                     break
             f_now[0] = f1
+            crouched[0] = True
             measure(s)
             _, loads = r.cop()
             print("   transfer done at t=%.2f s: loads %.0f/%.0f N, %s, CoM error (%.0f, %.0f) mm"
                   % (r.data.time, loads[0], loads[1], "released" if released else "NOT released",
                      1e3 * r.support()[0][0], 1e3 * r.support()[0][1]))
 
-        def centre_plan(f1, s):
+        def centre_plan(f1, s, landed="L"):
             # the centring in stages (docs/19): 0, both hips sink TP_CROUCH and the landed left foot is pressed until
             # it carries load and the body is still (or 3 s): a straight leg has no range left to press with; 1, the
             # share ramped back to even with its lateral move fed forward; 2, the CoM forward to f1; 3, both legs
@@ -1108,15 +1122,16 @@ def scenarios():
             measure(s)
             f0, off, w0 = com_ahead(), hip_offsets(), r.weight
             press = {"L": REACH_0, "R": REACH_0}
+            il = "LR".index(landed)
             t0 = r.data.time
             while True:
                 g = min(1.0, (r.data.time - t0) / 1.0)
                 g = g * g * (3 - 2 * g)
                 slew(planned_legs(f0, s, TP_CROUCH * (1.0 if TP_KEEP_CROUCH else g),
-                                  {"L": TP_LAND_REACH + (REACH_0 - TP_LAND_REACH) * g, "R": REACH_0}, off), dt)
-                restore_rolls("L", dt)
+                                  {landed: TP_LAND_REACH + (REACH_0 - TP_LAND_REACH) * g, "LR"[1 - il]: REACH_0}, off), dt)
+                restore_rolls(landed, dt)
                 r.step()
-                if g >= 1.0 and ((r.cop()[1][0] > 0.15 * r.mass * 9.81 and np.linalg.norm(r._com_v) < 0.02)
+                if g >= 1.0 and ((r.cop()[1][il] > 0.15 * r.mass * 9.81 and np.linalg.norm(r._com_v) < 0.02)
                                  or r.data.time - t0 > 3.0):
                     break
             nB = int(round(TP_B / dt))
@@ -1126,7 +1141,7 @@ def scenarios():
                 set_weight(tuple(w0[j] + (0.5 - w0[j]) * g for j in range(2)))
                 r.com_bias = np.asarray(bias(f0, s, r.weight), dtype=float)
                 slew(planned_legs(f0, s, TP_CROUCH, press, off), dt)
-                restore_rolls("L", dt)
+                restore_rolls(landed, dt)
                 r.step()
             nA = int(round(TP_A / dt))
             for i in range(1, 2 * nA + int(round(2.0 / dt)) + 1):
@@ -1137,7 +1152,7 @@ def scenarios():
                 f = f0 + (f1 - f0) * g
                 r.com_bias = np.asarray(bias(f, s, r.weight), dtype=float)
                 slew(planned_legs(f, s, TP_CROUCH * (1.0 - g2), press, off), dt)
-                restore_rolls("L", dt)
+                restore_rolls(landed, dt)
                 r.step()
 
         def move_com(seconds, f1, s, tall, weight=None, hold=0.0, reach0=LAND_REACH, release=None, knee=True,
@@ -1212,19 +1227,19 @@ def scenarios():
             # CoM bias (m, forward is -y) that puts the CoM f ahead of the left ankle for the weight share w
             return (0.0, -(f - sum(w[i] * (s[i] + sole) for i in range(2))))
 
-        def place(swing, s, s_new):
+        def place(swing, s, s_new, tag=None):
             i = "LR".index(swing)
             stance = "LR"[1 - i]
             measure(s)
             f = com_ahead()
             r.swing, r.swing_land = swing, False
-            r.set_phase("%s lift %s" % ("2" if swing == "R" else "5", swing))
+            r.set_phase("%s lift %s" % (tag or ("2" if swing == "R" else "5"), swing))
             if SWING_IK:
                 # lift: the ankle straight up to HOVER_H above the floor, sole level, at its standing width (world
                 # frame, docs/18); the stance leg straight at its lean
                 swing_q.clear()
                 restore.clear()
-                keep = TRANSFER_PLAN and TP_KEEP_CROUCH and swing == "L"
+                keep = TRANSFER_PLAN and TP_KEEP_CROUCH and crouched[0]      # after a transfer (docs/19)
                 if IK_LATERAL:
                     restore.update({k: r.target[k] for k in ("thigh.%s_roll" % swing, "foot.%s_roll" % swing)})
                 if keep:
@@ -1252,7 +1267,7 @@ def scenarios():
             # move the sole met the floor before it had travelled back from the fold and landed 48 mm long.
             # The hip runs parallel to the stance leg throughout, so the foot comes down at stance width
             r.swing_land = True
-            r.set_phase("%s place %s" % ("3" if swing == "R" else "6", swing))
+            r.set_phase("%s place %s" % (tag or ("3" if swing == "R" else "6"), swing))
             s2 = list(s)
             s2[i] = s_new
             f = com_ahead()
@@ -1264,8 +1279,30 @@ def scenarios():
                 y_m, z_f = y_l0 - s_new, anchor("foot.%s_pitch" % stance)[2]
                 swing_ik(swing, lambda g: (a0[1] + (y_m - a0[1]) * g, a0[2] + (z_f + HOVER_H - a0[2]) * g), HOVER_T)
                 swing_ik(swing, lambda g: (y_m, z_f + HOVER_H), 0.3)
+                sink_fn = None
+                if PLACE_SINK > 0.0:
+                    # the stance leg sinks while the swing leg is straight and its ankle still above the path: a
+                    # foot a step and a half ahead of the CoM is at full reach (docs/23); the stance hip comes down
+                    # until the foot can land, from the stance leg's measured geometry at the start of the descent
+                    hp = anchor("thigh.%s_pitch" % stance)
+                    ap = anchor("foot.%s_pitch" % stance)
+                    d0, h0 = float(-(hp[1] - ap[1])), float(hp[2] - ap[2])
+                    sunk = [0.0]
+                    sj = mujoco.mj_name2id(r.model, mujoco.mjtObj.mjOBJ_JOINT, "foot.%s_pitch" % swing)
+
+                    def sink_fn(g, z_want):
+                        straight = swing_q.get("shank.%s_pitch" % swing, 1.0) < math.radians(3.0)
+                        if straight and r.data.xanchor[sj][2] > z_want + 0.002:
+                            sunk[0] = min(PLACE_SINK, sunk[0] + PLACE_SINK_RATE * r.model.opt.timestep)
+                        if sunk[0] > 0.0:
+                            t, k, a_ = leg(d0, h0 - sunk[0])
+                            r.target["thigh.%s_pitch" % stance] = t
+                            r.target["shank.%s_pitch" % stance] = k
+                            r.target["foot.%s_pitch" % stance] = a_
                 landed = swing_ik(swing, lambda g: (y_m, z_f + HOVER_H - (HOVER_H + LAND_REACH) * g), PLACE_T,
-                                  until=touch)
+                                  until=touch, each=sink_fn)
+                if sink_fn is not None:
+                    sink_carry[0] = sunk[0]
             else:
                 r.ramp(HOVER_T, legs(f, s2, stance, swing, reach=-HOVER_H))
                 r.run(0.3)
@@ -1278,6 +1315,8 @@ def scenarios():
                      1e3 * (s_new - s[1 - i])))
 
         y_l0 = anchor("foot.L_pitch")[1]
+        crouched = [False]                                # a transfer leaves the stance leg crouched (TP_KEEP_CROUCH)
+        sink_carry = [0.0]                                # how far the last landing sank the stance hip (PLACE_SINK)
         z_floor = []
         width0 = [0.0, 0.0]
         s = [0.0, 0.0]                                    # ankles ahead of the left ankle's start
@@ -1310,18 +1349,35 @@ def scenarios():
         # (the targets come from the feet as measured: the leading foot slid 46 mm forward during this transfer
         # once, and a plan from the stale position landed the next foot behind it and the CoM on a heel)
         r.set_phase("4 transfer onto R")
+        walking = n_steps > 1
         if TRANSFER_PLAN:
-            transfer_plan(s[1] + sole - TRANSFER_BACK * half, s, "R")
+            transfer_plan(s[1] + sole - (WALK_BACK if walking else TRANSFER_BACK) * half, s, "R",
+                          crouch=WALK_CROUCH if walking else None)
         else:
             move_com(TRANSFER_T, s[1] + sole - TRANSFER_BACK * half, s, "L", weight=(0.0, 1.0), hold=TRANSFER_HOLD,
                      release="L", knee=TRANSFER_KNEE, swap=TRANSFER_SWAP)
         unloaded(r, 0)
         r.knee_tau["R"] = None                            # the right leg is the stance now: position mode
         measure(s)
-        place("L", s, s[1])                               # left foot level with it (the right leg straightens)
+        lead = "R"
+        for k in range(2, n_steps + 1):
+            # the walk (docs/23): the trailing foot swings from a step behind to a step ahead of the leading one,
+            # the weight goes onto it the same way, and it leads
+            trail = "LR"[1 - "LR".index(lead)]
+            place(trail, s, s["LR".index(lead)] + STEP_LEN, tag="w%d" % k)
+            lead = trail
+            il = "LR".index(lead)
+            r.set_phase("w%d transfer onto %s" % (k, lead))
+            transfer_plan(s[il] + sole - WALK_BACK * half, s, lead, crouch=WALK_CROUCH)
+            unloaded(r, 1 - il)
+            r.knee_tau[lead] = None
+            measure(s)
+        il = "LR".index(lead)
+        trail = "LR"[1 - il]
+        place(trail, s, s[il], tag="c" if n_steps > 1 else None)   # the trailing foot level with it
         r.set_phase("7 centre")
         if TRANSFER_PLAN:
-            centre_plan(s[1] + sole, s)
+            centre_plan(s[il] + sole, s, landed=trail)
         else:
             move_com(TRANSFER_T, s[1] + sole, s, "R", weight=(0.5, 0.5), hold=3.0, knee=False)   # centre over both
         if r.lock_enabled != lock_was:
@@ -1338,7 +1394,10 @@ def scenarios():
             ("shift", "weight shift onto the left foot", "hip-roll shift and ankle-roll CoP control", shift),
             ("onefoot", "one-foot stance: right foot lifted, held 10 s", "Phase 5 exit test (docs/06)", onefoot),
             ("step", "first static step: right foot 100 mm ahead, then the left level with it",
-             "Phase 6a (docs/06): shift, lift, place, shift, lift, place, centre", take_step)]
+             "Phase 6a (docs/06): shift, lift, place, shift, lift, place, centre", take_step),
+            ("walk", "static walk: %d steps of 100 mm, alternating, then the feet level" % WALK_STEPS,
+             "Phase 6a gait cycle (docs/23): each foot in turn a step ahead of the other",
+             lambda r: take_step(r, WALK_STEPS))]
     if STAGGER_ONLY:
         out = [("stagger", "staggered stance: right foot placed ahead, CoM to the middle, held",
                 "the transfer's stance on its own (docs/18)", take_step)]

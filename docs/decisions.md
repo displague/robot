@@ -413,3 +413,16 @@ arm-with-a-load scene costs more (162 J against 114): unlocked, the balance loop
 Alternative: the gate on the legs only (197 of 200) or on all but the arms (198 of 200).
 Reverses if: the real drums' hold current or lock wear makes frequent release costly, or the IMU-based CoM
 speed is too noisy to gate on.
+
+## D-039 (2026-10-28) A transfer starts from the crouch the stance leg has
+
+Why: hub task `gait-cycle-static` (P-037). The walk generalises the step (`take_step(r, n_steps)`); from the
+second step on the stance leg is crouched when the transfer begins (TP_KEEP_CROUCH), and the transfer's settle
+planned it straight, so it straightened at the plan's slew rate, threw the body and kicked the new foot off
+the floor. The walk stood in 16 of 42 grid variants (2 of 28 on the rolled-up masses). Starting the transfer
+from the stance leg's crouch (none after the first lift) makes it 42 of 42, landings within 6 mm; the single
+step is unchanged.
+Alternative tried: the CoM further forward after each transfer, a deeper crouch, the stance hip sinking while a
+straight swing leg cannot reach the floor (all worse or no better; flags off).
+Reverses if: a gait without the kept crouch (straight-legged stance) is wanted; then the swing needs the reach
+another way.

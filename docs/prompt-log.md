@@ -530,3 +530,16 @@ Produced: hub task `locks-off-while-balancing` (claimed). `BALANCE_LOCKS`, the w
 (`LOCK_STILL`, `LOCK_STILL_V`, `LOCK_RELEASE_V`): 200 random pushes 199 stand (184 with the per-drum rule),
 energy down in 9 of 11 scenes, the one-foot hold 562 J (811), step grid 42 of 42. Teacher data re-recorded
 with 200 pushes: 210 episodes, 65 787 steps. `22`, D-038.
+
+## P-037 (2026-10-28) The walk; wind
+
+> (continuing P-035: "go ahead with the full plan and continue")
+
+> for generalization - are we walking against and away from winds of dynamic strengths? (theses were some of the intended obstacles of the ai-embedded-dynamic-diversity system)
+
+Produced: hub task `gait-cycle-static` (claimed). `take_step(r, n_steps)` and the `walk` scene (4 steps and a
+closing step), `step_sweep.py --scene walk`. The fault traced (the transfer planned a crouched stance leg
+straight) and fixed (D-039): the walk stands in 42 of 42 grid variants, landings within 6 mm, 93 s, 1113 J,
+no flags; the rest of the gauntlet and the step grid unchanged. Shorter stages tried (39 of 42), defaults kept.
+`23`, `docs/img/walk.gif`. Wind: not modelled yet; hub task `wind-gauntlet` filed (drag per segment, gusting
+wind from any direction, the stand, step and walk swept over speed and gust strength).
