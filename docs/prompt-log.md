@@ -496,3 +496,15 @@ Produced: the article's screw actuators suggest a lead-screw winch in place of t
 (a 775 on a T8 2 mm screw: ~660 N, ~400 mm/s, self-locking, ~120 g of screw; the catch is 160 to 260 mm of
 stroke); frameless BLDC kits are for joint-integrated motors and add little over a 5010 outrunner for winch
 banks (the Alibaba page could not be read). Recorded as a hub note on `wmax-mass-down`.
+
+## P-034 (2026-10-28) The worm gearmotor options, modelled
+
+> worm-gearmotor-options-20261028
+
+Produced: the hub record (weight and torque per speed of two worm gearmotor families) read; the 12 V 10 rpm
+1:634 one (3.92 N m rated) added as `WORM_10RPM` and the class `W-worm`, with the variant `ROBOT_TORSO_WORM`
+(spine and shoulders) in `export_mjcf.py` and `--torso-worm` in `mass_rollup.py`. 25.0 kg against 26.1. At
+20.4 kg the worm torso stands the gauntlet and 14 of 14 grid variants, the one-foot hold at 568 J (811). On
+its own roll-up the step grid drops to 4 of 14, which crossing the runs traces to the lighter torso, not the
+drive (worm on the 775 roll-up's masses: 12 of 14). `20`, skills.
+

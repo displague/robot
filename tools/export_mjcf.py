@@ -47,6 +47,9 @@ CLASSES = {
     "W-mini": dict(motor="N20_298:1", eta=0.75, r_drum=0.003, line="braid_50lb",  rotor_J=1.6e-8, ratio=298, hold=0.8),
     "W-mid":  dict(motor="JGB37_1:90", eta=0.75, r_drum=0.006, line="braid_100lb", rotor_J=3.6e-6, ratio=90,  hold=0.8),
     "W-max":  dict(motor="775_PLAN40", eta=0.60, r_drum=0.015, line="braid_200lb", rotor_J=1.1e-5, ratio=40,  hold=0.8),
+    # variant (TORSO_WORM): a bought self-locking worm gearmotor on the drum; hold far above stall (a worm
+    # cannot be back-driven), figures at the output so eta 1.0
+    "W-worm": dict(motor="WORM_10RPM", eta=1.00, r_drum=0.015, line="braid_200lb", rotor_J=2.0e-6, ratio=634, hold=3.0),
 }
 # line stretch: 2 % at a quarter of break (docs/08) -> EA = break / 0.08
 STRETCH_AT_QUARTER_BREAK = 0.02
@@ -77,6 +80,8 @@ JOINTS = {
 
 STIFF_MINI = False   # variant: every W-mini pulley at least 25 mm (docs/13 finding; since D-032 the neck is at 25 mm
                      # in the baseline and the wrist at 18, so this now only raises the wrist)
+TORSO_WORM = bool(os.environ.get("ROBOT_TORSO_WORM"))   # variant: spine and shoulders on W-worm (docs/20; hub
+                     # record worm-gearmotor-options-20261028); an environment variable so step_sweep's children see it
 HIP_ROLL_60 = True   # hip roll on the 60 mm pulley with tackle 3 (D-028, docs/15); False restores the 50 mm, tackle 2 of docs/14
 
 
@@ -119,7 +124,7 @@ SHELL = {"pelvis": ("box", (0.28, 0.16, 0.10)), "spine": ("box", (0.26, 0.16, 0.
          "neck": ("capsule", 0.040), "head": ("capsule", 0.08), "clavicle": ("capsule", 0.02),
          "upperarm": ("capsule", 0.045), "forearm": ("capsule", 0.035), "hand": ("box", (0.08, 0.03, 0.18)),
          "thigh": ("capsule", 0.06), "shank": ("capsule", 0.05)}
-TINT = {"W-max": "0.55 0.58 0.62 1", "W-mid": "0.62 0.60 0.52 1", "W-mini": "0.66 0.62 0.60 1"}
+TINT = {"W-worm": "0.50 0.55 0.66 1", "W-max": "0.55 0.58 0.62 1", "W-mid": "0.62 0.60 0.52 1", "W-mini": "0.66 0.62 0.60 1"}
 
 
 BOX_GEOM = '      <geom type="box" size="%.4f %.4f %.4f" pos="%.4f %.4f %.4f" mass="%.3f" rgba="%s"/>\n'
@@ -168,7 +173,8 @@ def mjcf(links, data):
     for l in links:
         jd = joint_defs.get(l["base"])
         for d in l["dofs"]:
-            p = winch_params(jd["name"], d["axis"], jd["winch"])
+            cls = "W-worm" if TORSO_WORM and jd["name"] in ("waist", "shoulder") else jd["winch"]
+            p = winch_params(jd["name"], d["axis"], cls)
             winches.append(("%s_%s" % (l["name"], d["axis"]), p, l["parent"]))
 
     def body(l, indent):

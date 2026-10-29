@@ -17,10 +17,12 @@ python tools/sim_tendon.py --only stand,push30      # scene keys from sim_tendon
 python tools/sim_tendon.py --stiff-mini             # variant: every W-mini pulley at least 25 mm
 python tools/sim_tendon.py --csv                    # also sim/out/<scene>.csv time series
 ROBOT_MASSES=masses.json python tools/sim_tendon.py # variant: per-bone masses from tools/mass_rollup.py --json
+ROBOT_TORSO_WORM=1 python tools/sim_tendon.py        # variant: spine and shoulders on the 10 rpm worm gearmotor
 ```
 
-`ROBOT_MASSES` is read by `export_mjcf.build()`, so it also applies to `step_sweep.py` (its children inherit
-the environment) and `step_trace.py`.
+`ROBOT_MASSES` and `ROBOT_TORSO_WORM` are read by `export_mjcf`, so they also apply to `step_sweep.py` (its
+children inherit the environment) and `step_trace.py`. Running `export_mjcf.py` with either set rewrites
+`sim/robot.xml` as the variant: re-run it without them before committing.
 
 Scene keys: stand, push10, push20, push30, push40, sustained, arm, squat, shift, onefoot, step. Run long
 gauntlets in the background with output to a file in the scratchpad, and keep working meanwhile.

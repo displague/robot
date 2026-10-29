@@ -51,6 +51,10 @@ MOTORS = {
     # 775 brushed motor (12 V, ~0.6 Nm stall, ~12000 rpm) + printed two-stage 1:40 planetary.
     # Torque below is BEFORE gearbox efficiency; pass eta_gear ~0.6 for printed PETG gears.
     "775_PLAN40":  Motor("775 motor + printed 1:40 planetary", 24.0, 300, 25.0, 12, 450, 11.0),
+    # 12 V worm gearmotor, 58 mm gearbox, 8 mm shaft, 10 rpm 1:634 (Greartisan B07YBXMTWC; hub record
+    # worm-gearmotor-options-20261028): seller's rated 40 kg cm (3.92 N m) at 1.4 A, at the output (worm
+    # losses included: pass eta 1.0). Stall not stated: taken as twice rated, current to match. Self-locking.
+    "WORM_10RPM":  Motor("12V worm gearmotor 10 rpm 1:634", 7.84, 10, 2.7, 12, 380, 27.0, cont_fraction=0.5),
 }
 
 # ---------------------------------------------------------------- lines (braided PE / Dyneema; verify spool label)

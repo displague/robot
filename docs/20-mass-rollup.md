@@ -85,6 +85,35 @@ yet (D-036): the step and the hold were tuned on 20 kg, and the mass should come
 Without changing the motor, the first, fifth, sixth and seventh rows bring it to about 23.5 kg. Reaching 20 kg
 needs a lighter W-max motor.
 
+## The torso on worm gearmotors (P-034)
+
+The worm gearmotor class the owner found (hub record `worm-gearmotor-options-20261028`) suits the torso: slow
+posture joints that hold. The one that meets the torso's line peaks (232 to 250 N, 3.5 to 3.8 N m on the 15 mm
+drum) is the 12 V 10 rpm, 1:634 option rated 40 kg cm (3.92 N m) at 1.4 A, 380 g listed (probably the shipping
+weight). In the model (`ROBOT_TORSO_WORM=1`, class `W-worm`, motor `WORM_10RPM` in `tendon_calc.py`; stall taken
+as twice rated, which the listing does not state) it drives the spine and both shoulders: 9 of the 21 W-max.
+Line rating 261 N continuous, 523 N stall; about 9 deg/s at the spine. It self-locks, so the drum never back-drives.
+
+Mass (`mass_rollup.py --torso-worm`): 25.0 kg against 26.1, the torso 7.4 kg against 8.5 (the motor saves little
+at 380 g; the BTS7960s and printed planetaries for those nine go).
+
+| Run | Model as committed (775, 20.4 kg) | Worm torso, 20.4 kg | Worm torso, its roll-up (25.0 kg) |
+| --- | --- | --- | --- |
+| gauntlet | all stand | all stand; fewer neck flags | all stand except the step (falls in the transfer) |
+| one-foot hold | 811 J, 41 W | **568 J, 29 W** | 531 J, 29 W |
+| step | 444 J, no flags | 437 J, no flags | falls |
+| step grid | 14 of 14 | **14 of 14**, landings within 3 mm | 4 of 14 |
+
+The last column is the mass distribution, not the drive: crossing them, the worm torso on the 775 roll-up's masses
+stands 12 of 14 (the 775 on them: 11), and the 775 on the worm roll-up's masses 2 of 14. With the torso 1.1 kg
+lighter the transfer onto the leading foot fails again (phase 4, the lift gate times out with the trailing foot
+still loaded), so the step as tuned depends on where the mass is. That is the re-tuning D-036 defers until the
+masses are settled.
+
+So the worm torso is no worse for the balance (the spine and shoulders are not in the balance loop) and saves
+energy, but it saves only ~1.1 kg and its 9 deg/s spine and shoulders make the arms slow. Its stall torque, the
+real (unpacked) weight and whether one purchase is one motor are still to check on the bench.
+
 ## Not yet
 
 - The pelvis and torso frames, head, soles and W-max gearbox have no generator; they are 5.7 kg of guesses.

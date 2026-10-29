@@ -67,7 +67,7 @@ UNGENERATED = [
     ("head shell and face mechanisms", "head", 350),
     ("clavicle brackets", "clavicle", 150),
     ("foot soles (long feet, D-015)", "foot", 500),
-    ("W-max gearbox: printed 1:40 planetary, drum, clutch, housing, x21", None, 21 * 150),
+    ("W-max gearbox: printed 1:40 planetary, drum, clutch, housing, x21", None, 150),        # per W-max
     ("W-mid housing and drum, x4", "upperarm", 4 * 40),
 ]
 WMAX_AT = {"pelvis": 6, "spine": 9, "thigh": 6}          # hips in the pelvis; spine + shoulders in the torso;
@@ -76,15 +76,29 @@ WMAX_AT = {"pelvis": 6, "spine": 9, "thigh": 6}          # hips in the pelvis; s
 PVC_KG_M = {"1": 0.446, "1-1/4": 0.605, "1-1/2": 0.722, "2": 0.970}   # Schedule 40, from OD and wall, 1.40 g/cc
 
 
+TORSO_WORM = False   # --torso-worm: spine and shoulders on a bought worm gearmotor (export_mjcf ROBOT_TORSO_WORM)
+
+
+def wmax_at():
+    """W-max drives per segment that still use the 775 and the printed planetary."""
+    return {s: (0 if TORSO_WORM and s == "spine" else n) for s, n in WMAX_AT.items()}
+
+
 def bought():
     rows = []
 
     def add(name, seg, n, g, src):
         rows.append((name, seg, n, g, src))
-    for seg, n in WMAX_AT.items():
+    for seg, n in wmax_at().items():
+        if not n:
+            continue
         add("775 motor 12 V 12000 rpm", seg, n, 354, "listing")
         add("BTS7960 driver with heatsink", seg, n, 65, "listing")
         add("608 bearings in the gearbox, 2 per W-max", seg, 2 * n, 11.9, "listing")
+    if TORSO_WORM:
+        add("12 V 10 rpm worm gearmotor (spine, shoulders)", "spine", 9, 380, "listing, likely shipping weight")
+        add("small H-bridge (3 A class), per worm", "spine", 9, 5, "est")
+        add("608 bearings on the drum shaft, 2 per worm", "spine", 18, 11.9, "listing")
     add("JGB37-520 encoder gearmotor", "upperarm", 4, 175, "est")
     add("N20 298:1 with encoder (neck, wrist)", "spine", 3, 13, "listing")
     add("N20 298:1 with encoder (neck, wrist)", "forearm", 4, 13, "listing")
@@ -169,8 +183,11 @@ def main():
     ap.add_argument("--infill", type=float, default=0.25)
     ap.add_argument("--wall", type=float, default=1.2, help="mm of solid walls and skins (3 lines of 0.4 mm)")
     ap.add_argument("--md", help="also write the tables as Markdown to this file")
+    ap.add_argument("--torso-worm", action="store_true", help="spine and shoulders on the 10 rpm worm gearmotor")
     ap.add_argument("--json", help="write {bone: kg per side} for the model (ROBOT_MASSES=<file>, export_mjcf.py)")
     args = ap.parse_args()
+    global TORSO_WORM
+    TORSO_WORM = args.torso_worm
     if args.build:
         build(args.stl)
 
@@ -219,13 +236,20 @@ def main():
     p("| --- | --- | --- |")
     tot_ungen = 0.0
     for name, s, g in UNGENERATED:
-        tot_ungen += g
         if s is None:
-            for ws, n in WMAX_AT.items():
-                put(ws, "est", g * n / 21)
+            wm = wmax_at()
+            for ws, n in wm.items():
+                put(ws, "est", g * n)
+            g *= sum(wm.values())
+            name = name.replace("x21", "x%d" % sum(wm.values()))
             s = "with the W-max"
+            if TORSO_WORM:
+                tot_ungen += 9 * 60
+                put("spine", "est", 9 * 60)
+                p("| worm drive drum, clutch and mount, x9 | spine | %d |" % (9 * 60))
         else:
             put(s, "est", g)
+        tot_ungen += g
         p("| %s | %s | %.0f |" % (name, s, g))
     p()
     p("## Bought parts")
