@@ -452,3 +452,22 @@ Alternative: the clutch and pretension re-derived from each case's figures (hide
 bare crimps (at 0.3 of label the line breaks before the clutch slips).
 Reverses if: a bench check after purchase shows the wrapped anchor slipping or the braid failing on the drum
 before the knot figures would.
+
+## D-042 (2026-10-29) Wind is MuJoCo's drag on each body; a sustained force is carried by leaning into it
+
+Why: hub task `wind-gauntlet` (P-038, docs/25). Wind is `opt.density` 1.2 and `opt.wind` set every step (the
+inertia-box drag of each body's shell: 26 N at 10 m/s head-on, CdA 0.43 m^2, centre of drag 0.95 m up), the mean
+plus Ornstein-Uhlenbeck gusts. Standing, the robot fell at 10 m/s head-on (8 stood) for two reasons, fixed:
+(1) a wind building up slowly keeps the body still, so the D-038 gate locked every drum and the locked ankles
+carried a growing load until the body tipped; the gate now also resets when the disturbance estimate has moved
+20 mm since the body went still (`LOCK_RELEASE_D`). (2) The balance loop held the CoM over the sole centre and
+carried the force on the CoP alone (about 21 N, 9 m/s); it now leans (`LEAN`): the slow part of the disturbance
+estimate (`LEAN_TAU` 0.4 s, lateral `LEAN_TAU_X` 1.5 s, beyond a 20 mm dead band, at most 80 mm) moves the
+ankles' planned angle and the lateral shift's target, so the CoP returns toward the sole centre and gravity
+carries the force. The capture-point integral alone could not do it: the ankle is a spring about its planned
+angle and the integral can hold only ~25 N m of it off the plan. The ankle part fades out in a staggered stance
+(`LEAN_STAGGER`), where tilting both ankles fights the legs.
+Alternative tried: the lean through the integral alone, faster integral gains (no change); no dead band (the step
+and pushes cost 10 to 20 % more); a 0.4 s lateral lean (192 of 200 random pushes).
+Reverses if: a learned controller carries wind better, or a stepping strategy (a capture step downwind) replaces
+the lean for gusts beyond the sole.

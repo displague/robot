@@ -557,3 +557,11 @@ high for every drive and line with URLs; `ROBOT_MOTORS=low|nom|high|<file>` in `
 `tendon_calc.py --ranges`; D-041. The 775's Kt is 0.0095 N m/A (66 A stall, not 25). At low the gauntlet loses
 push 40 and the walk, the walk grid stands 20 of 42 (sourced nom 36, model 42); the W-max (775 on the printed
 1:40) is the limit and needs about 8.8 N m at the drum (a gearbox of at least 0.55).
+
+Then (wind, hub task `wind-gauntlet`): wind as MuJoCo drag on every body with OU gusts from any side (`WIND`,
+`Rig.set_wind`, `--wind`), `tools/wind_sweep.py`, the `gust` scene, the wind drawn in `sim_video.py`. The robot
+leans into a sustained force and the lock gate releases when the disturbance moves (D-042). Standing carries
+12 m/s head or tail and 10 m/s from the side (10 m/s fell from every side before); the one-foot hold 9 m/s;
+the step and the walk 3 m/s with gusts from any side (the walk is the limit). No-wind gates unchanged: gauntlet,
+step and walk grids 42 of 42, 199 of 200 pushes. Teacher data re-recorded with 60 wind episodes (272 episodes).
+Sibling: wind in the stand-in env (issue #53, PR #54, merged). `25`, `docs/img/gust.gif`.

@@ -17,7 +17,11 @@ that environment's action span, which depends on the task, so the loader builds 
 
 Scenarios that end in a fall (the 40 N push) are left out: the teacher is only worth copying where it works.
 
-Run:  python tools/record_teacher.py [--pushes 24] [--jobs 8]   -> sim/out/teacher/teacher.npz
+Wind (docs/25): --winds N adds N episodes of 12 s standing in a random wind (mean 0 to 9 m/s, gusts 0 to 2 m/s, any
+direction); the observation has no wind channel (the robot carries no anemometer), so the policy must read it
+from its own motion as the controller's disturbance observer does.
+
+Run:  python tools/record_teacher.py [--pushes 24] [--winds 0] [--jobs 8]   -> sim/out/teacher/teacher.npz
 """
 import math
 import multiprocessing as mp
@@ -45,6 +49,12 @@ def _push_scenario(seed):
             r.push("spine", (f * math.cos(ang), f * math.sin(ang), 0.0), 0.2)
             r.run(rng.uniform(1.5, 2.5))
     return fn
+
+
+def _wind_spec(seed):
+    rng = np.random.default_rng(seed)
+    return dict(mean=float(rng.uniform(0.0, 9.0)), gust=float(rng.uniform(0.0, 2.0)),
+                dir=float(rng.uniform(0.0, 360.0)), seed=int(seed))
 
 
 def record(job):
@@ -83,9 +93,11 @@ def record(job):
 
 def main():
     pushes = int(sys.argv[sys.argv.index("--pushes") + 1]) if "--pushes" in sys.argv else 24
+    winds = int(sys.argv[sys.argv.index("--winds") + 1]) if "--winds" in sys.argv else 0
     jobs = int(sys.argv[sys.argv.index("--jobs") + 1]) if "--jobs" in sys.argv else 8
     work = [(k, fn) for k, title, note, fn in st.scenarios() if k not in SKIP]
     work += [("push_rand_%02d" % i, _push_scenario(1000 + i)) for i in range(pushes)]
+    work += [("wind_rand_%02d" % i, None) for i in range(winds)]
     # scenario functions are closures, so each worker rebuilds its list and picks its own by key
     with mp.Pool(jobs) as pool:
         results = pool.map(_record_by_key, [(k, pushes) for k, _ in work])
@@ -113,6 +125,10 @@ def _record_by_key(arg):
     key, pushes = arg
     table = {k: fn for k, title, note, fn in st.scenarios()}
     table.update({"push_rand_%02d" % i: _push_scenario(1000 + i) for i in range(pushes)})
+    st.WIND = None
+    if key.startswith("wind_rand_"):
+        st.WIND = _wind_spec(2000 + int(key.split("_")[-1]))
+        return record((key, lambda r: r.run(12.0)))
     return record((key, table[key]))
 
 

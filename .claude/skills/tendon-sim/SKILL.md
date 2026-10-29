@@ -44,7 +44,7 @@ is nominal except the parts under test at their `low`) and run them as `ROBOT_MO
 scenes, then on the walk grid. A build is recommended only if the walk grid, the one-foot hold and push40
 stand at `low` (D-040).
 
-Scene keys: stand, push10, push20, push30, push40, lean15, arm, squat, shift, onefoot, step, walk (docs/23,
+Scene keys: stand, push10, push20, push30, push40, lean15, arm, squat, gust (8 m/s head wind with gusts, docs/25), shift, onefoot, step, walk (docs/23,
 about 95 s; judge it with `step_sweep.py --scene walk`). Run long
 gauntlets in the background with output to a file in the scratchpad, and keep working meanwhile.
 
@@ -68,6 +68,25 @@ along the voltage line at that current (`motor_peak_power_w`). `wmax_options.py`
 figures (Kt 0.024) and Kt from its 12 000 rpm (0.0095, so ~18 A at the D-021 limit, docs/21); docs/24 settled
 it at 0.0095 (0.0088 to 0.0100) from nine 775 datasheets, so the second reading is the real one. Neither tool touches
 `sim/robot.xml`; a brushless W-max class in the model does not exist yet.
+
+## Wind (docs/25, D-042)
+
+```bash
+python tools/sim_tendon.py --only stand --wind 10,1.5,head      # mean m/s, gust sigma m/s, head|tail|left|right|deg
+python tools/wind_sweep.py --scenes stand,step --dirs head,left --speeds 4,8,12 --gusts 0,1.5 --seeds 0,1 [K=V]
+python tools/sim_video.py --only gust --gif --out gust          # the wind is drawn as a cyan arrow, its speed in the HUD
+```
+
+`WIND` (module constant, also a `step_sweep` K=V: `"WIND=dict(mean=5.0,gust=1.5,dir='head')"`) or
+`rig.set_wind(spec)` in a scene after `reset()`. Drag is MuJoCo's fluid model (`opt.density`, `opt.wind` each
+step) on each body's inertia box; forward is -y, left +x; `dir` is where the wind comes from. The report prints
+the wind and the drag (mean, peak). `wind_sweep.py` runs every scene x direction x speed x gust x seed as its
+own process (`WIND_JOBS` at once; `stand` there is 20 s) and prints one table per scene and direction. Do not
+edit `sim_tendon.py` while a sweep runs: each child imports it when it starts. The balance loop leans into a
+sustained force (`LEAN`, `LEAN_TAU`, `LEAN_TAU_X`, `LEAN_DEAD`, `LEAN_MAX`, `LEAN_STAGGER`) and the lock gate
+releases when the disturbance estimate moves (`LOCK_RELEASE_D`). `record_teacher.py --winds N` adds N standing
+episodes in random winds. The sibling's stand-in has the same wind (`EnvConfig.wind_mean`, `wind_gust`;
+`--wind-mean lo,hi --wind-gust lo,hi`; sibling PR #54).
 
 ## Reading a scene's table
 
@@ -136,6 +155,6 @@ change altered; these GIFs are the release visuals.
 
 ## Learned control hooks
 
-`python tools/record_teacher.py [--pushes 24] [--jobs 8]` writes `sim/out/teacher/teacher.npz`
+`python tools/record_teacher.py [--pushes 24] [--winds 0] [--jobs 8]` writes `sim/out/teacher/teacher.npz`
 (gitignored): the hand-written controller's targets on the stand-in's observations, for behaviour cloning
 in the sibling project (ai-embedded-dynamic-diversity, `rl/`). Re-record after a controller or model change.

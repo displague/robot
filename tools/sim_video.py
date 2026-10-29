@@ -146,6 +146,14 @@ class Recorder:
             self.add_ball(scn, (cop[0], cop[1], 0.003), 0.02, (1.0, 0.55, 0.1, 1.0))
         if rig.balance and d.time > st.BAL_START:
             self.add_ball(scn, (rig.cop_cmd[0], rig.cop_cmd[1], 0.003), 0.012, (1.0, 1.0, 1.0, 1.0))
+        if rig.wind:
+            # the wind: an arrow at chest height from upwind, its length the speed (0.1 m per m/s)
+            v = np.array([m.opt.wind[0], m.opt.wind[1], 0.0])
+            sp = float(np.linalg.norm(v))
+            if sp > 0.2:
+                tip = np.array([com[0], com[1], 1.25]) - v / sp * 0.25
+                self.add_line(scn, tip - v * 0.1, tip, 0.012, (0.3, 0.85, 1.0, 0.9))
+                self.add_ball(scn, tip, 0.02, (0.3, 0.85, 1.0, 0.9))
         img = Image.fromarray(self.renderer.render())
         self.hud(img, worst, loads)
         self.proc.stdin.write(img.tobytes())
@@ -168,7 +176,12 @@ class Recorder:
         dr.text((12, 34), "t = %5.2f s   %s   pelvis %.2f m  tilt %.0f deg   motors %4.0f W   CoM %+.0f mm fwd of sole centre"
                 % (rig.data.time, state, z, tilt, self.power, -e[1] * 1e3), font=self.small,
                 fill=(255, 120, 120) if state == "FALLS" else (220, 220, 220))
-        dr.text((12, 54), self.note, font=self.small, fill=(200, 200, 200))
+        note = self.note
+        if rig.wind:
+            note += "   wind %.1f m/s from %s (arrow), drag %.0f N" % (
+                math.hypot(rig.model.opt.wind[0], rig.model.opt.wind[1]), rig.wind["dir"],
+                math.hypot(rig.data.qfrc_fluid[0], rig.data.qfrc_fluid[1]))
+        dr.text((12, 54), note, font=self.small, fill=(200, 200, 200))
         dr.text((12, 72), "feet %3.0f / %3.0f N   lines: grey slack, green..red = 0..continuous rating; drums: blue locked, orange driving, red clutch slip"
                 % (loads[0], loads[1]), font=self.small, fill=(170, 170, 170))
         # worst five lines as bars
@@ -202,6 +215,13 @@ def main():
     if "--hip50" in args:
         import export_mjcf
         export_mjcf.HIP_ROLL_60 = False
+    if "--wind" in args:                     # --wind mean[,gust[,dir]] for every scene, as sim_tendon
+        a = args[args.index("--wind") + 1].split(",")
+        st.WIND = dict(mean=float(a[0]))
+        if len(a) > 1:
+            st.WIND["gust"] = float(a[1])
+        if len(a) > 2:
+            st.WIND["dir"] = a[2] if a[2] in st.WIND_DIRS else float(a[2])
     rig = st.Rig()
     rec = Recorder(rig, out, fps=fps, gif=gif,
                    gif_scenes=tuple(only) if only else ("stand", "push30", "lean15", "onefoot", "step"))

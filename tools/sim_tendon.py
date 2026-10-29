@@ -64,6 +64,9 @@ LOCK_STILL_BONES = None          # the drums the gate applies to (None: all). Le
                                  # neck flags; all drums 199/200 (docs/22)
 LOCK_RELEASE_V = 0.08           # m/s: the gate resets only above this (a 10 N push gives ~0.1); between the two the
                                  # stillness timer holds, so a slow sway under an arm load does not keep the legs unlocked
+LOCK_RELEASE_D = 0.02            # m: the gate also resets when the disturbance estimate has moved this far since the robot
+                                 # went still (a wind building up slowly: the body stays still while the locked ankles
+                                 # carry a growing load, until it tips; docs/25). None: off
 LOCK_STILL_V = 0.02              # every lock releases the moment it moves faster (a push): locks hold a still robot at zero
                                  # power and stay out of any balancing (D-034, D-038). None: the per-drum rule alone (docs/19)
 ANKLE_QUIET = 1.0                # s: the ankle may lock once its torque demand has been steady this long
@@ -164,6 +167,24 @@ REACH_0 = 0.003                  # m: the bent leg of a staggered stance is plan
                                  # the weight settles onto rather than a position that hovers or presses
 ANKLE_BLEND = 0.3                # s: a foot that has just landed takes up its share of the ankle torque over this
                                  # long (a swing foot's ankle is in position mode, sole level, carrying no offset)
+WIND = None                      # wind (docs/25): dict(mean=m/s, gust=m/s, tau=s, dir=..., seed=, start=s, ramp=s) or None.
+                                 # dir is where it comes from: "head", "tail", "left", "right" or degrees (0 head, 90
+                                 # left). Drag is MuJoCo's fluid model on each body's inertia box (the shells; Cd 1 on
+                                 # the box faces): about 26 N on the 20 kg robot at 10 m/s head-on, 1.6x the gauntlet's
+                                 # sustained push. Gusts: Ornstein-Uhlenbeck on the along- and cross-wind speed (sigma
+                                 # gust and 0.75 gust, time constant tau)
+LEAN = True                      # lean into a sustained force (docs/25): the capture-point integral regulates the CoM to
+                                 # minus the slow part of the disturbance estimate instead of to the reference, so the
+                                 # CoP returns to the sole centre and gravity carries the force (a wind, a long push)
+LEAN_TAU, LEAN_MAX = 0.4, 0.08   # s, m: low-pass of the disturbance estimate for the lean, and its clamp
+LEAN_DEAD = 0.02                 # m: the lean answers only the slow disturbance beyond this (the robot's own motion: the
+                                 # step and the pushes cost 10 to 20 % more without it)
+LEAN_STAGGER = 0.04              # m: the ankle part of the lean is gone once the soles are this far apart fore and aft
+LEAN_SLEW = 0.1                  # rad/s: how fast the ankle lean may change
+LEAN_TAU_X = 1.5                 # s: the lateral lean's low-pass (slower: at 0.4 s a short side push moved the hips; 192 of 200 pushes)
+LEAN_LATERAL = True              # the same on the lateral loops (hip-roll shift)
+AIR_DENSITY = 1.2                # kg/m^3
+WIND_DIRS = {"head": 0.0, "left": 90.0, "tail": 180.0, "right": 270.0}
 GEAR_FRICTION = 0.02             # of stall: running friction of the gear train when powered
 CURRENT_LIMIT = 0.9              # of the clutch slip torque: the driver's current limit
 
@@ -254,7 +275,8 @@ class Rig:
         self.applied = dict(self.target)  # per DOF: the joint target control() applied last step, balance terms in
         self._quiet, self._off_prev, self._hip_i = 0.0, pre, 0.0
         self._still = 0.0
-        self._v_prev, self._dist = np.zeros(2), np.zeros(2)
+        self._lean_q = 0.0
+        self._v_prev, self._dist, self._lean, self._dist_ref = np.zeros(2), np.zeros(2), np.zeros(2), np.zeros(2)
         self._com_f, self._com_v, self._cp_i, self._roll_i = None, np.zeros(2), np.zeros(2), 0.0
         self.weight = (0.5, 0.5)         # planner: desired share of the weight on (left, right)
         self.com_share = (0.5, 0.5)      # balance loop: the share the CoM position between the soles implies
@@ -266,6 +288,21 @@ class Rig:
             m.eq_data[w["eq_lock"]][0] = d.qpos[w["gq"]]
             d.eq_active[w["eq_stick"]] = 1
             d.eq_active[w["eq_lock"]] = 0
+        self.set_wind(WIND)
+
+    def set_wind(self, spec):
+        """Wind from now on (a WIND dict, or None for still air); a scene may call it after reset()."""
+        m = self.model
+        self.wind = None if spec is None else dict(dict(mean=0.0, gust=0.0, tau=2.0, dir="head", seed=0, start=0.5,
+                                                        ramp=2.0), **spec)
+        m.opt.density = AIR_DENSITY if self.wind else 0.0
+        m.opt.wind[:] = 0.0
+        if self.wind:
+            a = math.radians(WIND_DIRS[self.wind["dir"]] if isinstance(self.wind["dir"], str) else self.wind["dir"])
+            self._wind_u = np.array([-math.sin(a), math.cos(a)])   # unit vector the wind blows along (forward is -y)
+            self._wind_g = np.zeros(2)                             # gust: along, across
+            self._wind_rng = np.random.default_rng(self.wind["seed"])
+        self.wind_stat = [0.0, 0.0, 0, 0.0]                        # drag sum, peak drag, steps, peak speed
 
     # ---- physics of the drive train read back from the state
     def line_force(self, t):
@@ -367,9 +404,25 @@ class Rig:
             resid = acc / omega ** 2 - (self._com_f - (cop_meas - ref))
             b = dt / ((DOB_TAU_SS if len(grounded) == 1 else DOB_TAU) + dt)
             self._dist = np.clip(self._dist + b * (resid - self._dist), -DOB_MAX, DOB_MAX)
-        # capture-point CoP demand (m, relative to the reference point), integral on the CoM offset
+        # capture-point CoP demand (m, relative to the reference point), integral on the CoM offset (LEAN: on the
+        # offset from the lean, the slow part of the disturbance, so a sustained force is carried by leaning into it)
         cp = self._com_f + self._dist + self._com_v / omega
-        self._cp_i = np.clip(self._cp_i + CP_KI * self._com_f * dt, -CP_IMAX, CP_IMAX)
+        if LEAN:
+            k = dt / (np.array([LEAN_TAU_X, LEAN_TAU]) + dt)
+            self._lean = np.clip(self._lean + k * (self._dist - self._lean), -LEAN_MAX, LEAN_MAX)
+        # with a dead band (LEAN_DEAD) that still reaches LEAN_MAX: zero up to the band, then steeper than 1:1
+        lean = (np.sign(self._lean) * np.clip((np.abs(self._lean) - LEAN_DEAD) * LEAN_MAX / (LEAN_MAX - LEAN_DEAD),
+                                              0.0, LEAN_MAX) if LEAN else np.zeros(2))
+        self._cp_i = np.clip(self._cp_i + CP_KI * (self._com_f + lean) * dt, -CP_IMAX, CP_IMAX)
+        # the lean is a posture: the ankles' planned angle moves by it (the ankle is a spring about its plan, and
+        # the integral above could hold only ~25 N m of that spring off the plan)
+        # only while the soles are level with each other: tilting both ankles by one angle closes the chain only
+        # when the legs are side by side; in a staggered stance it fights the legs and lifts the landed foot
+        # (docs/25), so there the lean fades out and the integral alone carries it (LEAN_STAGGER, m)
+        both = [c for c, on in s if on]
+        dy = abs(both[0][1] - both[1][1]) if len(both) == 2 else 0.0
+        want_q = -lean[1] / h * float(np.clip(1.0 - dy / LEAN_STAGGER, 0.0, 1.0)) if LEAN_STAGGER else -lean[1] / h
+        self._lean_q += float(np.clip(want_q - self._lean_q, -LEAN_SLEW * dt, LEAN_SLEW * dt))
         p = np.array([(1.0 + CP_GAIN_X) * cp[0], (1.0 + CP_GAIN) * cp[1]]) + self._cp_i
         # keep the CoP inside what the grounded soles can supply
         xs, ys = [c[0] for c in grounded], [c[1] for c in grounded]
@@ -398,6 +451,9 @@ class Rig:
         self._quiet = self._quiet + dt if abs(self.ankle_offset - self._off_prev) < math.radians(0.02) else 0.0
         v = np.linalg.norm(self._com_v)
         self._still = 0.0 if v > LOCK_RELEASE_V else (self._still + dt if v < LOCK_STILL_V else self._still)
+        if LOCK_RELEASE_D is not None:
+            if self._still == 0.0 or np.linalg.norm(self._dist - self._dist_ref) > LOCK_RELEASE_D:
+                self._still, self._dist_ref = 0.0, self._dist.copy()
         self._off_prev = self.ankle_offset
         # excess beyond the ankle's comfortable CoP goes to the hip as a trunk lean (+ hip pitch = trunk back),
         # integrated, leaking back toward upright
@@ -423,7 +479,7 @@ class Rig:
             if not self._single:
                 self._shift_hold, self._ss_i, self._swing_free = self.hip_shift, 0.0, False
                 self._swing_roll_f = None
-            ex, vx = float(self._com_f[0]), float(self._com_v[0])
+            ex, vx = float(self._com_f[0] + (lean[0] if LEAN_LATERAL else 0.0)), float(self._com_v[0])
             self._ss_i = max(-ROLL_MAX, min(ROLL_MAX, self._ss_i + SS_KI * ex * dt))
             self.hip_shift = max(-ROLL_MAX, min(ROLL_MAX, self._shift_hold - SS_KP * (ex + vx / omega) - self._ss_i))
             for side, (c, on), load in zip("LR", s, loads):
@@ -454,10 +510,13 @@ class Rig:
             if LAT_FF:
                 mid_x = 0.5 * (s[0][0][0] + s[1][0][0])
                 ff = (ref[0] - mid_x) / self.leg
+            # LEAN_LATERAL: the CoM's target moves upwind by the lean, the shift that takes it there fed forward
+            lx = lean[0] if LEAN_LATERAL else 0.0
+            ff -= lx / self.leg
             if self._single:
-                self._roll_i = ff - self.hip_shift - ROLL_KP * self._com_f[0]
-            self._roll_i = max(-ROLL_MAX, min(ROLL_MAX, self._roll_i + ROLL_KI * self._com_f[0] * dt))
-            want = max(-ROLL_MAX, min(ROLL_MAX, ff - (ROLL_KP * self._com_f[0] + ROLL_KD * self._com_v[0]
+                self._roll_i = ff - self.hip_shift - ROLL_KP * (self._com_f[0] + lx)
+            self._roll_i = max(-ROLL_MAX, min(ROLL_MAX, self._roll_i + ROLL_KI * (self._com_f[0] + lx) * dt))
+            want = max(-ROLL_MAX, min(ROLL_MAX, ff - (ROLL_KP * (self._com_f[0] + lx) + ROLL_KD * self._com_v[0]
                                                       + self._roll_i)))
             self.hip_shift += max(-ROLL_SLEW * dt, min(ROLL_SLEW * dt, want - self.hip_shift))
             for side in "LR":
@@ -515,7 +574,8 @@ class Rig:
                 torque_mode = True
                 # roll: the parallelogram term stays (the leg keeps its angle to the pelvis when the other foot
                 # leaves the ground), the CoP torque is added on top
-                tgt += self.ankle_off[side] if axis == "pitch" else (self.ankle_roll[side] - self.hip_roll_cmd[side])
+                tgt += (self.ankle_off[side] + self._lean_q if axis == "pitch"
+                        else (self.ankle_roll[side] - self.hip_roll_cmd[side]))
             elif bone == "foot" and axis == "roll":
                 tgt -= self.hip_roll_cmd[side]          # parallelogram: the sole stays flat under the shift
             elif bone == "shank" and self.knee_tau.get(side) is not None:
@@ -567,9 +627,28 @@ class Rig:
             d.ctrl[w["act"]] = max(-1.0, min(1.0, ctrl))
             w["_locked"] = locked
 
+    def blow(self):
+        """Set the wind for this step: the mean ramped in after `start`, plus the gusts (WIND)."""
+        m, d, w = self.model, self.data, self.wind
+        dt = m.opt.timestep
+        g, k = self._wind_g, dt / w["tau"]
+        g += -g * k + np.array([1.0, 0.75]) * w["gust"] * math.sqrt(2.0 * k) * self._wind_rng.standard_normal(2)
+        f = min(1.0, max(0.0, (d.time - w["start"]) / max(w["ramp"], 1e-9)))
+        u = self._wind_u
+        v = f * ((w["mean"] + g[0]) * u + g[1] * np.array([-u[1], u[0]]))
+        m.opt.wind[0:2] = v
+        st = self.wind_stat
+        drag = math.hypot(d.qfrc_fluid[0], d.qfrc_fluid[1])
+        st[0] += drag
+        st[1] = max(st[1], drag)
+        st[2] += 1
+        st[3] = max(st[3], math.hypot(v[0], v[1]))
+
     def step(self, record=False):
         m, d = self.model, self.data
         self.control()
+        if self.wind:
+            self.blow()
         mujoco.mj_step(m, d)
         self.steps += 1
         dt = m.opt.timestep
@@ -663,6 +742,10 @@ class Rig:
         energy = sum(s["e_j"] for s in self.stats.values())
         print("\n== %s: t=%.1f s, pelvis %.3f m, tilt %.1f deg -> %s; electrical energy %.1f J (%.1f W mean)"
               % (title, t, z, tilt, "STANDS" if self.standing() else "FALLS", energy, energy / max(t, 1e-9)))
+        if self.wind:
+            w, st = self.wind, self.wind_stat
+            print("   wind from %s, mean %.1f m/s, gusts %.1f m/s (tau %.1f s), peak %.1f m/s; drag mean %.1f N, peak %.1f N"
+                  % (w["dir"], w["mean"], w["gust"], w["tau"], st[3], st[0] / max(st[2], 1), st[1]))
         rows = []
         for w in self.w:
             s, p = self.stats[w["name"]], w["p"]
@@ -749,6 +832,10 @@ def scenarios():
         r.move({"upperarm.L_pitch": math.radians(-90)}, 1.5)
         r.run(1.0)
         r.push("hand.L", (0, 0, -10), 4.0)
+
+    def gust(r):
+        r.set_wind(dict(mean=8.0, gust=1.5, dir="head", seed=0))
+        r.run(15.0)
 
     def squat(r):
         r.run(1.0)
@@ -1391,6 +1478,7 @@ def scenarios():
     out += [("lean15", "sustained 15 N at the torso for 5 s", "disturbance observer: the CoP goes forward at once", lean),
             ("arm", "left arm forward, 1 kg in the hand for 4 s", "shoulder and wrist lines under a held load", arm),
             ("squat", "quarter squat held 4 s", "hip, knee and ankle loops all loaded", squat),
+            ("gust", "head wind 8 m/s with 1.5 m/s gusts, 15 s", "the lean into a sustained force (docs/25)", gust),
             ("shift", "weight shift onto the left foot", "hip-roll shift and ankle-roll CoP control", shift),
             ("onefoot", "one-foot stance: right foot lifted, held 10 s", "Phase 5 exit test (docs/06)", onefoot),
             ("step", "first static step: right foot 100 mm ahead, then the left level with it",
@@ -1416,6 +1504,16 @@ def main():
     if "--trace" in sys.argv:
         global TRACE
         TRACE = True
+    if "--wind" in sys.argv:                 # --wind mean[,gust[,dir[,tau]]] for every scene (docs/25)
+        global WIND
+        a = sys.argv[sys.argv.index("--wind") + 1].split(",")
+        WIND = dict(mean=float(a[0]))
+        if len(a) > 1:
+            WIND["gust"] = float(a[1])
+        if len(a) > 2:
+            WIND["dir"] = a[2] if a[2] in WIND_DIRS else float(a[2])
+        if len(a) > 3:
+            WIND["tau"] = float(a[3])
     if "--open-swing" in sys.argv:
         global SWING_IK, IK_LATERAL, TRANSFER_PLAN, STEP_LOCKS
         SWING_IK = IK_LATERAL = TRANSFER_PLAN = False   # the step of docs/16, for comparison
