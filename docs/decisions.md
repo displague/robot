@@ -426,3 +426,14 @@ Alternative tried: the CoM further forward after each transfer, a deeper crouch,
 straight swing leg cannot reach the floor (all worse or no better; flags off).
 Reverses if: a gait without the kept crouch (straight-legged stance) is wanted; then the swing needs the reach
 another way.
+
+## D-040 (2026-10-29) No bench tests before buying: motor figures are sourced ranges and the design must hold across them
+
+Why: the owner will not buy motors until the outcome is reasonably certain and cannot run the bench tests
+(P-038). So the figures the model runs on (stall torque, speed, current, gearbox efficiency, line strength)
+come from sources (datasheets, the sellers' curves, reference projects that published measurements, the
+physics of the motor's own numbers), each with a low and a high value and where it came from, and a build is
+only recommended if the walk, the one-foot hold and the push set stand at the pessimistic end of its range.
+The bench tests (`bench-load-tests`) become checks after purchase, not gates before it.
+Alternative: buy one of each motor and measure (the owner declined: cost and time before the design is sure).
+Reverses if: the owner gets the parts in hand; then the measured values replace the ranges.

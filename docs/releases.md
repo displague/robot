@@ -3,6 +3,28 @@
 Each tag has a GitHub release (github.com/displague/robot/releases) with notes, visuals and assets:
 the generated STLs, the MuJoCo models and the recordings. How to make one: `.claude/skills/release/SKILL.md`.
 
+## v0.3.0 (2026-10-29) — A static walk
+
+**State:** the robot walks in simulation: four alternating 100 mm steps and a closing step, standing in 42 of
+42 variants of a grid over two drive models, seven step lengths (85 to 115 mm) and three mass sets (20 kg and
+the 25 and 26 kg roll-ups), every landing within 6 mm (D-039, docs/23). The step's landing press is found
+from the foot's load (D-037); the drum locks engage only when the whole body is still (D-038, docs/22). The
+mass is rolled up from the parts (docs/20, 26.1 kg as specified) and the W-max options costed (docs/21). The
+parts list carries Amazon prices (docs/05).
+
+**Results:** walk grid 42/42 (93 s, 1113 J, no flags at 20 kg); step grid 42/42 over three mass sets (27/42
+before D-037); random pushes 199/200 (184); one-foot hold 562 J (811); standing 12 J (21); the arm scene
+162 J (114, worse).
+
+**Known gaps:** slow (16 s per step); the arm scene's sway; 26 kg against a 20 kg budget and the motor
+undecided; the 775's catalogue figures inconsistent; no wind, slopes or turning; three STLs non-manifold
+(thumb_palm, forearm_6808_rotor, shoulder_rot_rotor).
+
+**Assets:** robot-v0.3.0-stl.zip, robot.xml, robot_standin.xml/.json, rollup_775.json, rollup_worm.json,
+walk.gif, walk.mp4.
+
+**Decisions:** D-035 to D-039. **Prompts:** P-028 to P-038.
+
 ## v0.2.0 (2026-10-28) — A static step with margin
 
 **State:** the first static step stands in every variant of a 14-run grid (two models, step lengths 85 to

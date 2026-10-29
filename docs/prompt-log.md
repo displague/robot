@@ -543,3 +543,11 @@ straight) and fixed (D-039): the walk stands in 42 of 42 grid variants, landings
 no flags; the rest of the gauntlet and the step grid unchanged. Shorter stages tried (39 of 42), defaults kept.
 `23`, `docs/img/walk.gif`. Wind: not modelled yet; hub task `wind-gauntlet` filed (drag per segment, gusting
 wind from any direction, the stand, step and walk swept over speed and gust strength).
+
+## P-038 (2026-10-29) Release v0.3.0; wind; sourced motor figures instead of bench tests
+
+> yes, publish, and then on with the wind. (I'm not going to have these motors until I can be relatively sure of what we will get out of them -- I don't know the bench tests, you'll have to get good at sourcing this information and building flex into the system)
+
+Produced: release v0.3.0 (github.com/displague/robot/releases/tag/v0.3.0, `docs/releases.md`). D-040: motor
+figures become sourced ranges and a build is recommended only if it stands at the pessimistic end; the
+bench tests become post-purchase checks.
