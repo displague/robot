@@ -478,3 +478,12 @@ against 20 (the W-max drives 12.4 kg); the 13 kg joint-end figure in `05` was so
 `ROBOT_MASSES` model variant: on the real masses the gauntlet stands, the one-foot ankle line peaks at 306 of
 288 N with clutch slip, the step grid 11 of 14. `20`, D-036, `05` mass section, skills.
 
+
+## P-032 (2026-10-28) Other motors on Amazon
+
+> any relevance for things like : (pasted: a 12 V 15 rpm worm gearmotor, 2 A 20 W, 3-250 rpm options; an 8-pack of TT 1:48 3-6 V gearmotors; a 6-pack of 6 V 5 rpm micro gearmotors)
+
+Produced: the worm gearmotor is a candidate for the torso W-max (spine and shoulders: slow, static holds,
+self-locking, small driver) but not the legs (about 14 deg/s at the joint); it needs its torque and weight
+before modelling. The TT motor is below the N20 100:1's torque; the 5 rpm micro motor is too slow for any
+drive. Recorded as a hub note on `wmax-mass-down`.
