@@ -34,6 +34,18 @@ commit `sim/robot.xml` and `sim/robot_standin.*` with the change.
 (D-035). Changing a motor, ratio, line or winch count in the model means changing its row and the totals
 in `05` in the same commit; `python tools/export_mjcf.py --table` gives the per-DOF classes to count.
 
+## Drive options off the model (desk calculations)
+
+```bash
+python tools/tendon_calc.py              # scenarios; MOTORS has 5010_PLAN16 / 5010_PLAN25_24V (brushless: kv, r_ohm, ratio)
+python tools/wmax_options.py [--drum|--screw]   # W-max drives on the 15 mm drum vs the walking points; lead-screw winch per joint
+```
+
+For a `Motor` with `kv` set, `stall_torque_nm` is the torque at the driver's peak current and peak power is taken
+along the voltage line at that current (`motor_peak_power_w`). `wmax_options.py` carries the 775 twice: the model's
+figures (Kt 0.024) and Kt from its 12 000 rpm (0.0095, so ~18 A at the D-021 limit, docs/21). Neither tool touches
+`sim/robot.xml`; a brushless W-max class in the model does not exist yet.
+
 ## Reading a scene's table
 
 `== <scene>: t, pelvis height, tilt -> STANDS|FALLS; electrical energy (mean W)`, then lines worst first:

@@ -49,6 +49,7 @@ Goal ordering, in case they conflict: **cheap > simple to build > human range of
 | `docs/18-swing-leg-world-frame.md` | The swing leg by world-frame IK (accurate landings, steady single support with the free foot held in the world), and the finding that the step has no margin: most variants fall in the weight transfer, whatever the swing leg does (in progress) |
 | `docs/19-transfer-for-margin.md` | The step with margin: no drum locks while stepping, staged transfers from planned geometry, the shift fed forward; stands in 14 of 14 grid variants, landings within 4 mm, 444 J (D-034) |
 | `docs/20-mass-rollup.md` | Mass roll-up of every printed and bought part: about 26 kg against the 20 kg budget; the model on those masses (the ankle at its rating, the step 11 of 14); where mass can come off (D-036) |
+| `docs/21-wmax-options.md` | W-max options weighed: a VNH5019-class driver for the 775 (25.0 kg), a 5010 brushless W-max (19.9 kg), lead-screw winches (heavier); the 775's current constant questioned |
 | `tools/step_sweep.py`, `tools/step_trace.py` | The step's robustness grid (two models x three step lengths, landing errors, fall phase) and the per-0.1 s trace falls are found with |
 | `tools/mass_rollup.py` | Printed (from the generators' STLs at print settings), estimated and bought mass per body segment against `cad/skeleton.json`; `--json` feeds the `ROBOT_MASSES` model variant |
 | `docs/references.md` | External projects to borrow test scenarios and tooling from (primo, microban, Isaac Lab, DreamDojo, LeRobot, the sibling ai-embedded-dynamic-diversity) |
@@ -67,6 +68,7 @@ Goal ordering, in case they conflict: **cheap > simple to build > human range of
 | `docs/decisions.md` | Decision log (what we chose and why; revisit when a test disagrees) |
 | `docs/prompt-log.md` | Every prompt that produced a set of work, verbatim, with what it produced |
 | `tools/tendon_calc.py` | Force / speed / power / line-safety calculator for any motor + drum + tackle combination |
+| `tools/wmax_options.py` | The W-max drives (775 with two drivers and two readings of its Kt, the 5010 brushless at 12 and 24 V) on the 15 mm drum against the walking points, and the lead-screw winch per W-max joint (docs/21) |
 | `cad/blender/winch_mini.py` | Parametric Blender generator for the W-mini winch (N20 motor); exports STL |
 | `cad/out/` | Generated STLs (regenerate, do not hand-edit) |
 

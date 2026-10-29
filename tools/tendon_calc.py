@@ -34,6 +34,25 @@ class Motor:
     mass_g: float
     price_usd: float
     cont_fraction: float = 0.30  # fraction of stall torque usable continuously without cooking motor/gearbox
+    # Brushless (current-limited) motors only: stall_torque_nm is then the torque at the driver's peak current
+    # (stall_current_a), not a true stall, and peak power is taken along the voltage line at that current.
+    kv: float = 0.0              # rpm per volt; 0 = brushed (peak power at half stall, half no-load speed)
+    r_ohm: float = 0.0           # winding resistance, line to line
+    ratio: float = 1.0           # gearbox ratio included in stall_torque_nm and noload_rpm
+
+
+def motor_peak_power_w(m: Motor, eta: float) -> float:
+    """Peak mechanical power at the gearbox output.
+    Brushed: T_stall * w_noload / 4. Brushless: at the peak current (or V / 2R if that is lower), with the speed
+    the voltage left after the I R drop allows (DC-equivalent model of FOC; ~10 % optimistic)."""
+    w0 = m.noload_rpm / 60 * 2 * math.pi
+    if not m.kv:
+        return m.stall_torque_nm * w0 / 4 * eta
+    v_eff = w0 * m.ratio / (m.kv / 60 * 2 * math.pi)            # the voltage the no-load speed implies
+    i = min(m.stall_current_a, v_eff / (2 * m.r_ohm))
+    t_out = m.stall_torque_nm * i / m.stall_current_a
+    w = (v_eff - i * m.r_ohm) / v_eff * w0
+    return t_out * w * eta
 
 
 MOTORS = {
@@ -55,6 +74,16 @@ MOTORS = {
     # worm-gearmotor-options-20261028): seller's rated 40 kg cm (3.92 N m) at 1.4 A, at the output (worm
     # losses included: pass eta 1.0). Stall not stated: taken as twice rated, current to match. Self-locking.
     "WORM_10RPM":  Motor("12V worm gearmotor 10 rpm 1:634", 7.84, 10, 2.7, 12, 380, 27.0, cont_fraction=0.5),
+    # 5010 360 KV multirotor outrunner (109 g listed, docs/05) on FOC + printed two-stage 1:16 planetary (4 x 4), 12 V.
+    # Kt ~ 8.27 / KV = 0.023 N m/A (per amp of phase current amplitude). Torque here is at the driver's 20 A peak:
+    # 0.023 x 20 x 16 = 7.36 N m BEFORE gearbox efficiency (pass eta ~0.6). No-load 0.9 x 360 x 12 / 16 = 243 rpm.
+    # Continuous 8 A (0.4 of peak): heat-limited, a fan-less outrunner inside the torso; estimate, not measured.
+    # R 0.15 ohm line to line: estimate (5010-class listings do not state it). docs/21.
+    "5010_PLAN16": Motor("5010 360KV BLDC + printed 1:16 planetary", 7.36, 243, 20.0, 12, 109, 28.0,
+                         cont_fraction=0.4, kv=360, r_ohm=0.15, ratio=16),
+    # the same on a 6S (24 V) bus with 1:25 (5 x 5): more continuous force at the same speed. docs/21.
+    "5010_PLAN25_24V": Motor("5010 360KV BLDC + printed 1:25 planetary, 24 V", 11.5, 311, 20.0, 24, 109, 28.0,
+                             cont_fraction=0.4, kv=360, r_ohm=0.15, ratio=25),
 }
 
 # ---------------------------------------------------------------- lines (braided PE / Dyneema; verify spool label)
@@ -96,6 +125,9 @@ def evaluate(s: Scenario) -> dict:
     # crude DC-motor model: speed falls linearly with load from no-load to stall
     load_frac = min(s.required_force_n / f_stall, 0.99) if f_stall > 0 else 1
     v_loaded = v_noload * (1 - load_frac)
+    if m.kv:   # brushless on a current-limited driver: speed falls only by the I R drop, until the peak current
+        v_eff = m.noload_rpm * m.ratio / m.kv
+        v_loaded = v_noload * (1 - load_frac * m.stall_current_a * m.r_ohm / v_eff) if load_frac < 0.99 else 0.0
     t_full = s.excursion_mm / v_loaded if v_loaded > 0 else float("inf")
     dia, brk = LINES[s.line]
     sf = brk * s.tackle / s.required_force_n
@@ -104,7 +136,7 @@ def evaluate(s: Scenario) -> dict:
     # Power is the real budget: drum/tackle only trade force against speed, they never add watts.
     p_required = s.required_force_n * (s.excursion_mm / 1000) / s.target_time_s
     eta_total = s.eta_gear * (s.eta_worm if s.worm_ratio > 1 else 1.0)
-    p_motor_peak = m.stall_torque_nm * (m.noload_rpm / 60 * 2 * math.pi) / 4 * eta_total
+    p_motor_peak = motor_peak_power_w(m, eta_total)
     return {
         "scenario": s.name,
         "motor": m.name,
@@ -174,6 +206,13 @@ SCENARIOS = [
              line="braid_200lb", target_time_s=0.4),
     # Hip swing: 25 Nm, 60 mm pulley -> 420 N, 40 deg in 0.5 s -> 42 mm
     Scenario("WALK hip swing / 775 + printed 1:40 planetary, 15 mm drum, 2:1 tackle", "775_PLAN40", 15.0,
+             tackle=2, eta_gear=0.6, joint_moment_arm_mm=60, excursion_mm=42, required_force_n=420,
+             line="braid_200lb", target_time_s=0.5),
+    # ---- brushless W-max (docs/21): the same joints on a 5010 + printed 1:16 planetary
+    Scenario("WALK ankle push-off / 5010 BLDC + printed 1:16 planetary, 15 mm drum, 3:1 tackle", "5010_PLAN16", 15.0,
+             tackle=3, eta_gear=0.6, joint_moment_arm_mm=50, excursion_mm=26, required_force_n=640,
+             line="braid_200lb", target_time_s=0.25),
+    Scenario("WALK hip swing / 5010 BLDC + printed 1:16 planetary, 15 mm drum, 2:1 tackle", "5010_PLAN16", 15.0,
              tackle=2, eta_gear=0.6, joint_moment_arm_mm=60, excursion_mm=42, required_force_n=420,
              line="braid_200lb", target_time_s=0.5),
 ]
