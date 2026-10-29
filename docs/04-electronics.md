@@ -65,6 +65,10 @@ Cost per node: about $40 in electronics for an arm node before motors. BLDC-base
   it never does. Plan for 300 W continuous, 600 W peak with a 40 A fuse, and sequence motion in
   firmware so no more than six W-max are accelerating simultaneously.
 - Standing still costs nothing: self-locking stages hold pose with zero motor current.
+- Measured in the model (docs/27, D-045): the 26 kg build on the sourced motor figures walks at 59 W mean, 34 A
+  at the 99th percentile and 63 A (700 W) peak, above the 600 W plan; it stands at 14 W, since the lock gate
+  waits for stillness. A 111 Wh pack walks about 18 m (1.2 h). The logic rail gets its own supply (a buck with
+  hold-up, or a 5 V bank) so a peak's sag cannot reset the balance loop.
 - E-stop: hardware line that opens the main motor contactor (relay or MOSFET), logic stays up.
 
 ## Compute decision

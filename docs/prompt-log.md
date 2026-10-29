@@ -589,3 +589,16 @@ unchanged; a 10 ms loop delay loses the 40 N push (5 ms stands); uncalibrated FS
 adds 2 m/s head-on if started within about a second; squat, arms, hands and twist do not help. The silicone pad
 shears by microns (held feet are right) at friction 0.5 to 1.2. Blender is not used for physics: every wind
 result is MuJoCo plus hand checks; a second engine, CFD or a leaf-blower test would be independent.
+
+## P-041 (2026-10-29) Motor energy, walking against wind on batteries, power banks in the bones
+
+> good. continue. are the energy costs of the motors calculated into this, i'm curious how long we can walk against the wind on our batteries. fwiw - multiple batteries, like usb backups stored in the pvcs could add weight and on-site power storage if that helps with weight or power distribution (without getting in the way of our fish lines/tubes/needles or wiring. I'm thinking the cylindrical power banks. what have we been using for power? https://www.amazon.com/s?k=cylinder+power+bank&channelId=500&clpRedir=Y&plpRedirect=mhFallback
+
+> esp32-s3 are cheap if we need more of them (wasn't sure if you meant we were compute/io slow or in the drives)
+
+> (but more for more .. power.. trade-offs every which way)
+
+Produced: `27`, D-045, `tools/energy_report.py`, the measured power note in `04`. The walk on the 26 kg build at
+the sourced figures: 59 W mean, 700 W peak, about 18 m and 1.2 h on the 111 Wh pack (64 m on the model's old
+775 figures); wind changes it by under 10 %. Power banks: logic supply only. The latency of D-044 is the control
+loop's (sensor to command), not the drives'; a dedicated balance node is the fix and costs about 0.3 W.

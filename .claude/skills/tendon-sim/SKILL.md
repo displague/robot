@@ -111,6 +111,13 @@ and 4 corner load sensors per sole with gain, hysteresis, drift and saturation (
 `delay<ms>` isolate one error). `lc_fast` (1 kHz, 3 ms, load cells) is the build's target. Judge a controller
 change on it as well as on truth: a 10 ms delay already loses push 40.
 
+## Energy (docs/27, D-045)
+
+`python tools/energy_report.py walk 3 head` prints a scene's motor energy (per winch class), mean / p99 / peak
+power. Run it with `ROBOT_MOTORS=nom ROBOT_MASSES=sim/masses/rollup_775.json` for the real build: the model's own
+775 figures understate the walk's energy 3.4 times. For a battery add about 8 W of electronics and 10 % for the
+drivers.
+
 ## Reading a scene's table
 
 `== <scene>: t, pelvis height, tilt -> STANDS|FALLS; electrical energy (mean W)`, then lines worst first:

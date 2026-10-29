@@ -501,3 +501,19 @@ help. A bow reflex is the next wind work; nothing posture-based helps from the s
 Alternative: FSR 402s alone (their 20 N range needs a load-sharing pad and per-sensor calibration); a load cell
 per corner is the safer part, decided after the step works on held feet.
 Reverses if: the pad measures under 0.5 on a ramp, or the balance loop cannot close in 5 ms on the ESP32.
+
+## D-045 (2026-10-29) One main pack in the pelvis; the logic on its own supply; energy per metre judges the W-max
+
+Why: P-041 (docs/27). On the sourced motor figures the 26 kg build walks at 59 W of motor power (peaks 63 A),
+standing 14 W; a 111 Wh pack walks about 18 m in 1.2 h, and wind up to what the walk survives changes that by
+under 10 %. Nearly all of it is the W-max holding the body through the 775's 66 A stall current. USB power banks
+cannot feed the drives (5 V, 1 to 3 A, low-load cut-off), store less per kg than the LiPo, and in the legs add
+swing mass on the weakest drive. So: the main pack stays in the pelvis (a second pack or 21700 cells in the spine
+pipe if more is needed); the 5 V logic gets its own supply (a buck with hold-up capacitance, or one bank with an
+always-on mode) so a 63 A peak cannot brown out the balance loop; and the W-max choice (`wmax-stands-at-low`) is
+also judged on walking energy per metre at the sourced nominal. More ESP32 nodes cost about 0.3 W each and are
+not a constraint.
+Alternative: banks distributed in the bones (rejected above); a larger pack (linear runtime, but its mass costs
+energy per metre and W-max margin).
+Reverses if: the drives move to a self-locking or higher-ratio stage that holds the stance without current,
+making the electronics the main load.
