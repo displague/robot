@@ -621,3 +621,15 @@ Produced: a `references.md` row. Not near term. It is dual-arm manipulation on a
 balance, forces or tendons. Later uses: its annotation scheme and LeRobot layout for our teleoperation
 recordings, the G2 URDF for comparing reach, and Genie Sim next to the Isaac Lab task. Its licence is
 CC BY-NC-SA. Hub task `step-on-held-feet` stays in progress.
+
+## P-044 (2026-10-30) Continue with the claimed tasks
+
+> continue with the claimed tasks
+
+> resume
+
+Produced (hub task `step-on-held-feet`, still claimed): the lateral push of the walk's later transfers is traced
+(`25`). The landed foot carries under 15 % of the weight, so the balance loop runs single support, abducts it as a
+swing foot and rolls the pelvis with the stance hip. Three roll fixes (hold, parallelogram, forced double support)
+each made the held walk grid worse (14, 12, falls; 23 without them) and were reverted. No code change. A grid
+interrupted by the session ending gave `error` cells and is discarded.

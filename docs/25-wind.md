@@ -223,6 +223,22 @@ The catch-up rate was swept on the held step grid: 0.02 m/s stands 27, 0.05 stan
 The lateral push is the open problem. Its likely source is the roll side of the transfer, which the press does not
 plan.
 
+**Traced (P-044).** On the worm mass set at w4 the landed foot carries 11 to 25 N, under the 15 % a foot needs to
+count as grounded (`GROUND_LOAD` with its hysteresis). So the balance loop is in single support. It treats the landed
+foot as a swing foot and abducts it to `SWING_CLEAR`, and the stance hip's capture-point shift rolls the pelvis.
+Either way the light foot is carried 20 to 80 mm sideways. Three fixes were tried on the 42-variant walk grid on held
+feet (press fix on, 23 without them), and none was kept:
+
+| Change, only while the landed foot takes its load | Walk, held | Note |
+| --- | --- | --- |
+| The landed hip keeps its roll | 14 | the stance hip then rolls the pelvis and the held leg with it, 80 mm |
+| The landed hip follows the stance hip's roll (parallelogram) | 12 | the 20 kg rows now fail too |
+| The landed foot counts as grounded (double support) | falls at the first transfer | traced on 775 and worm |
+| Any foot not the planner's swing keeps its roll (broad) | 10 of 18 (3 lengths) | stood the worm trace; the step on soft contact fell to 6 of 18 |
+
+The abduction at touchdown seems to help the 20 kg walk. The next lever is not the roll but how the load builds on
+the landed foot: a press that waits for the pelvis to settle, or a compliant sole.
+
 ## Not yet
 
 - **Walking in wind** above 3 m/s: the planner's gates and stages are geometry for still air. The transfer onto
