@@ -612,3 +612,12 @@ leg touches down bent, and the transfer's press straightened it at once and kick
 `TP_PRESS_FROM_LANDED` with `TP_PRESS_CATCHUP`, is off by default. On held feet it raises the step grid from 23 to
 40 and the walk from 16 to 23 (`25`). The walk's later transfers still push the landed foot sideways. Two other
 attempts are recorded as not helping.
+
+## P-043 (2026-10-30) AgiBot World: anything usable near term?
+
+> https://agibot-world.com/ https://huggingface.co/datasets/agibot-world/AgiBotWorld2026 -- anything we can use here in the near term?
+
+Produced: a `references.md` row. Not near term. It is dual-arm manipulation on a wheeled robot, with no legs,
+balance, forces or tendons. Later uses: its annotation scheme and LeRobot layout for our teleoperation
+recordings, the G2 URDF for comparing reach, and Genie Sim next to the Isaac Lab task. Its licence is
+CC BY-NC-SA. Hub task `step-on-held-feet` stays in progress.
