@@ -102,6 +102,31 @@ Cylindrical USB power banks are lithium cells with a 5 V converter:
 | More battery | linear in runtime | 0.45 kg per 100 Wh, and that mass costs energy too |
 | More ESP32 nodes (a balance node, D-044) | about 0.3 W each | nothing measurable: 0.5 % of the walk |
 
+## Cutting the walk's energy (P-045, hub task `walk-energy`)
+
+Where it goes, 26 kg build at the sourced nominal (`walk`, 5.9 kJ in 99 s): hip roll 32 %, ankle pitch 26 %, knee
+19 %, hip pitch 11 %, the rest under 4 % each. Each is holding torque: the hip roll carries the pelvis over one leg,
+the ankle the CoM ahead of it, the knee the kept crouch.
+
+| Try | Energy | J/m | Walk grid (42) |
+| --- | --- | --- | --- |
+| Today | 5.90 kJ, 99 s, 59 W | 14.7 k | 42 |
+| Drum locks in the walk (`STEP_LOCKS` and `BALANCE_LOCKS`, behind the D-038 stillness gate) | falls, 114 to 141 W | | falls (traced) |
+| `STEP_LOCKS` alone | no change: the walk's weight shift switches locks off | | |
+| **No hold after the sagittal stage (`TP_HOLD` 0, D-046)** | **5.68 kJ, 92 s, 62 W** | **14.2 k** | **42**, step 42 |
+| The CoM target 10 / 20 mm behind the sole centre (`COM_REF_BACK`) | | | 34 / 11 |
+
+- **The ankle's share is geometry.** The balance loop centres the CoM on the sole, 80 mm ahead of the ankle, so the
+  ankle holds weight x 80 mm (20 N m at 26 kg). The robot settles 78 mm forward of where it stood. Standing with the
+  target 50 mm back costs 7.3 W instead of 19.8 W without locks, and 9.4 W instead of 14.4 with them. But the
+  1 kg arm hold falls at 30 and 50 mm (the CoM nearer the heel, then the arm moves it), and every gate of the walk
+  is tuned to the centred target. `COM_REF_BACK` stays 0 as a flag. Using it needs the arm hold and the walk's
+  gates retuned, or the ankle moved forward on the foot (a CAD change: the ankle is 50 mm from the heel of a
+  260 mm sole).
+- **Locks while walking** still rock the body, as in docs/19, even behind the stillness gate.
+- On a charge (111 Wh to 80 %, + 10 % drivers + 8 W) the walk goes 18.3 m instead of 17.7 m. The large levers are
+  the drive (`wmax-stands-at-low`) and the posture (the ankle's offset), not the stage timing.
+
 ## Not yet
 
 - Electronics power is an estimate, not a measurement; regeneration and the drivers' losses are factors.

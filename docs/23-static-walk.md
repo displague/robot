@@ -55,6 +55,9 @@ One try, judged on the 42-variant walk grid: the transfer's stages at 2, 2 and 0
 defaults stay. A faster walk needs the stages gated on what they wait for (load, CoM speed) with shorter
 fixed ramps, not uniformly shorter ramps.
 
+One stage at a time (P-045, docs/27): `TP_HOLD` 0 or 0.5 s stands 42 (step and walk), `TP_A` 2 s 39, `TP_B` 2 s 41.
+The hold is dropped (D-046): the walk takes 92 s instead of 99.
+
 ## Not yet
 
 - Speed (above): every stage waits for settled quantities; the transfer is the slow part.

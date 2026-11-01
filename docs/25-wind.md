@@ -237,7 +237,21 @@ feet (press fix on, 23 without them), and none was kept:
 | Any foot not the planner's swing keeps its roll (broad) | 10 of 18 (3 lengths) | stood the worm trace; the step on soft contact fell to 6 of 18 |
 
 The abduction at touchdown seems to help the 20 kg walk. The next lever is not the roll but how the load builds on
-the landed foot: a press that waits for the pelvis to settle, or a compliant sole.
+the landed foot.
+
+**Swept (P-045)**, the same grid with the press fix on (23):
+
+| Setting | Walk, held |
+| --- | --- |
+| `SWING_CLEAR` 1.5 or 5 deg (3) | 23, 23: the abduction is not what decides it |
+| `LAND_REACH` 0, 10, 30, 40 mm (20) | 0, 14, 20, 24 |
+| `TP_PRESS_RATE` 0.01, 0.04 m/s (0.02) | 17, 11 |
+| `TP_HOLD` 0 (D-046) | 21 |
+
+No setting moves the grid beyond its scatter (11 to 24): the held walk is not one parameter away. A compliant sole
+is not a fix either: the real pad (1 mm of silicone and tape over 260 cm2, shear modulus about 0.5 MPa) shears a few
+microns at these loads. What is left is a transfer that builds the landed foot's load under control (a load loop on
+the press with the lateral CoM held), a larger piece of work.
 
 ## Not yet
 

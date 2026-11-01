@@ -98,7 +98,10 @@ The default contact is MuJoCo's soft one with friction 1.0, and a loaded foot cr
 and 16 and 13 (walk), against 42 on soft contact.
 `TP_PRESS_FROM_LANDED=True` (with `TP_PRESS_CATCHUP`, 0.05 m/s) starts the landed leg's press from its measured
 length. On held feet the step then stands 40 and the walk 23; it is off by default because the soft-contact walk
-drops to 39 (docs/25, P-042).
+drops to 39 (docs/25, P-042). P-045's sweep of the press and swing settings found nothing past the grid's scatter.
+For the energy of a walk per drive, sum `rig.stats[name]["e_j"]` after the scene (docs/27: hip roll, ankle
+pitch and knee carry three quarters, all holding torque). `COM_REF_BACK` moves the balance loop's CoM target
+toward the ankle (off: it costs the arm hold and the walk grid).
 
 ## Sensors and postures (docs/26, D-044)
 

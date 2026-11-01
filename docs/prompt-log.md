@@ -633,3 +633,15 @@ Produced (hub task `step-on-held-feet`, still claimed): the lateral push of the 
 swing foot and rolls the pelvis with the stance hip. Three roll fixes (hold, parallelogram, forced double support)
 each made the held walk grid worse (14, 12, falls; 23 without them) and were reverted. No code change. A grid
 interrupted by the session ending gave `error` cells and is discarded.
+
+## P-045 (2026-10-31) Continue on what can be done without interruption
+
+> continue on things you can do without interruption
+> continue
+
+> continue
+
+Produced (hub tasks `step-on-held-feet` and `walk-energy`): a sweep of the press and swing settings on the
+held-feet walk (nothing past the grid's scatter, `25`); the walk's energy per drive and four tries at cutting it
+(`27`); D-046, the transfer's 1 s hold dropped (walk 42/42, 92 s, 4 % less energy). `COM_REF_BACK` added as an off
+flag: the CoM target toward the ankle saves a third of standing power but drops the arm hold.

@@ -517,3 +517,13 @@ Alternative: banks distributed in the bones (rejected above); a larger pack (lin
 energy per metre and W-max margin).
 Reverses if: the drives move to a self-locking or higher-ratio stage that holds the stance without current,
 making the electronics the main load.
+
+## D-046 (2026-10-31) The transfer has no hold after its sagittal stage
+
+Why: P-045 (docs/27, docs/23). The 1 s hold after the transfer's sagittal stage (`TP_HOLD`) is not needed. Without
+it, the step grid and the walk grid stand 42 of 42 on soft contact, and the held-feet walk stands 21 against 23,
+within that grid's scatter (11 to 24 across P-045's sweep). The walk takes 92 s instead of 99, and its energy on
+the 26 kg build at the sourced nominal drops 4 % (5.90 to 5.68 kJ, 14.7 to 14.2 kJ/m).
+Alternative: the other stages shorter (`TP_A` 2 s stands 39, `TP_B` 2 s 41); `COM_REF_BACK` (the CoM target toward
+the ankle) saves a third of standing power but drops the arm hold and the walk grid.
+Reverses if: a gated transfer needs a settled CoM between its stages.

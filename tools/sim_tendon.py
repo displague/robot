@@ -135,6 +135,8 @@ TP_PRESS_FROM_LANDED = False     # the press starts from the landed leg's measur
                                  # length: a heavier body lands with the knee still bent, and straightening it at once
                                  # rolls the pelvis and kicks the lightly loaded foot out when it cannot slide (D-043)
 TP_PRESS_CATCHUP = 0.05          # m/s: the press's rate while it is still shorter than the plan's unpressed length
+COM_REF_BACK = 0.0               # m: the balance loop's CoM target this far behind the sole centre, toward the ankle (the
+                                 # sole centre is 80 mm ahead of it, so centred the ankle holds weight x 80 mm; docs/27)
 TP_START_REACH = None            # m: the transfer's landed-leg press starts here (None: LAND_REACH, as in docs/19)
 TP_LAND_REACH = 0.0              # m: the centring starts the landed leg's press here, not at the landing's 20 mm below the
                                  # floor (pressing an outward-leaning leg shoves the hip over the stance foot; docs/19)
@@ -142,7 +144,8 @@ TP_KEEP_CROUCH = True            # TRANSFER_PLAN: the stance leg stays crouched 
                                  # has reach to press with; the centring straightens it
 TP_SHIFT_FF = True               # the planned transfers feed the weight share's lateral move into the hip shift
 TP_CROUCH = 0.012                # m: both hips this far below the lower straight-leg height during a transfer
-TP_A, TP_B, TP_HOLD = 3.0, 3.0, 1.0   # s: the sagittal stage, the weight ramp, the holds
+TP_A, TP_B, TP_HOLD = 3.0, 3.0, 0.0   # s: the sagittal stage, the weight ramp, the hold after the sagittal stage
+                                      # (1.0 until D-046: without it the step and walk grids still stand 42)
 TRANSFER_SWAP, TRAIL_LIFT = False, 0.015   # through the transfer's hold the leading leg becomes the straight one and
                                  # the trailing leg is planned TRAIL_LIFT short, so its knee bends and its foot unloads
                                  # (a straight trailing leg sets the hip height and cannot unload; docs/18)
@@ -348,7 +351,7 @@ class Rig:
         if sum(wts) <= 0:
             return np.zeros(2), -1.0, -1.0
         ref = sum(w * s[i][0] for i, w in enumerate(wts)) / sum(wts)
-        e = com[:2] - ref[:2] - self.com_bias
+        e = com[:2] - ref[:2] - self.com_bias - (0.0, COM_REF_BACK)
         return e, (ref[1] + SOLE_HALF[1]) - com[1], com[1] - (ref[1] - SOLE_HALF[1])
 
     def cop(self):
