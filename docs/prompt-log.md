@@ -656,3 +656,17 @@ Produced (owner hub note on a 6:1 game hoist; hub task `walk-energy`): the tackl
 already use 2:1 and 3:1 blocks. A 4:1 ankle saves 6 % of the walk's energy with both grids at 42, but drops the
 1 kg arm hold. 6:1 adds nothing over 4:1, and a 6:1 hip roll falls. D-047: tackles unchanged.
 `export_mjcf.TACKLE_OVERRIDE` sets the strands per joint axis for later trials.
+
+## P-047 (2026-11-02) Three side quests for the hub
+
+> As another side quest to queue in agenthub, for the most expensive part of the build, given quantity needed, does it become cheaper to build a device to build/wind the part and then deal only with the barer materials? Is a more efficient alternative to those parts easier to self-manufacture?
+>
+> Another side quest, can we sit and then stand again, for different seat heights, with and without arms on the chair.
+>
+> Another side quest, can we carry a bag (like a grocery bag) with 5lbs-25lbs of weight? (Like a bag with a carton of bread and eggs, or a gallon milk, etc )
+
+Produced: three hub tasks, no code. `self-build-wmax-drive` covers the W-max drive, the costliest part at 21 per
+build: a winding jig, a printed or PCB motor, a self-made reducer or driver, priced against buying, and scored on
+walk energy if it changes the drive. `sit-and-stand-chair` covers seat heights 0.35 to 0.50 m with and without
+armrests, at 20 and 26 kg. `carry-grocery-bag` covers 2.3 to 11.3 kg carried one-handed, held in front, or in
+both hands, standing and walking; the grip is the likely limit.
