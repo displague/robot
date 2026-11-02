@@ -95,6 +95,7 @@ The foot load sensors and IMUs were in `07` but not in this list before; the bal
 | Fasteners | M3 heat-set inserts and screws, M2 screws | ~1000 | $40 |
 | Sheath | PTFE tube 2 mm ID / 4 mm OD | 30 m | $20 |
 | Channel liners (D-013) | hollow piercing needles, 16 G and 12 G | 200 | $26 |
+| Ring guides (D-048) | fishing-rod guide repair kit, ceramic rings in assorted sizes (or alumina textile thread-guide eyelets) | 40 to 100 | $10 to $15, estimate |
 | Line (D-002) | braided PE, 50, 100 and 200 lb (PowerPro Spectra class); **verify the break rating** against the model's 222 / 445 / 890 N with a spring scale | 3 spools | $60, estimate |
 | Terminations (D-014) | fishing crimp sleeves sized to each line, crimp pliers | 300 | $15, estimate |
 | Pretension (D-014) | bicycle barrel adjusters (M5) | 32 + spares | $20, estimate |

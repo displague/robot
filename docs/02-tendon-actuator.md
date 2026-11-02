@@ -125,6 +125,55 @@ Rules for using them:
 The finger generator sizes its flexor channel for a 16 G needle (1.75 mm bore) with countersunk
 mouths on both channels at every body face.
 
+## Ring guides: fishing-rod eyelets and ceramic thread guides (P-048, D-048)
+
+A rod guide is a hard, polished ring (alumina, "alconite" or SiC) in a stainless frame, made for braided line
+rubbing across it at an angle. Repair kits are cheap: 40 to 100 guides in 8 to 14 sizes for $10 to $15, with
+ring bores of about 3 to 19 mm. Textile mills use the same ring without the frame: an alumina thread guide or
+eyelet, bores from about 1.5 mm, made to be pressed into a holder.
+
+A needle and a ring do different jobs:
+
+| | Needle liner (D-013) | Ring guide |
+| --- | --- | --- |
+| Shape | a tube: carries the line along its length | a point: the line wraps a radiused ring |
+| Best for | straight runs through a bone | where the line changes direction, or where its angle changes with the joint |
+| Bend it takes | none: stops 1 mm short of the mouth | its ring radius, polished and much harder than steel |
+| Wear on it | low: the line runs along the bore | low: ceramic outlasts steel and PETG |
+
+**Keep needles where they are.** In a straight run a ring adds nothing, because the line is not pressing on a
+wall.
+
+**Rings help where we have no hard guide today:**
+
+1. **Channel mouths at joints.** The line's bend sits on a printed countersink (above), which is the softest
+   surface it rubs. A ceramic ring pressed into the mouth takes the bend instead. Pull the ring from a rod
+   guide's frame, or use a flanged thread-guide eyelet.
+2. **The drum's fairlead.** As the line winds across a drum, its angle into the sheath swings. A ring at the
+   socket keeps the line off the PTFE tube's cut end.
+3. **Bowden sheath exits** where the free line leaves at an angle to the next bone.
+4. **Open runs across the torso and spine.** Their angle changes with posture.
+5. **Bends of 20 to 45 degrees** that use PTFE tube today, where a short tube would wear at its ends.
+
+**Not in a tackle.** A tackle needs low friction around a 180-degree wrap. The capstan relation
+(`T_out = T_in exp(mu phi)`, `10`) charges a fixed ring for every degree of wrap; a sheave on a bearing costs
+about 3 to 5 % at any wrap.
+
+| Wrap | Loss on a ring, mu 0.1 | mu 0.2 | Sheave on a bearing |
+| --- | --- | --- | --- |
+| 20 deg | 3 % | 7 % | 3 to 5 % |
+| 45 deg | 8 % | 15 % | 3 to 5 % |
+| 90 deg | 15 % | 27 % | 3 to 5 % |
+| 180 deg | 27 % | 47 % | 3 to 5 % |
+
+So use a ring up to about 30 to 45 degrees of wrap, and a sheave beyond that. A 2:1 or 3:1 tackle with rings
+for sheaves would lose a third to half of its gain (D-047).
+
+Two things are not known yet:
+- `mu` for braided PE on alumina and on SiC. Published figures are for nylon (a SiC patent claims 0.4 or less)
+  or are marketing claims. Measure it with the spring-scale capstan test of `10`, next to needle, PTFE and PETG.
+- The sim does not model guide friction (`LINE_DAMPING` is viscous only).
+
 ## Direction, return and termination (P-004)
 
 How a joint moves both ways with one motor, what stops it, and how the line is tied off.

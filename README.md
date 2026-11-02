@@ -29,7 +29,7 @@ Goal ordering, in case they conflict: **cheap > simple to build > human range of
 | Path | What |
 | --- | --- |
 | `docs/01-architecture.md` | System overview, DOF budget, actuator classes, compute topology, honest limits |
-| `docs/02-tendon-actuator.md` | The winch: physics, lock options, drum rules, line choice, creep, calculator results |
+| `docs/02-tendon-actuator.md` | The winch: physics, lock options, drum rules, line choice, creep, calculator results, needle liners and ceramic ring guides (where each goes) |
 | `docs/03-skeleton-joints.md` | Joint types per body region, ROM targets vs human, materials, print segmentation |
 | `docs/04-electronics.md` | Boards, bus, drivers, encoders, power |
 | `docs/05-bom-estimate.md` | Parts list with recommended parts, checked prices, totals and mass |

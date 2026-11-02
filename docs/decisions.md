@@ -537,3 +537,16 @@ roll halves the balance loop's roll speed, and the walk falls. Real sheave frict
 block, not modelled) and n times the line travel make it worse.
 Alternative: a 4:1 ankle with the arm hold retuned; `TACKLE_OVERRIDE` keeps that one setting away.
 Reverses if: a faster ankle drive or a retuned arm hold makes 4:1 pass the gauntlet.
+
+## D-048 (2026-11-02) Ceramic ring guides at bends and mouths; needles stay in straight runs; sheaves stay in tackles
+
+Why: P-048 (docs/02). Fishing-rod guide rings and textile thread-guide eyelets are polished alumina or SiC made
+for braided line rubbing at an angle, at about $0.15 each in repair kits. A needle liner is a tube for straight
+runs, and the line's bends today sit on printed countersinks and PTFE ends, which are the softest surfaces it
+rubs. A ring is a fixed surface, so it pays the capstan loss on every degree of wrap: fine to about 30 to 45
+degrees, but in a 180-degree tackle wrap it would lose a quarter to half of the force against a sheave's 3 to 5 %.
+Provisional until `mu` for braid on ceramic is measured.
+Alternative: needles and PTFE only (D-013 as it was); sheaves at every bend (heavier, more parts).
+Reverses if: the capstan test finds `mu` for braid on ceramic above about 0.25, or pressed rings work loose in
+PETG.
+

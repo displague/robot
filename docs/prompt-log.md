@@ -670,3 +670,14 @@ build: a winding jig, a printed or PCB motor, a self-made reducer or driver, pri
 walk energy if it changes the drive. `sit-and-stand-chair` covers seat heights 0.35 to 0.50 m with and without
 armrests, at 20 and 26 kg. `carry-grocery-bag` covers 2.3 to 11.3 kg carried one-handed, held in front, or in
 both hands, standing and walking; the grip is the likely limit.
+
+## P-048 (2026-11-02) Fishing-rod eyelets
+
+> Fishing pole eyelits may also be of interest in places where we may be using the needles, or perhaps place where we are not
+
+Produced: a ring-guide section in `02`, with D-048. Needles stay in straight runs. Ceramic rod-guide rings or
+textile eyelets go where the line bends or its angle swings: joint mouths, drum fairleads, sheath exits and
+torso runs, up to about 30 to 45 degrees of wrap. Tackles keep sheaves, because a ring's capstan loss at 180
+degrees would cost a quarter to half of the gain. A `05` BOM row. Hub task `ring-guides` measures `mu` and adds
+ring pockets to the generators.
+
