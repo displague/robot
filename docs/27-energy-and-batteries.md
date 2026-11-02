@@ -127,11 +127,41 @@ the ankle the CoM ahead of it, the knee the kept crouch.
 - On a charge (111 Wh to 80 %, + 10 % drivers + 8 W) the walk goes 18.3 m instead of 17.7 m. The large levers are
   the drive (`wmax-stands-at-low`) and the posture (the ankle's offset), not the stage timing.
 
+## More tackle: a 6:1 hoist at the joints (P-046, owner question)
+
+A 6:1 game hoist is a block and tackle: six strands carry the load, so the line pulls a sixth of it and runs six
+times as far. The design already does this at every big joint (docs/01): waist, shoulder, elbow, hip and knee
+2:1; hip roll and ankle 3:1. More strands give n times the torque per line newton and 1/n the joint speed, and the
+drum line gets n times softer. `export_mjcf.TACKLE_OVERRIDE` (`{"ankle.pitch": 4}`) sets the strands per joint
+axis to try this.
+
+| Tackle (26 kg build, sourced nominal) | Walk energy | Walk grid (42) | Step grid (42) | Gauntlet (default build) |
+| --- | --- | --- | --- | --- |
+| Today (ankle 3, hip roll 3) | 5.68 kJ, 92 s | 42 | 42 | all stand |
+| Ankle pitch 4 | 5.32 kJ (-6 %) | 42 | 42 | the 1 kg arm hold falls |
+| Ankle pitch 6 | 5.31 kJ (-7 %) | 40 | 42 | the 1 kg arm hold falls |
+| Hip roll 6 | falls, 10.7 kJ | | | |
+| Hip roll 6, ankle 6, knee 4 | falls, 17.4 kJ | | | |
+
+- **Holding joints gain, but not much.** With a 4:1 ankle, the ankle drive's walk energy falls from 1.1 kJ to
+  0.7 kJ. Going to 6:1 adds nothing over 4:1, because the drive is no longer the limit.
+- **Joints that must move fast lose.** At hip roll 6:1, the balance loop's roll correction runs at half speed and
+  the walk falls.
+- **The ankle's speed holds the arm test.** At ankle 4:1 and 6:1, the forward lean from a 1 kg arm load is not
+  caught in time: it falls at 49 deg, where today it stands at 8 deg.
+- **The sim flatters it.** Sheave friction is not modelled. Printed sheaves on bearings run about 95 % each, so a
+  6-strand block passes about 88 % (0.95^5 at the joint end, plus the Bowden). Line travel and drum length both
+  grow n times: the ankle's 3:1 already winds about 3 x its arc on the drum.
+
+So tackles stay as they are (D-047). A 4:1 ankle comes back only with a faster ankle drive, or when the arm hold
+is retuned with it (the same retuning `COM_REF_BACK` needs).
+
 ## Not yet
 
 - Electronics power is an estimate, not a measurement; regeneration and the drivers' losses are factors.
 - Energy at the pessimistic motor end (`ROBOT_MOTORS=low`), where the walk falls.
 - The walk's energy with the stance drums locked between stages.
+- Sheave friction in the tackles; a 4:1 ankle with the arm hold retuned.
 - A battery's position in the mass model (the pack sits at the pelvis bone's midpoint, docs/20).
 
 ## Next

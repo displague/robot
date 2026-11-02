@@ -102,6 +102,9 @@ drops to 39 (docs/25, P-042). P-045's sweep of the press and swing settings foun
 For the energy of a walk per drive, sum `rig.stats[name]["e_j"]` after the scene (docs/27: hip roll, ankle
 pitch and knee carry three quarters, all holding torque). `COM_REF_BACK` moves the balance loop's CoM target
 toward the ankle (off: it costs the arm hold and the walk grid).
+`export_mjcf.TACKLE_OVERRIDE` sets the strands at a joint axis (`{"ankle.pitch": 4}`); the line stiffness follows.
+From a sweep variant: `"a4: _=__import__('export_mjcf').TACKLE_OVERRIDE.update({'ankle.pitch':4})"`. Always run the
+gauntlet too: a 4:1 ankle passes both grids but drops the arm hold (D-047, docs/27).
 
 ## Sensors and postures (docs/26, D-044)
 

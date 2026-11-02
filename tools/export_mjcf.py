@@ -127,6 +127,7 @@ def use_motor_case(spec):
 
 use_motor_case(MOTOR_SET)   # at import too: export_standin and wmax_options call winch_params without build()
 HIP_ROLL_60 = True   # hip roll on the 60 mm pulley with tackle 3 (D-028, docs/15); False restores the 50 mm, tackle 2 of docs/14
+TACKLE_OVERRIDE = {}  # "joint.axis" -> strands at the joint, over JOINTS (e.g. {"ankle.pitch": 6}; docs/27)
 
 
 def winch_params(joint_name, axis, cls_name):
@@ -138,6 +139,7 @@ def winch_params(joint_name, axis, cls_name):
     r_p = j["pulley"][axis]
     if HIP_ROLL_60 and joint_name == "hip" and axis == "roll":
         n, r_p = 3, 0.060
+    n = TACKLE_OVERRIDE.get("%s.%s" % (joint_name, axis), n)
     pre_frac = PRETENSION_FRACTION
     if STIFF_MINI and cls_name == "W-mini":
         r_p, pre_frac = max(r_p, 0.025), 0.25

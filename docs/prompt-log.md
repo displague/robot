@@ -645,3 +645,14 @@ Produced (hub tasks `step-on-held-feet` and `walk-energy`): a sweep of the press
 held-feet walk (nothing past the grid's scatter, `25`); the walk's energy per drive and four tries at cutting it
 (`27`); D-046, the transfer's 1 s hold dropped (walk 42/42, 92 s, 4 % less energy). `COM_REF_BACK` added as an off
 flag: the CoM target toward the ankle saves a third of standing power but drops the arm hold.
+
+## P-046 (2026-11-01) Continue
+
+> Continue
+
+> continue
+
+Produced (owner hub note on a 6:1 game hoist; hub task `walk-energy`): the tackle trial in `27`. The joints
+already use 2:1 and 3:1 blocks. A 4:1 ankle saves 6 % of the walk's energy with both grids at 42, but drops the
+1 kg arm hold. 6:1 adds nothing over 4:1, and a 6:1 hip roll falls. D-047: tackles unchanged.
+`export_mjcf.TACKLE_OVERRIDE` sets the strands per joint axis for later trials.

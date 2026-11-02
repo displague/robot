@@ -527,3 +527,13 @@ the 26 kg build at the sourced nominal drops 4 % (5.90 to 5.68 kJ, 14.7 to 14.2 
 Alternative: the other stages shorter (`TP_A` 2 s stands 39, `TP_B` 2 s 41); `COM_REF_BACK` (the CoM target toward
 the ankle) saves a third of standing power but drops the arm hold and the walk grid.
 Reverses if: a gated transfer needs a settled CoM between its stages.
+
+## D-047 (2026-11-01) Tackles stay at 2:1 and 3:1; no 6:1 block
+
+Why: P-046 (docs/27). The owner asked about a 6:1 hoist. The joints already use 2:1 and 3:1 tackles. A 4:1 ankle
+pitch cuts the 26 kg walk's energy by 6 % and keeps both grids at 42 of 42, but the gauntlet's 1 kg arm hold then
+falls: the slower ankle cannot catch the lean. 6:1 saves no more than 4:1 and loses two walk variants. A 6:1 hip
+roll halves the balance loop's roll speed, and the walk falls. Real sheave friction (about 88 % through a 6-strand
+block, not modelled) and n times the line travel make it worse.
+Alternative: a 4:1 ankle with the arm hold retuned; `TACKLE_OVERRIDE` keeps that one setting away.
+Reverses if: a faster ankle drive or a retuned arm hold makes 4:1 pass the gauntlet.
