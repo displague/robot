@@ -42,7 +42,7 @@ tendon model:
 | 5 m/s wind | 7 of 10 | 9 of 10 |
 | 30 N push | 10 of 10 | 8 of 10 |
 | stand 10 s | 10 of 10 | 9 of 10 |
-| standing power, median | 110 W | 83 W (one seed 253 to 28 W) |
+| standing power, median | 106 W | 85 W (one seed 253 to 28 W) |
 
 The ankle strategy is part of it: with the hand-written ankles two policies hold the 8 m/s wind, the 5 m/s wind
 nearly always holds, and power mostly falls. It is not all of it: eight still fall at 8 m/s, and two lose a scene
