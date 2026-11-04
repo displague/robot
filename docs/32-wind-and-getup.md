@@ -47,8 +47,14 @@ tendon model:
 The ankle strategy is part of it: with the hand-written ankles two policies hold the 8 m/s wind, the 5 m/s wind
 nearly always holds, and power mostly falls. It is not all of it: eight still fall at 8 m/s, and two lose a scene
 they held alone (the policy was not trained with those ankles). Leaving the balance loop on under the policy's own
-ankle targets instead made both policies tried worse (the two fight). Next: train with the ankle in torque mode
-(hub task `policy-ankle-torque-mode`).
+ankle targets instead made both policies tried worse (the two fight).
+
+Then the policies were trained with their own ankles in torque mode (sibling `--ankle-torque`: no outer-loop trim
+at the ankles, the lines a series spring, in the stand-in, the gate and the fine-tune), which is also how the
+demonstrations were recorded. Ten seeds, five plain and five with a hand load: **0 of 10 hold the 8 m/s wind**, named
+scenes 23 and 22 of 30 (as without it), and several stand at 250 to 350 W. So the drive mode is not it either: what
+the policies miss is the balance loop's ankle strategy (a CoP loop with a disturbance estimate and its integral),
+which with the hand-written ankles under them got two of them through.
 
 ## Getting up: what this robot can do
 
@@ -107,5 +113,6 @@ themselves up and mostly landed lying down.
 
 ## Next
 
-Give the policy the ankle torque mode the hand-written controller uses (a torque-equivalent ankle action), and
-retrain the get-up with a reward for the momentum of a controlled lunge.
+Either keep the hand-written ankle balance under a learned upper body (train the policy with it in the loop, on
+the tendon model), or give the policy what that loop uses: a disturbance estimate and the CoP. Retrain the get-up
+with the arms' line ratings as a cost, and test it on the tendon model.

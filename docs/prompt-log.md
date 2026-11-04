@@ -743,4 +743,5 @@ Produced (hub tasks `rl-seeds`, `standin-tendon-gap`; sibling #51, #56): `31` an
 - Sibling PR #58 merged (closes #51); the GRU baseline in a second PR (#59, merged).
 - Continued (`32`, D-053): the 8 m/s wind is not drag and not the action range (#60, merged); the robot cannot rise
   slowly below a pelvis height of 0.85 m (`tools/rise_static.py`); get-up as a curriculum from the one resting
-  half-kneel: a learned lunge rises 61 % of the time in the stand-in (sibling #61).
+  half-kneel: a learned lunge rises 61 % of the time in the stand-in (sibling #61). The 8 m/s wind: with the
+  hand-written ankles under them 2 of 10 policies hold it, trained with torque-mode ankles 0 of 10 (sibling #62).
