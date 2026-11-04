@@ -550,3 +550,13 @@ Alternative: needles and PTFE only (D-013 as it was); sheaves at every bend (hea
 Reverses if: the capstan test finds `mu` for braid on ceramic above about 0.25, or pressed rings work loose in
 PETG.
 
+## D-049 (2026-11-03) A carried bag hangs on a passive palm hook or forearm strap, not the finger grip
+
+Why: P-049 (docs/28). With the planned 100:1 finger motors, a hook grip on a bag handle holds about 2.4 kg
+continuously: each flexor pulls 0.55 times the bag's weight through its 6.5 mm moment arm at the PIP. So bread and
+eggs are at the edge, and a gallon of milk is past it. The arm and legs carry more: lifted over 1.5 s, the 20 kg
+build stands with 11.3 kg in one hand, and walks with 3.9 kg (a gallon of milk). A printed J-hook at the heel of
+the palm, or a strap loop on the forearm, carries the bag at no power, and the hand only places the handle.
+Alternative: the 298:1 grip motor in the fingers (about 6.9 kg continuous, but a 1.6 s close).
+Reverses if: the fingers get a lock (a ratchet or a self-locking stage) that holds a closed grip without current.
+

@@ -681,3 +681,15 @@ torso runs, up to about 30 to 45 degrees of wrap. Tackles keep sheaves, because 
 degrees would cost a quarter to half of the gain. A `05` BOM row. Hub task `ring-guides` measures `mu` and adds
 ring pockets to the generators.
 
+## P-049 (2026-11-03) Continue
+
+> continue
+
+Produced (hub task `carry-grocery-bag`, from P-047): `28` and D-049.
+- `export_mjcf.BAGS` hangs a swinging bag from a link; `tools/carry_bag.py` runs a gauntlet scene with it.
+- On the 20 kg build a one-hand bag walks up to 3.9 kg (a gallon of milk).
+- Lifted over 1.5 s, it stands with 11.3 kg in one hand and on one foot with 6.8 kg.
+- Two bags are no better: the walk's limit is the total added mass, about 4 kg.
+- The 26 kg build walks with nothing.
+- The planned fingers hook about 2.4 kg, so a passive palm hook or forearm strap carries the bag (D-049).
+

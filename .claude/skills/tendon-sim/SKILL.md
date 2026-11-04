@@ -105,6 +105,10 @@ toward the ankle (off: it costs the arm hold and the walk grid).
 `export_mjcf.TACKLE_OVERRIDE` sets the strands at a joint axis (`{"ankle.pitch": 4}`); the line stiffness follows.
 From a sweep variant: `"a4: _=__import__('export_mjcf').TACKLE_OVERRIDE.update({'ankle.pitch':4})"`. Always run the
 gauntlet too: a 4:1 ankle passes both grids but drops the arm hold (D-047, docs/27).
+`export_mjcf.BAGS` hangs a carried bag on a ball joint from a link's tail (`{"hand.L": 3.9}`; non-colliding, the
+balance loop sees its mass through `subtree_com`). `tools/carry_bag.py kg= style=down|both|front scene=` runs
+one gauntlet scene with it and prints one line (stands, energy, the bag's swing, line peaks and safety factors).
+The fingers are not in the model, so the grip is estimated by hand (docs/28).
 
 ## Sensors and postures (docs/26, D-044)
 

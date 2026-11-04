@@ -128,6 +128,10 @@ def use_motor_case(spec):
 use_motor_case(MOTOR_SET)   # at import too: export_standin and wmax_options call winch_params without build()
 HIP_ROLL_60 = True   # hip roll on the 60 mm pulley with tackle 3 (D-028, docs/15); False restores the 50 mm, tackle 2 of docs/14
 TACKLE_OVERRIDE = {}  # "joint.axis" -> strands at the joint, over JOINTS (e.g. {"ankle.pitch": 6}; docs/27)
+BAGS = {}             # link -> kg: a carried bag hanging from that link's tail on a ball joint (docs/28)
+BAG_HANDLE = 0.10     # m from the grip to the top of the bag
+BAG_SIZE = (0.10, 0.25, 0.30)   # x (across the body), y (front to back), z: a grocery bag, m
+BAG_DAMPING = 0.05    # N m s/rad on the ball joint: the contents settling
 
 
 def winch_params(joint_name, axis, cls_name):
@@ -249,6 +253,18 @@ def mjcf(links, data):
                 out.append(winch_body_xml(pad, name, p, pos))
         for c in children.get(l["name"], []):
             out.extend(body(c, indent + 1))
+        if l["name"] in BAGS:
+            # the bag swings from the grip at the link's tail; it does not collide (the legs pass through it)
+            g = sub(l["tail"], l["head"])
+            out.append('%s  <body name="bag.%s" pos="%.4f %.4f %.4f">\n' % ((pad, l["name"]) + tuple(g)))
+            out.append('%s    <joint name="bag.%s" type="ball" damping="%.3f"/>\n' % (pad, l["name"], BAG_DAMPING))
+            out.append('%s    <geom type="capsule" size="0.004" fromto="0 0 0 0 0 %.4f" mass="0.01" contype="0" '
+                       'conaffinity="0" rgba="0.9 0.9 0.6 1"/>\n' % (pad, -BAG_HANDLE))
+            out.append('%s    <geom type="box" size="%.4f %.4f %.4f" pos="0 0 %.4f" mass="%.3f" contype="0" '
+                       'conaffinity="0" rgba="0.85 0.7 0.45 1"/>\n'
+                       % (pad, BAG_SIZE[0] / 2, BAG_SIZE[1] / 2, BAG_SIZE[2] / 2, -BAG_HANDLE - BAG_SIZE[2] / 2,
+                          BAGS[l["name"]]))
+            out.append("%s  </body>\n" % pad)
         out.append("%s</body>\n" % pad)
         return out
 
