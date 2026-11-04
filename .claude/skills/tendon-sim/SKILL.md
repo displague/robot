@@ -209,4 +209,14 @@ change, re-export, and re-check the fit: step one joint's target by 0.03 rad wit
 with `balance = False`) and compare the fraction reached at 0.1, 0.4 and 1 s with the stand-in's.
 The gate: `PYTHONPATH=src ROBOT_REPO=../robot python -m ai_embedded_dynamic_diversity.rl.tendon_eval <policy.pt|teacher> 20`
 in the sibling (stand 10 s, 10/20/30 N, wind 5 and 8 m/s, 20 random pushes; `teacher` runs the hand-written
-controller on the same scenes). Under a policy the balance loop is off, so no drum lock engages (D-038's gate).
+controller on the same scenes). Under a policy the balance loop is off; `Rig.still_gate = True` runs D-038's
+stillness gate anyway (on the CoM speed alone), so drums can lock under a policy, and the sibling's gate sets it
+(docs/31). `... tendon_eval <policy.pt|teacher> rest` runs the rest scenes: idle 30 s and a 3.9 kg bag 20 s, power
+and locked fraction over the last 20 s (the hand-written controller: 5.4 W idle, 9.2 W with the bag).
+
+Rests and locks in the stand-in (docs/31): the JSON carries per DOF `volt`, `i_stall_a`, `gear_ratio`,
+`rotor_j_joint` (the motor and gear inertia in joint terms) and a `locks` dict (the lock rule in joint terms:
+tol per DOF, err_max, rate per DOF, still_s, still_v, release_v), and the XML a `com_vel` sensor (subtree linear
+velocity of the pelvis: the whole body's CoM). If `LOCK_*`, `LOCK_TOL_SCALE` or a motor changes, re-export. The
+sibling's `StandinEnv(locks=True, power_cost=c)` uses them: power V I_stall |(u + w/w_nl) u| with u the joint
+torque plus the rotor's inertia torque over stall, zero on a locked drum.

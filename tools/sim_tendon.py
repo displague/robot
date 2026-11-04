@@ -223,6 +223,8 @@ class Rig:
         self.by_name = {w["name"]: w for w in self.w}
         self.lock_enabled = True
         self.balance = True
+        self.still_gate = False          # True: the drums' stillness gate (D-038) runs with the balance loop off, as the
+                                         # firmware's would under any other controller (a learned policy, docs/30)
         self.hook = None                 # called after every step (the video recorder)
         self.record_all = False
         self.pelvis = mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_BODY, "pelvis")
@@ -391,6 +393,9 @@ class Rig:
         self._e_prev = com[:2].copy()
         self._com_f = self._com_f + a * (e - self._com_f)
         if not (self.balance and d.time > BAL_START):
+            if self.still_gate:          # on the CoM speed alone (the disturbance estimate is the balance loop's)
+                v = np.linalg.norm(self._com_v)
+                self._still = 0.0 if v > LOCK_RELEASE_V else (self._still + dt if v < LOCK_STILL_V else self._still)
             return
         s = self.soles()
         grounded = [c for c, on in s if on]

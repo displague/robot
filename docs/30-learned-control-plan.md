@@ -98,3 +98,9 @@ the gate. That needs the seed study (sibling #51) with a plain-network baseline 
 
 Sibling #51 with a plain-network arm (5 seeds each: plain network, random weights, grown, grown + cloning;
 about 3 hours of training), then rests and locks as above, then the multi-body run if #51 says the core helps.
+
+## Since (P-052)
+
+`31` ran the first two steps. Sibling #51: a plain network beats the core in every arm over five seeds, so D-051's
+reverse condition holds (D-052). Rests: the drums can lock under a policy; the stand-in carries the locks and the
+power but training it to rest did not transfer; training with a held load made policies rest (best 10.6 W idle).

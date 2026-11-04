@@ -585,3 +585,18 @@ Alternative: rests and locks first (the user's first idea); the seed study first
 the rest of the sibling work is worth doing on this robot.
 Reverses if: #51 shows no difference between the core and a plain network, then the robot's learned control uses
 a plain network and the sibling's work for this robot stops at what it already gave.
+
+## D-052 (2026-11-04) The learned stand policy is a plain network; rest is trained with held loads; the drums may lock under a policy
+
+Why: P-052 (docs/31). Over five seeds on the tendon gate, a plain MLP of the core's size beats the sibling's grown
+champion core in every arm (cloned: 22 against 17 of 30 named scenes, 98 against 89 of 100 pushes; uncloned: 18
+against 0). D-051's reverse condition is met, harder: the robot's learned control uses a plain network, trained
+with the sibling's `rl/` trainer; the sibling's core and pretraining stop at what they gave (the trainer, the
+gate, RPO transfer). `Rig.still_gate` lets the drums lock under any controller, as the firmware's gate would, and
+the gate counts power. Training the fast stand-in to rest failed (exploration noise keeps the drums unlocked;
+less noise does not transfer); training with 0 to 4 kg in one hand cut median idle power from 175 W to 38 W (best
+10.6 W) and is kept. The hand-written balance stays: no learned policy holds the 8 m/s wind or rests within 2
+times its power.
+A plain GRU of the same size does as well as the MLP (20 of 30, 100 of 100), so memory is not what the core adds.
+Alternative: keep the core for its RPO transfer (a reliable head start on a new body).
+Reverses if: a core (or a recurrent network) beats the plain network on the gate over five seeds.

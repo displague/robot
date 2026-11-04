@@ -207,5 +207,6 @@
     <jointlimitfrc name="foot.L_roll_stop" joint="foot.L_roll"/>
     <jointlimitfrc name="foot.R_pitch_stop" joint="foot.R_pitch"/>
     <jointlimitfrc name="foot.R_roll_stop" joint="foot.R_roll"/>
+    <subtreelinvel name="com_vel" body="pelvis"/>
   </sensor>
 </mujoco>

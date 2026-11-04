@@ -60,7 +60,10 @@ def dof_params(joint_name, axis, cls_name):
     slip = p["t_clutch"] * ratio                  # N m at the joint where the clutch slips
     return dict(cls=cls_name, kp=k_both, kv=kv, torque_max=min(slip, stall), stall_nm=stall,
                 noload_rad_s=w_nl, moment_arm_m=n_rp, pretension_n=p["pre"], line_cont_n=p["f_cont"],
-                line_break_n=p["break_n"], linear_torque_nm=2 * p["pre"] * n_rp)
+                line_break_n=p["break_n"], linear_torque_nm=2 * p["pre"] * n_rp,
+                # electrical power as the tendon model counts it (docs/30): V I_stall |(tau/stall + w/w_nl) tau/stall|
+                volt=p["volt"], i_stall_a=p["i_stall"], gear_ratio=ratio,
+                rotor_j_joint=p["armature"] * ratio ** 2)       # kg m^2: the motor and gear inertia, joint terms
 
 
 def standin(links, data):
@@ -131,7 +134,9 @@ def standin(links, data):
                + ['    <touch name="%s_touch" site="%s_sole"/>\n' % (f, f) for f in feet]
                + ['    <touch name="%s_impact" site="%s_impact"/>\n' % (b, b) for b in IMPACT_BODIES]
                + ['    <actuatorfrc name="%s_tau" actuator="%s"/>\n' % (d["name"], d["name"]) for d in dofs]
-               + ['    <jointlimitfrc name="%s_stop" joint="%s"/>\n' % (d["name"], d["name"]) for d in dofs])
+               + ['    <jointlimitfrc name="%s_stop" joint="%s"/>\n' % (d["name"], d["name"]) for d in dofs]
+               # the whole body's CoM velocity: the drums' stillness gate (docs/30) reads it, as the tendon model's
+               + ['    <subtreelinvel name="com_vel" body="pelvis"/>\n'])
     out = ['<mujoco model="tendon_humanoid_standin">\n',
            '  <compiler angle="radian"/>\n',
            '  <option timestep="0.005" gravity="0 0 -9.81" integrator="implicitfast"/>\n',
@@ -154,6 +159,17 @@ def outer_loop(dofs):
     return dict(kq=st.KQ, ki=st.KI, trim_max=st.TRIM_MAX, gain=gain, timeconst=TIMECONST, kv_scale=KV_SCALE)
 
 
+def locks(dofs):
+    """The tendon model's drum self-lock rule, in joint terms, for the training loop (docs/30): a drum locks (zero
+    power, the joint held) when its joint is within tol of the target and slower than rate, the gear on target,
+    and the body has been still (CoM under still_v) for still_s; the stillness resets above release_v."""
+    import sim_tendon as st
+    tol = [st.LOCK_TOL * st.LOCK_TOL_SCALE.get(d["name"].split(".")[0].split("_")[0], 1.0) for d in dofs]
+    rate = [st.LOCK_RATE / d["gear_ratio"] for d in dofs]
+    return dict(tol=tol, err_max=3 * st.LOCK_TOL, rate=rate, still_s=st.LOCK_STILL, still_v=st.LOCK_STILL_V,
+                release_v=st.LOCK_RELEASE_V)
+
+
 def build():
     with open(os.path.join(ROOT, "cad", "skeleton.json")) as f:
         data = json.load(f)
@@ -166,9 +182,9 @@ def main():
     with open(os.path.join(ROOT, "sim", "robot_standin.xml"), "w") as f:
         f.write(xml)
     spec = dict(model="sim/robot_standin.xml", source="tools/export_standin.py", timestep=0.005,
-                feet=feet, imu_site="imu", outer_loop=outer_loop(dofs), impact_bodies=list(IMPACT_BODIES), dofs=dofs,
+                feet=feet, imu_site="imu", outer_loop=outer_loop(dofs), locks=locks(dofs), impact_bodies=list(IMPACT_BODIES), dofs=dofs,
                 sensors="pelvis_quat 4, pelvis_gyro 3, pelvis_acc 3, <foot>_touch per foot, <body>_impact per "
-                        "impact body, <dof>_tau per DOF (actuator torque), <dof>_stop per DOF (joint-stop force)",
+                        "impact body, <dof>_tau per DOF (actuator torque), <dof>_stop per DOF (joint-stop force), com_vel 3 (whole-body CoM velocity)",
                 notes="kp: line loop stiffness, both runs taut; kv: motor back-EMF + line damping; torque_max: "
                       "clutch slip at the joint; line force for a joint torque tau: pretension + |tau| / (2 "
                       "moment_arm) while |tau| < linear_torque, else |tau| / moment_arm")

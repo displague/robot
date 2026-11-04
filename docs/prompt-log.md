@@ -724,3 +724,20 @@ Produced: `30` and D-051 (a plan; nothing trained).
 - The sibling's issues ordered: #51 (with a plain network) first, then rests and locks (#48), #50, #49,
   multi-body; the voxel-world issues parked. New sibling issues: #56 rests and locks, #57 multi-body
   training.
+
+## P-052 (2026-11-04) Go: through the day on direction and training
+
+> go - you clear to proceed through the day (through 6p) on direction and training - need second opinions? you have agenthub and sub-agents
+
+Produced (hub tasks `rl-seeds`, `standin-tendon-gap`; sibling #51, #56): `31` and D-052.
+- Sibling #51 with a plain-network arm, five seeds: the plain network beats the sibling's core in every arm (22
+  against 17 of 30 named scenes cloned; 18 against 0 uncloned). RPO transfer: a reliable head start, a small end
+  gain on four seeds of five.
+- `tools/sim_tendon.py` `Rig.still_gate`: the drums may lock under a policy. `tools/export_standin.py`: per-DOF
+  motor power figures and rotor inertia, the lock rule, a CoM velocity sensor.
+- Rests: the stand-in's locks and power, a tendon-model fine-tune environment, a rest mode; training with less
+  noise did not transfer; training with a held load made policies rest (median idle 175 to 38 W, best 10.6 W
+  against 5.4 W; the bag held by 3/5 seeds, 5/5 with quiet scenes).
+- A second opinion from a reviewer agent caught the noise problem and five fidelity bugs in the locks and power,
+  and asked for a recurrent baseline: a GRU of the same size does as well as the MLP.
+- Sibling PR #58 merged (closes #51); the GRU baseline in a second PR.
