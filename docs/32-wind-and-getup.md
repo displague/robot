@@ -4,10 +4,11 @@ The afternoon of P-052, after `31`. Two open items for learned control: no learn
 8 m/s head wind, and the robot cannot get up (sibling #49).
 
 Short answers:
-- **The 8 m/s wind is not the drag and not the action range.** Drag at 8 m/s is 16.4 N on the tendon model and
+- **The 8 m/s wind is not the drag and not the action range; its cause is not found.** Drag at 8 m/s is 16.4 N on the tendon model and
   15.6 N on the stand-in. Widening each joint's action range to the teacher's own corrections did not get it, and a
   200-iteration all-windy fine-tune on the tendon model did not either. A policy that falls at 8 m/s on the tendon model
-  stood on two of the three windy stand-in variants tried, so it is the ankle under load, not the wind model.
+  stood on two of the three windy stand-in variants tried. The cause is not found; the drive under a steady load
+  is the leading suspect, untested.
 - **The robot cannot rise slowly from below a pelvis height of 0.85 m.** With the ankle's 20 degrees of
   dorsiflexion, no one-leg pose with a flat foot puts the CoM over the sole lower than that (`tools/rise_static.py`).
   Getting up must be a dynamic rise: momentum, the other leg, or the hands.
@@ -27,9 +28,27 @@ Short answers:
   1.5 million steps, from the best held-load policy): still falls at 8 m/s, and standing power went from 36 to
   83 W.
 
-The ankle drive is a line loop: under a steady lean its lines stretch, and the firmware's outer loop trims only
-0.15 of the error at the ankles (`OUTER_GAIN`). A policy trained on the stand-in, whose servo reaches its target,
-asks for too little. The hand-written controller works the ankles in torque mode for this (docs/15).
+Not found yet. The leading suspect is the ankle drive under a steady load: it is a line loop that stretches, its
+outer loop runs at 0.15 gain on the ankles (`OUTER_GAIN`), and the hand-written controller does not position the
+ankles at all in this scene but works them in torque mode (the gear placed so the lines carry the planned torque,
+docs/15). But the stand-in carries the same outer loop, and the integral trim reaches the target in both, so this
+was a hypothesis. A direct test: the policy drives every joint but the ankles, and the hand-written balance
+loop drives the ankles alone (torque mode, its hip lean on top). Ten cloned policies (five plain, five held-load),
+tendon model:
+
+| Scene | Policy alone | Hand-written ankles under the policy |
+| --- | --- | --- |
+| 8 m/s wind | 0 of 10 | **2 of 10** (the plain seeds 2 and 3, at 51 and 54 W) |
+| 5 m/s wind | 7 of 10 | 9 of 10 |
+| 30 N push | 10 of 10 | 8 of 10 |
+| stand 10 s | 10 of 10 | 9 of 10 |
+| standing power, median | 110 W | 83 W (one seed 253 to 28 W) |
+
+The ankle strategy is part of it: with the hand-written ankles two policies hold the 8 m/s wind, the 5 m/s wind
+nearly always holds, and power mostly falls. It is not all of it: eight still fall at 8 m/s, and two lose a scene
+they held alone (the policy was not trained with those ankles). Leaving the balance loop on under the policy's own
+ankle targets instead made both policies tried worse (the two fight). Next: train with the ankle in torque mode
+(hub task `policy-ankle-torque-mode`).
 
 ## Getting up: what this robot can do
 

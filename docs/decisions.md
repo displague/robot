@@ -607,8 +607,9 @@ Why: P-052 (docs/32). With the ankle's 20 degrees of dorsiflexion no one-leg pos
 pelvis height of 0.85 m (`tools/rise_static.py`); more ankle range helps only to 0.80 m before the knee and hip drives
 run out. A two-knee kneel does not rest; one half-kneel does. A learned lunge from it rises 61 % of the time in the
 stand-in, with the forearm lines at 2.3 times their rating. For the wind: drag agrees between the models, widening
-the action range and an all-windy tendon fine-tune both failed; the gap is the ankle line's stretch under a steady
-lean, which the hand-written controller handles in torque mode and the policies do not have.
+the action range and an all-windy tendon fine-tune both failed; the ankle line's stretch under a steady
+lean, which the hand-written controller handles in torque mode and the policies do not have, is part of it: with the
+hand-written ankles under them, 2 of 10 policies hold the 8 m/s wind (0 alone) and 9 of 10 the 5 m/s (7 alone).
 Alternative: more ankle dorsiflexion (a geometry change in the shank-foot joint) for a slower rise; hands in the
 get-up.
 Reverses if: a policy given the ankle torque mode still loses the 8 m/s wind, or a slow rise is found with the hands.
