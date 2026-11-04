@@ -53,6 +53,7 @@ Goal ordering, in case they conflict: **cheap > simple to build > human range of
 | `docs/26-model-fidelity.md` | How close the model is: drag shape, wind speed, weight, the silicone foot pad, the sensors (a 1 kHz, 5 ms balance loop, D-044), postures against wind (bowing works), and how results are checked |
 | `docs/27-energy-and-batteries.md` | Energy: what is counted, how far a charge walks (about 18 m on the 26 kg build, wind barely matters), peaks, power banks in the bones (logic supply only), the trade-offs, cutting the walk's energy, more tackle (a 6:1 block does not pay) |
 | `docs/28-carrying-a-bag.md` | Carrying a grocery bag: standing to 11.3 kg in one hand, walking to 3.9 kg (20 kg build), the fingers hook about 2.4 kg, so a palm hook (D-049) |
+| `docs/29-learned-stand-gate.md` | The learned stand policy on the tendon model: the stand-in's drive refitted, retrained on three seeds; it stands 10 s and takes most pushes, not yet the 30 N push, the 8 m/s wind or the power budget (D-050) |
 | `docs/24-motor-sources.md` | Sourced low / nominal / high figures for every drive and line (`sim/motor_ranges.json`, `ROBOT_MOTORS`): the 775's Kt settled at 0.0095 N m/A; what stands at the pessimistic end and which part limits it (D-040, D-041) |
 | `docs/23-static-walk.md` | The static walk: four 100 mm steps and the closing step, 42 of 42 grid variants over three mass sets, landings within 6 mm, 93 s and 1113 J; each transfer starts from the stance leg's crouch (D-039); `walk.gif` |
 | `docs/22-locks-and-balance.md` | Drum locks only once the robot is still, released by any push: 199 of 200 random pushes stand (184), energy down in 9 of 11 scenes, the one-foot hold 562 J (811); teacher data re-recorded (D-038) |
@@ -75,7 +76,7 @@ Goal ordering, in case they conflict: **cheap > simple to build > human range of
 | `docs/img/onefoot.mp4`, `docs/img/onefoot.gif` | The weight shift and the 10 s one-foot hold, recorded the same way |
 | `docs/img/step.mp4`, `docs/img/step.gif` | The first static step of docs/16, recorded the same way |
 | `docs/img/step-ik.mp4`, `docs/img/step-ik.gif` | The step of docs/19 (`python tools/sim_video.py --only step --gif --out step-ik`) |
-| `tools/export_standin.py`, `sim/robot_standin.xml`, `sim/robot_standin.json` | The fast stand-in for training: each drive train as one position servo, with the per-DOF figures for the damage gates |
+| `tools/export_standin.py`, `sim/robot_standin.xml`, `sim/robot_standin.json` | The fast stand-in for training: each drive train as one position servo with a target lag and the firmware's outer loop (fitted, docs/29), with the per-DOF figures for the damage gates |
 | `tools/record_teacher.py` | Demonstrations from the hand-written controller on the tendon model, in the stand-in's observation layout |
 | `docs/decisions.md` | Decision log (what we chose and why; revisit when a test disagrees) |
 | `docs/prompt-log.md` | Every prompt that produced a set of work, verbatim, with what it produced |

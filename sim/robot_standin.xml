@@ -101,38 +101,38 @@
     </body>
   </worldbody>
   <actuator>
-    <position name="spine_pitch" joint="spine_pitch" kp="370.83" kv="27.788" ctrlrange="-0.3491 0.6981" ctrllimited="true" forcerange="-29.667 29.667" forcelimited="true"/>
-    <position name="spine_roll" joint="spine_roll" kp="370.83" kv="27.788" ctrlrange="-0.4363 0.4363" ctrllimited="true" forcerange="-29.667 29.667" forcelimited="true"/>
-    <position name="spine_yaw" joint="spine_yaw" kp="370.83" kv="27.788" ctrlrange="-0.7854 0.7854" ctrllimited="true" forcerange="-29.667 29.667" forcelimited="true"/>
-    <position name="neck_pitch" joint="neck_pitch" kp="11.56" kv="2.668" ctrlrange="-0.8727 0.8727" ctrllimited="true" forcerange="-1.850 1.850" forcelimited="true"/>
-    <position name="neck_roll" joint="neck_roll" kp="11.56" kv="2.668" ctrlrange="-0.6109 0.6109" ctrllimited="true" forcerange="-1.850 1.850" forcelimited="true"/>
-    <position name="neck_yaw" joint="neck_yaw" kp="11.56" kv="2.668" ctrlrange="-1.3963 1.3963" ctrllimited="true" forcerange="-1.850 1.850" forcelimited="true"/>
-    <position name="upperarm.L_pitch" joint="upperarm.L_pitch" kp="178.00" kv="16.598" ctrlrange="-2.9671 0.7854" ctrllimited="true" forcerange="-23.733 23.733" forcelimited="true"/>
-    <position name="upperarm.L_roll" joint="upperarm.L_roll" kp="178.00" kv="16.598" ctrlrange="-2.8798 0.5236" ctrllimited="true" forcerange="-23.733 23.733" forcelimited="true"/>
-    <position name="upperarm.L_yaw" joint="upperarm.L_yaw" kp="178.00" kv="16.598" ctrlrange="-1.3963 1.3963" ctrllimited="true" forcerange="-23.733 23.733" forcelimited="true"/>
-    <position name="upperarm.R_pitch" joint="upperarm.R_pitch" kp="178.00" kv="16.598" ctrlrange="-2.9671 0.7854" ctrllimited="true" forcerange="-23.733 23.733" forcelimited="true"/>
-    <position name="upperarm.R_roll" joint="upperarm.R_roll" kp="178.00" kv="16.598" ctrlrange="-0.5236 2.8798" ctrllimited="true" forcerange="-23.733 23.733" forcelimited="true"/>
-    <position name="upperarm.R_yaw" joint="upperarm.R_yaw" kp="178.00" kv="16.598" ctrlrange="-1.3963 1.3963" ctrllimited="true" forcerange="-23.733 23.733" forcelimited="true"/>
-    <position name="forearm.L_pitch" joint="forearm.L_pitch" kp="40.05" kv="12.976" ctrlrange="-2.4435 0.0000" ctrllimited="true" forcerange="-8.900 8.900" forcelimited="true"/>
-    <position name="forearm.L_yaw" joint="forearm.L_yaw" kp="17.44" kv="3.000" ctrlrange="-1.3963 1.3963" ctrllimited="true" forcerange="-4.153 4.153" forcelimited="true"/>
-    <position name="forearm.R_pitch" joint="forearm.R_pitch" kp="40.05" kv="12.976" ctrlrange="-2.4435 0.0000" ctrllimited="true" forcerange="-8.900 8.900" forcelimited="true"/>
-    <position name="forearm.R_yaw" joint="forearm.R_yaw" kp="17.44" kv="3.000" ctrlrange="-1.3963 1.3963" ctrllimited="true" forcerange="-4.153 4.153" forcelimited="true"/>
-    <position name="hand.L_pitch" joint="hand.L_pitch" kp="5.99" kv="1.383" ctrlrange="-1.2217 1.0472" ctrllimited="true" forcerange="-1.332 1.332" forcelimited="true"/>
-    <position name="hand.L_roll" joint="hand.L_roll" kp="5.99" kv="1.383" ctrlrange="-0.2618 0.4363" ctrllimited="true" forcerange="-1.332 1.332" forcelimited="true"/>
-    <position name="hand.R_pitch" joint="hand.R_pitch" kp="5.99" kv="1.383" ctrlrange="-1.2217 1.0472" ctrllimited="true" forcerange="-1.332 1.332" forcelimited="true"/>
-    <position name="hand.R_roll" joint="hand.R_roll" kp="5.99" kv="1.383" ctrlrange="-0.4363 0.2618" ctrllimited="true" forcerange="-1.332 1.332" forcelimited="true"/>
-    <position name="thigh.L_pitch" joint="thigh.L_pitch" kp="534.00" kv="40.015" ctrlrange="-1.9199 0.2618" ctrllimited="true" forcerange="-35.600 35.600" forcelimited="true"/>
-    <position name="thigh.L_roll" joint="thigh.L_roll" kp="801.00" kv="82.025" ctrlrange="-0.6981 0.4363" ctrllimited="true" forcerange="-53.400 53.400" forcelimited="true"/>
-    <position name="thigh.L_yaw" joint="thigh.L_yaw" kp="370.83" kv="27.788" ctrlrange="-0.6109 0.6109" ctrllimited="true" forcerange="-29.667 29.667" forcelimited="true"/>
-    <position name="thigh.R_pitch" joint="thigh.R_pitch" kp="534.00" kv="40.015" ctrlrange="-1.9199 0.2618" ctrllimited="true" forcerange="-35.600 35.600" forcelimited="true"/>
-    <position name="thigh.R_roll" joint="thigh.R_roll" kp="801.00" kv="82.025" ctrlrange="-0.4363 0.6981" ctrllimited="true" forcerange="-53.400 53.400" forcelimited="true"/>
-    <position name="thigh.R_yaw" joint="thigh.R_yaw" kp="370.83" kv="27.788" ctrlrange="-0.6109 0.6109" ctrllimited="true" forcerange="-29.667 29.667" forcelimited="true"/>
-    <position name="shank.L_pitch" joint="shank.L_pitch" kp="222.50" kv="24.822" ctrlrange="0.0000 2.3562" ctrllimited="true" forcerange="-29.667 29.667" forcelimited="true"/>
-    <position name="shank.R_pitch" joint="shank.R_pitch" kp="222.50" kv="24.822" ctrlrange="0.0000 2.3562" ctrllimited="true" forcerange="-29.667 29.667" forcelimited="true"/>
-    <position name="foot.L_pitch" joint="foot.L_pitch" kp="278.13" kv="51.399" ctrlrange="-0.3491 0.6981" ctrllimited="true" forcerange="-44.500 44.500" forcelimited="true"/>
-    <position name="foot.L_roll" joint="foot.L_roll" kp="278.13" kv="51.399" ctrlrange="-0.3491 0.2618" ctrllimited="true" forcerange="-44.500 44.500" forcelimited="true"/>
-    <position name="foot.R_pitch" joint="foot.R_pitch" kp="278.13" kv="51.399" ctrlrange="-0.3491 0.6981" ctrllimited="true" forcerange="-44.500 44.500" forcelimited="true"/>
-    <position name="foot.R_roll" joint="foot.R_roll" kp="278.13" kv="51.399" ctrlrange="-0.2618 0.3491" ctrllimited="true" forcerange="-44.500 44.500" forcelimited="true"/>
+    <position name="spine_pitch" joint="spine_pitch" kp="370.83" kv="9.454" timeconst="0.030" ctrlrange="-0.8491 1.1981" ctrllimited="true" forcerange="-29.667 29.667" forcelimited="true"/>
+    <position name="spine_roll" joint="spine_roll" kp="370.83" kv="9.454" timeconst="0.030" ctrlrange="-0.9363 0.9363" ctrllimited="true" forcerange="-29.667 29.667" forcelimited="true"/>
+    <position name="spine_yaw" joint="spine_yaw" kp="370.83" kv="9.454" timeconst="0.030" ctrlrange="-1.2854 1.2854" ctrllimited="true" forcerange="-29.667 29.667" forcelimited="true"/>
+    <position name="neck_pitch" joint="neck_pitch" kp="11.56" kv="0.475" timeconst="0.030" ctrlrange="-1.3727 1.3727" ctrllimited="true" forcerange="-1.850 1.850" forcelimited="true"/>
+    <position name="neck_roll" joint="neck_roll" kp="11.56" kv="0.475" timeconst="0.030" ctrlrange="-1.1109 1.1109" ctrllimited="true" forcerange="-1.850 1.850" forcelimited="true"/>
+    <position name="neck_yaw" joint="neck_yaw" kp="11.56" kv="0.475" timeconst="0.030" ctrlrange="-1.8963 1.8963" ctrllimited="true" forcerange="-1.850 1.850" forcelimited="true"/>
+    <position name="upperarm.L_pitch" joint="upperarm.L_pitch" kp="178.00" kv="4.864" timeconst="0.030" ctrlrange="-3.4671 1.2854" ctrllimited="true" forcerange="-23.733 23.733" forcelimited="true"/>
+    <position name="upperarm.L_roll" joint="upperarm.L_roll" kp="178.00" kv="4.864" timeconst="0.030" ctrlrange="-3.3798 1.0236" ctrllimited="true" forcerange="-23.733 23.733" forcelimited="true"/>
+    <position name="upperarm.L_yaw" joint="upperarm.L_yaw" kp="178.00" kv="4.864" timeconst="0.030" ctrlrange="-1.8963 1.8963" ctrllimited="true" forcerange="-23.733 23.733" forcelimited="true"/>
+    <position name="upperarm.R_pitch" joint="upperarm.R_pitch" kp="178.00" kv="4.864" timeconst="0.030" ctrlrange="-3.4671 1.2854" ctrllimited="true" forcerange="-23.733 23.733" forcelimited="true"/>
+    <position name="upperarm.R_roll" joint="upperarm.R_roll" kp="178.00" kv="4.864" timeconst="0.030" ctrlrange="-1.0236 3.3798" ctrllimited="true" forcerange="-23.733 23.733" forcelimited="true"/>
+    <position name="upperarm.R_yaw" joint="upperarm.R_yaw" kp="178.00" kv="4.864" timeconst="0.030" ctrlrange="-1.8963 1.8963" ctrllimited="true" forcerange="-23.733 23.733" forcelimited="true"/>
+    <position name="forearm.L_pitch" joint="forearm.L_pitch" kp="40.05" kv="2.019" timeconst="0.030" ctrlrange="-2.9435 0.5000" ctrllimited="true" forcerange="-8.900 8.900" forcelimited="true"/>
+    <position name="forearm.L_yaw" joint="forearm.L_yaw" kp="17.44" kv="0.614" timeconst="0.030" ctrlrange="-1.8963 1.8963" ctrllimited="true" forcerange="-4.153 4.153" forcelimited="true"/>
+    <position name="forearm.R_pitch" joint="forearm.R_pitch" kp="40.05" kv="2.019" timeconst="0.030" ctrlrange="-2.9435 0.5000" ctrllimited="true" forcerange="-8.900 8.900" forcelimited="true"/>
+    <position name="forearm.R_yaw" joint="forearm.R_yaw" kp="17.44" kv="0.614" timeconst="0.030" ctrlrange="-1.8963 1.8963" ctrllimited="true" forcerange="-4.153 4.153" forcelimited="true"/>
+    <position name="hand.L_pitch" joint="hand.L_pitch" kp="5.99" kv="0.246" timeconst="0.030" ctrlrange="-1.7217 1.5472" ctrllimited="true" forcerange="-1.332 1.332" forcelimited="true"/>
+    <position name="hand.L_roll" joint="hand.L_roll" kp="5.99" kv="0.246" timeconst="0.030" ctrlrange="-0.7618 0.9363" ctrllimited="true" forcerange="-1.332 1.332" forcelimited="true"/>
+    <position name="hand.R_pitch" joint="hand.R_pitch" kp="5.99" kv="0.246" timeconst="0.030" ctrlrange="-1.7217 1.5472" ctrllimited="true" forcerange="-1.332 1.332" forcelimited="true"/>
+    <position name="hand.R_roll" joint="hand.R_roll" kp="5.99" kv="0.246" timeconst="0.030" ctrlrange="-0.9363 0.7618" ctrllimited="true" forcerange="-1.332 1.332" forcelimited="true"/>
+    <position name="thigh.L_pitch" joint="thigh.L_pitch" kp="534.00" kv="13.614" timeconst="0.030" ctrlrange="-2.4199 0.7618" ctrllimited="true" forcerange="-35.600 35.600" forcelimited="true"/>
+    <position name="thigh.L_roll" joint="thigh.L_roll" kp="801.00" kv="22.620" timeconst="0.030" ctrlrange="-1.1981 0.9363" ctrllimited="true" forcerange="-53.400 53.400" forcelimited="true"/>
+    <position name="thigh.L_yaw" joint="thigh.L_yaw" kp="370.83" kv="9.454" timeconst="0.030" ctrlrange="-1.1109 1.1109" ctrllimited="true" forcerange="-29.667 29.667" forcelimited="true"/>
+    <position name="thigh.R_pitch" joint="thigh.R_pitch" kp="534.00" kv="13.614" timeconst="0.030" ctrlrange="-2.4199 0.7618" ctrllimited="true" forcerange="-35.600 35.600" forcelimited="true"/>
+    <position name="thigh.R_roll" joint="thigh.R_roll" kp="801.00" kv="22.620" timeconst="0.030" ctrlrange="-0.9363 1.1981" ctrllimited="true" forcerange="-53.400 53.400" forcelimited="true"/>
+    <position name="thigh.R_yaw" joint="thigh.R_yaw" kp="370.83" kv="9.454" timeconst="0.030" ctrlrange="-1.1109 1.1109" ctrllimited="true" forcerange="-29.667 29.667" forcelimited="true"/>
+    <position name="shank.L_pitch" joint="shank.L_pitch" kp="222.50" kv="6.487" timeconst="0.030" ctrlrange="-0.5000 2.8562" ctrllimited="true" forcerange="-29.667 29.667" forcelimited="true"/>
+    <position name="shank.R_pitch" joint="shank.R_pitch" kp="222.50" kv="6.487" timeconst="0.030" ctrlrange="-0.5000 2.8562" ctrllimited="true" forcerange="-29.667 29.667" forcelimited="true"/>
+    <position name="foot.L_pitch" joint="foot.L_pitch" kp="278.13" kv="10.146" timeconst="0.030" ctrlrange="-0.8491 1.1981" ctrllimited="true" forcerange="-44.500 44.500" forcelimited="true"/>
+    <position name="foot.L_roll" joint="foot.L_roll" kp="278.13" kv="10.146" timeconst="0.030" ctrlrange="-0.8491 0.7618" ctrllimited="true" forcerange="-44.500 44.500" forcelimited="true"/>
+    <position name="foot.R_pitch" joint="foot.R_pitch" kp="278.13" kv="10.146" timeconst="0.030" ctrlrange="-0.8491 1.1981" ctrllimited="true" forcerange="-44.500 44.500" forcelimited="true"/>
+    <position name="foot.R_roll" joint="foot.R_roll" kp="278.13" kv="10.146" timeconst="0.030" ctrlrange="-0.7618 0.8491" ctrllimited="true" forcerange="-44.500 44.500" forcelimited="true"/>
   </actuator>
   <sensor>
     <framequat name="pelvis_quat" objtype="site" objname="imu"/>

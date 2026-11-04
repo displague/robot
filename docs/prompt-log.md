@@ -693,3 +693,18 @@ Produced (hub task `carry-grocery-bag`, from P-047): `28` and D-049.
 - The 26 kg build walks with nothing.
 - The planned fingers hook about 2.4 kg, so a passive palm hook or forearm strap carries the bag (D-049).
 
+## P-050 (2026-11-03) Continue, and train as before
+
+> continue and train as we did before
+
+Produced (hub task `standin-tendon-gap`, sibling issue #48): `29` and D-050.
+- The v0.3.0 stand policy falls in every gate scene on today's model; the hand-written controller passes all.
+- The stand-in's drive refitted to the tendon model's step responses: damping at 0.1 of the back-EMF figure, a
+  30 ms target lag, the firmware's outer loop run by the training environment (fit error 0.84 against 2.41).
+- Retrained as in `17` (grown champion, cloned from the teacher, PPO with pushes and wind) on three seeds, on the
+  refitted and the old stand-in: every policy stands 10 s on the tendon model; the best take 30 N; random pushes
+  52/60 on both. The refit's effect is inside the seed spread; the gain over v0.3.0 is mostly the re-recorded
+  teacher data.
+- No policy passes the whole gate; they use 50 to 130 W standing still against 3.6 W.
+- In the sibling: the cascade in `StandinEnv`, the gate's teacher run on every scene, random pushes judged 4.5 s
+  after the push.

@@ -137,3 +137,9 @@ The next steps below are its issues #48 (stand-in gap), #49 (get-up), #50 (rehea
    model).
 2. Get-up as a curriculum from kneeling.
 3. A second seed for every comparison before reading anything into the champion-versus-random difference.
+
+## Since (P-050)
+
+`29` retrains the stand policy on today's teacher data with the stand-in's drive refitted to the tendon model, on
+three seeds. Every policy now stands 10 s on the tendon model, and the best take 10 to 30 N pushes; none yet
+passes the whole gate, and they spend 50 to 130 W standing still against the hand-written controller's 3.6 W.

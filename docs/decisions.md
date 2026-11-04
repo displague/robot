@@ -560,3 +560,14 @@ the palm, or a strap loop on the forearm, carries the bag at no power, and the h
 Alternative: the 298:1 grip motor in the fingers (about 6.9 kg continuous, but a 1.6 s close).
 Reverses if: the fingers get a lock (a ratchet or a self-locking stage) that holds a closed grip without current.
 
+## D-050 (2026-11-03) The stand-in carries the drive's cascade, fitted to the tendon model; the learned stand policy is not used yet
+
+Why: P-050 (docs/29). On step responses the old stand-in's joints were slow and soft (a held knee reached 16 % of a
+step in 1 s, the tendon model 91 %): its damping was the motor's back-EMF at the joint, and it had no integral
+action, where the firmware's outer loop trims out the line stretch. The stand-in now has 0.1 of that damping, a
+30 ms target lag and the outer loop (`outer_loop` in its JSON, run by the training environment), fitted on six
+joints (error 0.84 against 2.41). Retrained on three seeds, policies on either stand-in stand 10 s on the tendon
+model; the refit's gain on the gate is within the seed spread. No policy passes the 30 N push and the 8 m/s wind
+together, and they use 50 to 130 W standing still against 3.6 W, so the hand-written balance stays.
+Alternative: keep the plain servo (simpler, and as good on the gate so far); fine-tune on the tendon model.
+Reverses if: a policy passes the whole gate within the hand-written controller's power, on more than one seed.

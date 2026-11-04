@@ -13,7 +13,14 @@ replaced by one MuJoCo position servo that keeps what a policy can feel of it:
     (sim_tendon.Rig.torque_to_angle); the loop is half as stiff once one run goes slack, which the
     training randomises rather than models
   * damping kv = the motor's back-EMF slope reflected to the joint, T_stall n_r^2 / w_noload, plus the
-    line damping (export_mjcf.LINE_DAMPING); this is also what caps the joint speed near w_noload / n_r
+    line damping (export_mjcf.LINE_DAMPING), scaled by KV_SCALE (below)
+  * the drive's cascade (P-050, docs/29): the tendon model's firmware loop is an inner gear servo and an
+    outer joint loop (sim_tendon KQ, KI, TRIM_MAX, OUTER_GAIN) whose integral trim takes out the line
+    stretch under load, so a held joint reaches its target. The stand-in reproduces it as a target lag
+    (TIMECONST, the gear's travel) on the servo and the outer loop run by the training loop at its control
+    rate from `outer_loop` in the JSON. KV_SCALE and TIMECONST were fitted to the tendon model's step
+    responses standing (docs/29); the plain servo was slow and soft (a held knee reached 16 % of a 0.03 rad
+    step in 1 s, the tendon model 91 %)
   * torque limit = the clutch slip torque reflected to the joint (above it the clutch slips, so no drive
     can push harder)
   * per DOF in the JSON: the line force for a joint torque, the continuous line rating, the break
@@ -35,6 +42,9 @@ from export_urdf import expand, sub, WORLD_AXIS, FOOT_BOX, FOOT_OFFSET     # noq
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 IMPACT_BODIES = ("head", "spine", "pelvis")   # touch sensors for falls: the shell parts that take impacts
+KV_SCALE = 0.1           # of the back-EMF damping: the motor's damping acts on the gear, behind the line spring
+TIMECONST = 0.03         # s: first-order lag of the servo's target (the gear's travel and the inner loop)
+CTRL_MARGIN = 0.5        # rad beyond the joint range the servo target may go (the outer loop's trim)
 JOINT_ARMATURE = 0.01     # kg m^2 at the joint: the motor's inertia sits behind the line spring in the real
                            # drive train, so the joint does not feel its full reflected value at impact
 
@@ -46,7 +56,7 @@ def dof_params(joint_name, axis, cls_name):
     k_both = 2 * p["k"] * n_rp ** 2               # N m / rad, both runs taut
     stall = p["t_stall"] * ratio                  # N m at the joint
     w_nl = p["w_noload"] / ratio                  # rad/s at the joint
-    kv = stall / w_nl + em.LINE_DAMPING * k_both
+    kv = KV_SCALE * stall / w_nl + em.LINE_DAMPING * k_both
     slip = p["t_clutch"] * ratio                  # N m at the joint where the clutch slips
     return dict(cls=cls_name, kp=k_both, kv=kv, torque_max=min(slip, stall), stall_nm=stall,
                 noload_rad_s=w_nl, moment_arm_m=n_rp, pretension_n=p["pre"], line_cont_n=p["f_cont"],
@@ -109,9 +119,10 @@ def standin(links, data):
     # outputs mean the same joints on both models
     order = ["%s_%s" % (l["name"], d["axis"]) for l in links for d in l["dofs"]]
     dofs.sort(key=lambda d: order.index(d["name"]))
-    acts = ['    <position name="%s" joint="%s" kp="%.2f" kv="%.3f" ctrlrange="%.4f %.4f" ctrllimited="true" '
-            'forcerange="%.3f %.3f" forcelimited="true"/>\n'
-            % (d["name"], d["name"], d["kp"], d["kv"], d["lo"], d["hi"], -d["torque_max"], d["torque_max"])
+    acts = ['    <position name="%s" joint="%s" kp="%.2f" kv="%.3f" timeconst="%.3f" ctrlrange="%.4f %.4f" '
+            'ctrllimited="true" forcerange="%.3f %.3f" forcelimited="true"/>\n'
+            % (d["name"], d["name"], d["kp"], d["kv"], TIMECONST, d["lo"] - CTRL_MARGIN, d["hi"] + CTRL_MARGIN,
+               -d["torque_max"], d["torque_max"])
             for d in dofs]
     feet = [l["name"] for l in links if l["base"] == "foot"]
     sensors = (['    <framequat name="pelvis_quat" objtype="site" objname="imu"/>\n',
@@ -135,6 +146,14 @@ def standin(links, data):
     return "".join(out), dofs, feet
 
 
+def outer_loop(dofs):
+    """The tendon model's outer joint loop, for the training loop to run at its control rate: servo target =
+    target + gain (kq err + trim), trim += gain ki err dt with |trim| <= trim_max, err = target - q."""
+    import sim_tendon as st
+    gain = [st.OUTER_GAIN.get(d["name"].split("_")[0].split(".")[0], 1.0) for d in dofs]
+    return dict(kq=st.KQ, ki=st.KI, trim_max=st.TRIM_MAX, gain=gain, timeconst=TIMECONST, kv_scale=KV_SCALE)
+
+
 def build():
     with open(os.path.join(ROOT, "cad", "skeleton.json")) as f:
         data = json.load(f)
@@ -147,7 +166,7 @@ def main():
     with open(os.path.join(ROOT, "sim", "robot_standin.xml"), "w") as f:
         f.write(xml)
     spec = dict(model="sim/robot_standin.xml", source="tools/export_standin.py", timestep=0.005,
-                feet=feet, imu_site="imu", impact_bodies=list(IMPACT_BODIES), dofs=dofs,
+                feet=feet, imu_site="imu", outer_loop=outer_loop(dofs), impact_bodies=list(IMPACT_BODIES), dofs=dofs,
                 sensors="pelvis_quat 4, pelvis_gyro 3, pelvis_acc 3, <foot>_touch per foot, <body>_impact per "
                         "impact body, <dof>_tau per DOF (actuator torque), <dof>_stop per DOF (joint-stop force)",
                 notes="kp: line loop stiffness, both runs taut; kv: motor back-EMF + line damping; torque_max: "

@@ -201,3 +201,12 @@ change altered; these GIFs are the release visuals.
 `python tools/record_teacher.py [--pushes 24] [--winds 0] [--jobs 8]` writes `sim/out/teacher/teacher.npz`
 (gitignored): the hand-written controller's targets on the stand-in's observations, for behaviour cloning
 in the sibling project (ai-embedded-dynamic-diversity, `rl/`). Re-record after a controller or model change.
+
+The stand-in's drive (`tools/export_standin.py`) is fitted to the tendon model (docs/29, D-050): `KV_SCALE`,
+`TIMECONST` and `outer_loop` in the JSON (the firmware's KQ, KI, trim limit, per-joint gain), which the sibling's
+`StandinEnv` runs at its control rate (`EnvConfig.outer_loop`). If `sim_tendon`'s KQ, KI, TRIM_MAX or OUTER_GAIN
+change, re-export, and re-check the fit: step one joint's target by 0.03 rad with the robot standing (tendon model
+with `balance = False`) and compare the fraction reached at 0.1, 0.4 and 1 s with the stand-in's.
+The gate: `PYTHONPATH=src ROBOT_REPO=../robot python -m ai_embedded_dynamic_diversity.rl.tendon_eval <policy.pt|teacher> 20`
+in the sibling (stand 10 s, 10/20/30 N, wind 5 and 8 m/s, 20 random pushes; `teacher` runs the hand-written
+controller on the same scenes). Under a policy the balance loop is off, so no drum lock engages (D-038's gate).
