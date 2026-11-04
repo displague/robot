@@ -600,3 +600,15 @@ times its power.
 A plain GRU of the same size does as well as the MLP (20 of 30, 100 of 100), so memory is not what the core adds.
 Alternative: keep the core for its RPO transfer (a reliable head start on a new body).
 Reverses if: a core (or a recurrent network) beats the plain network on the gate over five seeds.
+
+## D-053 (2026-11-04) Getting up is a dynamic rise from a half-kneel; the 8 m/s wind waits for the ankle's torque mode in the policy
+
+Why: P-052 (docs/32). With the ankle's 20 degrees of dorsiflexion no one-leg pose puts the CoM over a flat foot below a
+pelvis height of 0.85 m (`tools/rise_static.py`); more ankle range helps only to 0.80 m before the knee and hip drives
+run out. A two-knee kneel does not rest; one half-kneel does. A learned lunge from it rises 61 % of the time in the
+stand-in, with the forearm lines at 2.3 times their rating. For the wind: drag agrees between the models, widening
+the action range and an all-windy tendon fine-tune both failed; the gap is the ankle line's stretch under a steady
+lean, which the hand-written controller handles in torque mode and the policies do not have.
+Alternative: more ankle dorsiflexion (a geometry change in the shank-foot joint) for a slower rise; hands in the
+get-up.
+Reverses if: a policy given the ankle torque mode still loses the 8 m/s wind, or a slow rise is found with the hands.

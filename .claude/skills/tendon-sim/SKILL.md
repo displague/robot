@@ -220,3 +220,7 @@ tol per DOF, err_max, rate per DOF, still_s, still_v, release_v), and the XML a 
 velocity of the pelvis: the whole body's CoM). If `LOCK_*`, `LOCK_TOL_SCALE` or a motor changes, re-export. The
 sibling's `StandinEnv(locks=True, power_cost=c)` uses them: power V I_stall |(u + w/w_nl) u| with u the joint
 torque plus the rotor's inertia torque over stall, zero on a locked drum.
+
+`tools/rise_static.py [dorsi=N]` answers whether the robot can rise slowly on one leg: the lowest pelvis height with
+the CoM over a flat front foot within the knee and hip drives, per ankle dorsiflexion limit (docs/32: 0.85 m at the
+joint's 20 degrees). Re-run it after a leg geometry, ankle range or drive change.

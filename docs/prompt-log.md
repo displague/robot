@@ -740,4 +740,7 @@ Produced (hub tasks `rl-seeds`, `standin-tendon-gap`; sibling #51, #56): `31` an
   against 5.4 W; the bag held by 3/5 seeds, 5/5 with quiet scenes).
 - A second opinion from a reviewer agent caught the noise problem and five fidelity bugs in the locks and power,
   and asked for a recurrent baseline: a GRU of the same size does as well as the MLP.
-- Sibling PR #58 merged (closes #51); the GRU baseline in a second PR.
+- Sibling PR #58 merged (closes #51); the GRU baseline in a second PR (#59, merged).
+- Continued (`32`, D-053): the 8 m/s wind is not drag and not the action range (#60, merged); the robot cannot rise
+  slowly below a pelvis height of 0.85 m (`tools/rise_static.py`); get-up as a curriculum from the one resting
+  half-kneel: a learned lunge rises 61 % of the time in the stand-in (sibling #61).
