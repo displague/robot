@@ -571,3 +571,17 @@ model; the refit's gain on the gate is within the seed spread. No policy passes 
 together, and they use 50 to 130 W standing still against 3.6 W, so the hand-written balance stays.
 Alternative: keep the plain servo (simpler, and as good on the gate so far); fine-tune on the tendon model.
 Reverses if: a policy passes the whole gate within the hand-written controller's power, on more than one seed.
+
+## D-051 (2026-11-04) Learned control order: settle whether the sibling's core helps, then rests and locks, then other bodies
+
+Why: P-051 (docs/30). The gains so far come from cloning the hand-written controller; the sibling's core beat
+random weights of its own architecture on one seed, and there is no plain-network baseline. Rests and locks are
+the furthest gap (15 to 35 times the power), but under a policy the tendon model's stillness gate never runs, so
+no lock can engage in the gate; that is fixed before any training for it. Cross-training on other MuJoCo bodies
+(only RPO so far, one seed) is worth its cost only if the core helps. Order: sibling #51 with a plain-network arm;
+rests and locks (the gate's stillness and power first, then the stand-in's power and lock, then three seeds); #50;
+#49; multi-body training. The sibling's voxel-world issues (#8, #9, #13, #16, #17, #18) are parked.
+Alternative: rests and locks first (the user's first idea); the seed study first is cheaper and decides whether
+the rest of the sibling work is worth doing on this robot.
+Reverses if: #51 shows no difference between the core and a plain network, then the robot's learned control uses
+a plain network and the sibling's work for this robot stops at what it already gave.

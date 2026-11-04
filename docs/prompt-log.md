@@ -708,3 +708,19 @@ Produced (hub task `standin-tendon-gap`, sibling issue #48): `29` and D-050.
 - No policy passes the whole gate; they use 50 to 130 W standing still against 3.6 W.
 - In the sibling: the cascade in `StandinEnv`, the gate's teacher run on every scene, random pushes judged 4.5 s
   after the push.
+
+## P-051 (2026-11-04) Rests and locks, other MuJoCo robots, the sibling in MuJoCo, its issues
+
+> can we train ai-embedded-dynamic-diversity on rests and locks if that is the biggest gap? scenarios that reward it meaningfully matching real-world needs for it? likewise, have we tried putting any of the other mujoco robots through this sibling project for cross-training the model's capability on transfer? likewise - how are we doing with the sibling model within mujoco? (above are my naive thoughts). If we are going to get benefits out of the sibling project, we may need to spend some time addressing its opened issues, most of which are now direct findings from this project
+
+Produced: `30` and D-051 (a plan; nothing trained).
+- The sibling in MuJoCo: the gains are from cloning the hand-written controller; the core against random weights
+  is one seed and has no plain-network baseline; RPO transfer helped early learning once; body training erases
+  the old skills.
+- Rests and locks: yes. Under a policy the tendon model's stillness gate never runs, so no lock engages in the
+  gate; fix that, add the drive's power and the lock rule to the stand-in, reward watts, and use scenes where
+  resting is the point (idle 60 s, a held load, steady wind, push then quiet).
+- Other MuJoCo robots: only RPO, sequentially, one seed; no Menagerie body, no joint training, no held-out body.
+- The sibling's issues ordered: #51 (with a plain network) first, then rests and locks (#48), #50, #49,
+  multi-body; the voxel-world issues parked. New sibling issues: #56 rests and locks, #57 multi-body
+  training.
