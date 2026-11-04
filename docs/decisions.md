@@ -611,7 +611,8 @@ the action range and an all-windy tendon fine-tune both failed; the ankle line's
 lean, which the hand-written controller handles in torque mode and the policies do not have, is part of it: with the
 hand-written ankles under them, 2 of 10 policies hold the 8 m/s wind (0 alone) and 9 of 10 the 5 m/s (7 alone);
 trained with their own ankles in torque mode, 0 of 10. The policies miss the balance loop's ankle strategy, not
-its drive mode.
+its drive mode. As a hybrid (the hand-written ankle balance, the policy on every other joint) two plain policies pass
+all six named scenes, at the cost of push recovery (77 of 100 random pushes against 98 alone).
 Alternative: more ankle dorsiflexion (a geometry change in the shank-foot joint) for a slower rise; hands in the
 get-up.
 Reverses if: a policy holds the 8 m/s wind without the hand-written ankles, or a slow rise is found with the hands.

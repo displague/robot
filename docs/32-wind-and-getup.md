@@ -56,6 +56,19 @@ scenes 23 and 22 of 30 (as without it), and several stand at 250 to 350 W. So th
 the policies miss is the balance loop's ankle strategy (a CoP loop with a disturbance estimate and its integral),
 which with the hand-written ankles under them got two of them through.
 
+The whole gate for that hybrid (the sibling's `tendon_eval ... handankles`), ten cloned policies not trained with it:
+
+| Policies | All six named scenes | Random pushes | Best: stand, idle, bag |
+| --- | --- | --- | --- |
+| Five plain, alone | 0 of 5 | 98 of 100 | |
+| Five plain, hybrid | **2 of 5** (seeds 2 and 3) | 77 of 100 | seed 3: 19/20 pushes, 44 W, 40 W, 61 W |
+| Five held-load, hybrid | 0 of 5 (all lose only the 8 m/s wind) | 94 of 100 | seed 4: 20/20 pushes, 26 W, 11.6 W, 29.5 W |
+
+The first learned-control results to hold the gate's 8 m/s wind are hybrids, and they give up some of the
+policies' push recovery. A 200-iteration tendon fine-tune in the hybrid (from plain seed 3) got 20 of 20 pushes but
+lost the 8 m/s wind and stood at 270 W; like every tendon fine-tune today (`31`), too slow and noisy at this budget
+to improve on its start.
+
 ## Getting up: what this robot can do
 
 `tools/rise_static.py` searches one-leg poses (hip, knee, ankle, spine) with the body pitched so the front foot is
