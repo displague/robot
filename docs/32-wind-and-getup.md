@@ -9,7 +9,7 @@ Short answers:
   200-iteration all-windy fine-tune on the tendon model did not either. A policy that falls at 8 m/s on the tendon model
   stood on two of the three windy stand-in variants tried. The cause is not found; the drive under a steady load
   is the leading suspect, untested.
-- **The robot cannot rise slowly from below a pelvis height of 0.85 m.** With the ankle's 20 degrees of
+- **The robot cannot rise slowly from below a pelvis height of 0.90 m** (0.85 m before a review fix, below). With the ankle's 20 degrees of
   dorsiflexion, no one-leg pose with a flat foot puts the CoM over the sole lower than that (`tools/rise_static.py`).
   Getting up must be a dynamic rise: momentum, the other leg, or the hands.
 - **A two-knee kneel does not rest on this robot**; one half-kneel does. Get-up as a curriculum from it: see below.
@@ -33,7 +33,9 @@ outer loop runs at 0.15 gain on the ankles (`OUTER_GAIN`), and the hand-written 
 ankles at all in this scene but works them in torque mode (the gear placed so the lines carry the planned torque,
 docs/15). But the stand-in carries the same outer loop, and the integral trim reaches the target in both, so this
 was a hypothesis. A direct test: the policy drives every joint but the ankles, and the hand-written balance
-loop drives the ankles alone (torque mode, its hip lean on top). Ten cloned policies (five plain, five held-load),
+loop drives the ankles (torque mode). The loop also adds its hip lean to the thigh pitch and its hip-roll shift to
+the thigh and ankle roll, on top of the policy's targets, so the hips have two controllers; that may be part of
+the push-recovery cost below. Ten cloned policies (five plain, five held-load),
 tendon model:
 
 | Scene | Policy alone | Hand-written ankles under the policy |
@@ -69,21 +71,34 @@ policies' push recovery. A 200-iteration tendon fine-tune in the hybrid (from pl
 lost the 8 m/s wind and stood at 270 W; like every tendon fine-tune today (`31`), too slow and noisy at this budget
 to improve on its start.
 
+Recorded (`tools/record_policy.py`, the gate's own runner, so the clips reproduce the gate: the hybrid ends at a
+pelvis height of 0.913 m and 2.4 degrees of tilt, as scored), plain seed 3 in the 8 m/s wind:
+
+| Alone (every joint) | Hybrid (the hand-written ankles under it) |
+| --- | --- |
+| ![alone](img/wind8-alone.gif) | ![hybrid](img/wind8-hybrid.gif) |
+
+"Passes" means standing. Some lines go over their continuous rating while it does: in the hybrid's 5 m/s wind a
+left forearm line carries 119 N against 64 N for 4.7 s (seed 3), and seed 2's neck line 64 N against 37 N for most
+of each scene. Neither is a pass by the line ratings yet.
+
 ## Getting up: what this robot can do
 
 `tools/rise_static.py` searches one-leg poses (hip, knee, ankle, spine) with the body pitched so the front foot is
-flat and the whole-body CoM within 4 cm of the sole's centre, and checks the front knee's and hip's gravity torques
-against their drives (the clutch slip at the joint):
+flat and the whole-body CoM within 4 cm of the sole's centre (8 cm ahead of the ankle), and checks the front knee's,
+hip's and ankle's gravity torques against their drives (the clutch slip at the joint):
 
-| Ankle dorsiflexion allowed | Lowest pelvis height, slow one-leg rise within the drives | Geometry alone |
-| --- | --- | --- |
-| 0 degrees | 0.95 m | 0.95 m |
-| 20 degrees (the joint's limit) | 0.85 m | 0.85 m |
-| 30 degrees | 0.80 m | 0.75 m |
-| 40 degrees | 0.80 m | 0.65 m |
+| Ankle dorsiflexion allowed | Geometry alone | Within the knee and hip drives | And the ankle drive |
+| --- | --- | --- | --- |
+| 0 degrees | 0.95 m | 0.95 m | 0.95 m |
+| 20 degrees (the joint's limit) | 0.90 m | 0.90 m | 0.90 m |
+| 30 degrees | 0.80 m | 0.80 m | 0.80 m |
+| 40 degrees | 0.70 m | 0.80 m | 0.80 m |
 
-At the robot's 20 degrees the limit is geometric: the CoM cannot get over the foot. More ankle range helps only down
-to 0.80 m before the knee and hip drives run out. A slow rise from a half-kneel (pelvis 0.46 m) is not possible on
+The release review (P-053) found the first version placed the sole's centre 5 cm ahead of the ankle instead of the
+model's 8 cm, which gave 0.85 m at 20 degrees; the corrected window asks for the CoM further forward, which is
+harder in a crouch. At the robot's 20 degrees the limit is geometric: the CoM cannot get over the foot. More ankle
+range helps only down to 0.80 m before the knee and hip drives run out; the ankle's own drive is never the limit. A slow rise from a half-kneel (pelvis 0.46 m) is not possible on
 this robot as built; a dynamic one might be.
 
 ## Get-up as a curriculum (sibling #49)
@@ -118,8 +133,8 @@ themselves up and mostly landed lying down.
 
 ## Not yet
 
-- The 8 m/s wind for a learned policy: the ankles' stretch under load in the stand-in, or the ankle torque mode
-  given to the policy.
+- The 8 m/s wind for a learned policy on its own (only the hybrid holds it), and the hybrid within its lines'
+  continuous ratings and with the policies' push recovery (77 of 100 against 98).
 - A get-up that works from a fall (0 %), on the tendon model, and within the arms' line ratings (the arm lines'
   overload is cut at 2 s, not prevented).
 - Hands in the get-up (the arms are not used yet), and a two-knee kneel with a ratchet or longer plantarflexion.

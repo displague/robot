@@ -1,9 +1,9 @@
 """Can the robot rise slowly on one leg? (docs/32)
 
 For poses of the front leg (hip, knee, ankle) and the spine, with the body pitched so the front foot is flat and the
-whole-body CoM over its sole, the front knee's and hip's gravity torques against their drives' limits (the
+whole-body CoM over its sole, the front knee's, hip's and ankle's gravity torques against their drives' limits (the
 stand-in's torque_max: the clutch slip at the joint). Prints, for each ankle dorsiflexion limit, the lowest pelvis
-height reachable that way within the drives. Below it a rise needs momentum, the other leg or the hands.
+height reachable that way: by geometry alone, within the knee and hip drives, and within the ankle drive too. Below it a rise needs momentum, the other leg or the hands.
 
     python tools/rise_static.py                 # the stand-in as exported (sim/robot_standin.xml, .json)
     python tools/rise_static.py dorsi=50        # also try ankles that dorsiflex further than the joint allows
@@ -19,7 +19,10 @@ import numpy as np
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FRONT = ("thigh.L", "shank.L", "foot.L")
-SOLE_AHEAD = 0.05          # m: the sole's centre ahead of the ankle
+sys.path.insert(0, os.path.join(ROOT, "tools"))
+from export_urdf import FOOT_OFFSET  # noqa: E402
+
+SOLE_AHEAD = -FOOT_OFFSET[1]   # m: the sole's centre ahead of the ankle (0.08, the model's own)
 SOLE_HALF = 0.04           # m: how far the CoM may sit from it
 
 
@@ -37,7 +40,7 @@ def main():
     bid = lambda b: m.body(b).id
     R = math.radians
     g = 9.81
-    best = {}
+    best, geo, ank = {}, {}, {}
     for th, kn, an, sp in itertools.product(range(-100, 1, 5), range(0, 121, 5), range(-dorsi, 41, 5), (-20, 0, 20, 40)):
         d.qpos[:] = 0
         d.qpos[3] = 1.0
@@ -69,14 +72,23 @@ def main():
             cy = sum(m.body_mass[b] * d.xipos[b][1] for b in sub) / mm
             return mm * g * abs(cy - d.xpos[bid(body)][1]) / tmax[dof]
 
+        h = round((d.xpos[bid("pelvis")][2] - foot[2] + 0.08) / 0.05) * 0.05
+        lim = max(0, -an)
+        geo[lim] = min(geo.get(lim, 9.0), h)
         r = max(ratio("shank.L", "shank.L_pitch"), ratio("thigh.L", "thigh.L_pitch"))
         if r < 1.0:
-            h = round((d.xpos[bid("pelvis")][2] - foot[2] + 0.08) / 0.05) * 0.05
-            lim = max(0, -an)
             best[lim] = min(best.get(lim, 9.0), h)
-    for lim in sorted(best):
-        print("ankle dorsiflexion to %2d deg: lowest pelvis height for a slow one-leg rise within the drives %.2f m"
-              % (lim, min(v for k, v in best.items() if k <= lim)))
+            if ratio("foot.L", "foot.L_pitch") < 1.0:
+                ank[lim] = min(ank.get(lim, 9.0), h)
+
+    def low(tab, lim):
+        v = [x for k, x in tab.items() if k <= lim]
+        return "%.2f m" % min(v) if v else "none"
+    print("lowest pelvis height for a slow one-leg rise (CoM within %.0f cm of the sole centre, %.0f cm ahead of the ankle)"
+          % (SOLE_HALF * 100, SOLE_AHEAD * 100))
+    print("ankle dorsiflexion | geometry alone | within the knee and hip drives | and the ankle drive")
+    for lim in sorted(geo):
+        print("%2d deg             | %s         | %s                         | %s" % (lim, low(geo, lim), low(best, lim), low(ank, lim)))
 
 
 if __name__ == "__main__":

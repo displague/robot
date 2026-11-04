@@ -196,6 +196,15 @@ python tools/sim_video.py --only walk --gif --out walk     # then re-encode the 
 Line tension, drum state, CoM and CoP are drawn into the frames. Re-record a scene whose behaviour a
 change altered; these GIFs are the release visuals.
 
+A learned policy (the sibling's `.pt`) on the tendon model, through the sibling gate's own runner so the clip
+reproduces the gate's numbers. Run from the sibling root; one recording per process (a second MuJoCo renderer
+in one process renders black):
+
+```bash
+PYTHONPATH=src ROBOT_REPO=../robot .venv/Scripts/python.exe ../robot/tools/record_policy.py \
+    artifacts/rl/seeds/mlp-bc-s3.pt --wind 8 --hybrid --out wind8-hybrid   # also --push N, --secs S, --title T
+```
+
 ## Learned control hooks
 
 `python tools/record_teacher.py [--pushes 24] [--winds 0] [--jobs 8]` writes `sim/out/teacher/teacher.npz`
@@ -222,5 +231,6 @@ sibling's `StandinEnv(locks=True, power_cost=c)` uses them: power V I_stall |(u 
 torque plus the rotor's inertia torque over stall, zero on a locked drum.
 
 `tools/rise_static.py [dorsi=N]` answers whether the robot can rise slowly on one leg: the lowest pelvis height with
-the CoM over a flat front foot within the knee and hip drives, per ankle dorsiflexion limit (docs/32: 0.85 m at the
+the CoM over a flat front foot, by geometry, within the knee and hip drives and within the ankle drive, per ankle
+dorsiflexion limit (docs/32: 0.90 m at the
 joint's 20 degrees). Re-run it after a leg geometry, ankle range or drive change.

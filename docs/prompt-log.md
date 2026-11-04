@@ -746,3 +746,18 @@ Produced (hub tasks `rl-seeds`, `standin-tendon-gap`; sibling #51, #56): `31` an
   half-kneel: a learned lunge rises 61 % of the time in the stand-in (sibling #61). The 8 m/s wind: with the
   hand-written ankles under them 2 of 10 policies hold it, trained with torque-mode ankles 0 of 10 (sibling #62); as a
   hybrid two plain policies pass all six named scenes, with fewer random pushes (sibling #63).
+
+## P-053 (2026-11-04) Document, review, merge, tag, release
+
+> document, review, merge, tag, release with details (remeber as detailed at the sibling project's releases). share details in the agenthub space where this was last discussed
+
+Produced: release v0.4.0 of this repo and sibling v0.4.0.
+- A reviewer agent read both diffs since v0.3.0 (sibling tests 137 pass). No bug behind a published gate number.
+  It found `tools/rise_static.py` placing the sole's centre 5 cm ahead of the ankle, not the model's 8 cm: fixed,
+  the slow-rise limit is 0.90 m, not 0.85 m (`32`, D-053), and the script now reports geometry, the knee and hip
+  drives and the ankle drive separately. The hybrid's wording corrected (the balance loop also adds its hip lean
+  and hip-roll shift). Sibling fixes in #64 (the gate takes `hand_ankles` from a saved policy and keeps the hand-written
+  ankle gain in the hybrid; `rl.getup_eval` committed and reproducing 61 %).
+- `tools/record_policy.py`: a sibling policy recorded on the tendon model through the gate's runner;
+  `docs/img/wind8-alone.gif` and `wind8-hybrid.gif` (plain seed 3 in the 8 m/s wind).
+- Tag v0.4.0 with STLs, models and recordings (`releases.md`); findings on the hub.

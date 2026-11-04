@@ -604,14 +604,15 @@ Reverses if: a core (or a recurrent network) beats the plain network on the gate
 ## D-053 (2026-11-04) Getting up is a dynamic rise from a half-kneel; the 8 m/s wind waits for the ankle's torque mode in the policy
 
 Why: P-052 (docs/32). With the ankle's 20 degrees of dorsiflexion no one-leg pose puts the CoM over a flat foot below a
-pelvis height of 0.85 m (`tools/rise_static.py`); more ankle range helps only to 0.80 m before the knee and hip drives
+pelvis height of 0.90 m (`tools/rise_static.py`; 0.85 m before the P-053 review fixed its sole offset); more ankle range helps only to 0.80 m before the knee and hip drives
 run out. A two-knee kneel does not rest; one half-kneel does. A learned lunge from it rises 61 % of the time in the
 stand-in, with the forearm lines at 2.3 times their rating. For the wind: drag agrees between the models, widening
 the action range and an all-windy tendon fine-tune both failed; the ankle line's stretch under a steady
 lean, which the hand-written controller handles in torque mode and the policies do not have, is part of it: with the
 hand-written ankles under them, 2 of 10 policies hold the 8 m/s wind (0 alone) and 9 of 10 the 5 m/s (7 alone);
 trained with their own ankles in torque mode, 0 of 10. The policies miss the balance loop's ankle strategy, not
-its drive mode. As a hybrid (the hand-written ankle balance, the policy on every other joint) two plain policies pass
+its drive mode. As a hybrid (the hand-written balance loop on the ankles, plus its hip lean and hip-roll shift added to
+the policy's hip targets; the policy on every joint but the ankles) two plain policies pass
 all six named scenes, at the cost of push recovery (77 of 100 random pushes against 98 alone).
 Alternative: more ankle dorsiflexion (a geometry change in the shank-foot joint) for a slower rise; hands in the
 get-up.

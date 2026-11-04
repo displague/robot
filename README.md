@@ -56,7 +56,7 @@ Goal ordering, in case they conflict: **cheap > simple to build > human range of
 | `docs/29-learned-stand-gate.md` | The learned stand policy on the tendon model: the stand-in's drive refitted, retrained on three seeds; it stands 10 s and takes most pushes, not yet the 30 N push, the 8 m/s wind or the power budget (D-050) |
 | `docs/30-learned-control-plan.md` | Learned control: how the sibling's model does in MuJoCo, training it to rest and lock the drums, other MuJoCo bodies, the order for its open issues (D-051) |
 | `docs/31-plain-network-and-rests.md` | Five seeds: a plain network beats the sibling's core on this robot; the drums lock under a policy; training with a held load makes policies rest (best 10.6 W idle against 5.4 W) (D-052) |
-| `docs/32-wind-and-getup.md` | The 8 m/s wind (not the drag, the action range or the ankle drive mode: the policies lack the balance loop's ankle strategy) and getting up: no slow rise below a pelvis height of 0.85 m; a learned lunge rises from a half-kneel 61 % of the time (D-053) |
+| `docs/32-wind-and-getup.md` | The 8 m/s wind (not the drag, the action range or the ankle drive mode: the policies lack the balance loop's ankle strategy) and getting up: no slow rise below a pelvis height of 0.90 m; a learned lunge rises from a half-kneel 61 % of the time (D-053) |
 | `docs/24-motor-sources.md` | Sourced low / nominal / high figures for every drive and line (`sim/motor_ranges.json`, `ROBOT_MOTORS`): the 775's Kt settled at 0.0095 N m/A; what stands at the pessimistic end and which part limits it (D-040, D-041) |
 | `docs/23-static-walk.md` | The static walk: four 100 mm steps and the closing step, 42 of 42 grid variants over three mass sets, landings within 6 mm, 93 s and 1113 J; each transfer starts from the stance leg's crouch (D-039); `walk.gif` |
 | `docs/22-locks-and-balance.md` | Drum locks only once the robot is still, released by any push: 199 of 200 random pushes stand (184), energy down in 9 of 11 scenes, the one-foot hold 562 J (811); teacher data re-recorded (D-038) |
@@ -80,7 +80,8 @@ Goal ordering, in case they conflict: **cheap > simple to build > human range of
 | `docs/img/step.mp4`, `docs/img/step.gif` | The first static step of docs/16, recorded the same way |
 | `docs/img/step-ik.mp4`, `docs/img/step-ik.gif` | The step of docs/19 (`python tools/sim_video.py --only step --gif --out step-ik`) |
 | `tools/export_standin.py`, `sim/robot_standin.xml`, `sim/robot_standin.json` | The fast stand-in for training: each drive train as one position servo with a target lag and the firmware's outer loop (fitted, docs/29), the per-DOF figures for the damage gates, and the motor power and drum-lock rule (docs/31) |
-| `tools/rise_static.py` | Whether the robot can rise slowly on one leg: the lowest pelvis height with the CoM over a flat foot within the knee and hip drives, per ankle dorsiflexion (docs/32) |
+| `tools/record_policy.py`, `docs/img/wind8-alone.gif`, `docs/img/wind8-hybrid.gif` | A learned policy (the sibling's) recorded on the tendon model through the gate's own runner; the two clips: plain seed 3 in the 8 m/s wind alone (falls) and as the hybrid under the hand-written ankle balance (stands) (docs/32) |
+| `tools/rise_static.py` | Whether the robot can rise slowly on one leg: the lowest pelvis height with the CoM over a flat foot, by geometry and within the knee, hip and ankle drives, per ankle dorsiflexion (docs/32) |
 | `tools/record_teacher.py` | Demonstrations from the hand-written controller on the tendon model, in the stand-in's observation layout |
 | `docs/decisions.md` | Decision log (what we chose and why; revisit when a test disagrees) |
 | `docs/prompt-log.md` | Every prompt that produced a set of work, verbatim, with what it produced |

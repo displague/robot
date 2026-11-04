@@ -3,6 +3,31 @@
 Each tag has a GitHub release (github.com/displague/robot/releases) with notes, visuals and assets:
 the generated STLs, the MuJoCo models and the recordings. How to make one: `.claude/skills/release/SKILL.md`.
 
+## v0.4.0 (2026-11-04) — Wind, energy, a bag, and learned control judged on the tendon model
+
+**State:** the model has wind (MuJoCo drag on every body, gusts from any side; the robot leans into it, standing
+12 m/s head-on; D-042, docs/25), sourced low / nominal / high figures for every drive and line (D-040, D-041,
+docs/24), its fidelity checked (docs/26: a 1 kHz, 5 ms balance loop on modelled sensors), an energy account (about
+18 m per charge on the 26 kg build; docs/27), tackles and ring guides settled (D-047, D-048), and a grocery bag
+(standing to 11.3 kg, walking to 3.9 kg; palm hook, D-049, docs/28). Learned control is judged on the full tendon
+model: a plain network beats the sibling's core (D-052, docs/31); policies rest with held loads; only a hybrid
+(the hand-written ankle balance under a policy) holds the 8 m/s wind; getting up is a dynamic rise from a
+half-kneel (D-053, docs/32). The hand-written controller stays the robot's controller.
+
+**Results:** gauntlet 13 of 13 (the walk 88 s, 1053 J; the arm scene 238 J, worse); standing in wind 12 m/s head-on, 10 m/s side; the walk 3 m/s any side;
+learned stand: plain MLP 22 of 30 named gate scenes over five seeds (grown core 17), hybrid 2 of 5 seeds all six
+including the 8 m/s wind; best learned idle 10.6 W (hand-written 5.4 W); get-up 61 % from a half-kneel in the
+stand-in; no slow rise below a pelvis height of 0.90 m.
+
+**Known gaps:** no learned policy alone holds the 8 m/s wind; the hybrid costs push recovery (77 of 100) and runs
+some lines over their continuous rating; get-up from a fall 0 %, untested on the tendon model, arm lines at 2.3
+times their rating; the walk is the wind weak point; still 26 kg against 20 and nothing printed.
+
+**Assets:** robot-v0.4.0-stl.zip, robot.xml, robot_standin.xml/.json, motor_ranges.json, gust.gif,
+wind8-alone.gif, wind8-hybrid.gif and their MP4s.
+
+**Decisions:** D-040 to D-053. **Prompts:** P-038 (continued) to P-053.
+
 ## v0.3.0 (2026-10-29) — A static walk
 
 **State:** the robot walks in simulation: four alternating 100 mm steps and a closing step, standing in 42 of
