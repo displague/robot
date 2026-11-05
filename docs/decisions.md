@@ -617,3 +617,14 @@ all six named scenes, at the cost of push recovery (77 of 100 random pushes agai
 Alternative: more ankle dorsiflexion (a geometry change in the shank-foot joint) for a slower rise; hands in the
 get-up.
 Reverses if: a policy holds the 8 m/s wind without the hand-written ankles, or a slow rise is found with the hands.
+
+## D-054 (2026-11-05) The repository is public, without a licence yet
+
+Why: P-054. At v0.4.0 the design, the models and the learned-control results are documented end to end, and the
+sibling project is already public. A pre-publication audit of all history found no credentials, keys or tokens, no
+local paths, only GitHub noreply and Anthropic noreply addresses, and no file over 6 MB (the largest are the
+gauntlet and step GIFs). The prompt log, which quotes every prompt verbatim, and the Agent Hub references
+(`docs/references.md`, the project-loop skill) are published as they are.
+Alternative: stay private until something is printed.
+Not yet: a licence. Without one the code and parts are all rights reserved; the sibling has none either.
+Reverses if: something that should not be public is found in the history.

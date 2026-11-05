@@ -18,9 +18,8 @@ capability in simulation, a printable preset set), patch for fixes.
 3. `git tag -a vX.Y.Z -m "<title>" -m "<one-paragraph state>"`, then `git push origin vX.Y.Z`.
 4. Notes file in the scratchpad (never pipe text with emoji through the cp1252 console), sections:
    - **Summary**: what the robot can do at this tag, and what is not yet real (nothing printed, etc.).
-   - A visuals table of the recordings and renders. The repo is private, so reference images as
-     `https://github.com/displague/robot/blob/vX.Y.Z/docs/img/<file>?raw=true`, which renders for
-     signed-in viewers.
+   - A visuals table of the recordings and renders. The repo is public (D-054): reference images as
+     `https://raw.githubusercontent.com/displague/robot/vX.Y.Z/docs/img/<file>`.
    - **What changed** (numbered, naming docs and decisions), **Results** (a table of gauntlet and step
      verdicts and the numbers that moved), **Known gaps**, **Attached**.
 5. Assets: `robot-vX.Y.Z-stl.zip` built fresh from the generators at the tag. `cad/out` is gitignored, so

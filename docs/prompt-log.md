@@ -761,3 +761,11 @@ Produced: release v0.4.0 of this repo and sibling v0.4.0.
 - `tools/record_policy.py`: a sibling policy recorded on the tendon model through the gate's runner;
   `docs/img/wind8-alone.gif` and `wind8-hybrid.gif` (plain seed 3 in the 8 m/s wind).
 - Tag v0.4.0 with STLs, models and recordings (`releases.md`); findings on the hub.
+
+## P-054 (2026-11-05) Make the repository public
+
+> ok, robot is at a point where we can make the repo public
+
+Produced: D-054. An audit of the whole history (credentials, keys, tokens, emails, local paths, large files) found
+nothing to remove. `displague/robot` set to public. The release skill now links images by
+`raw.githubusercontent.com`, which renders for everyone. No licence yet.
