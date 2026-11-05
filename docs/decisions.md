@@ -637,3 +637,17 @@ remixes are free but derived designs stay open and credit the project. `LICENSE`
 Settles D-054's "Not yet".
 Alternative: CERN-OHL-S for the hardware.
 Reverses if: the user changes it.
+
+## D-056 (2026-11-05) Sitting: a CoM-keeping descent and a trunk-swing, knee-led rise; the spine's drive and the forward reach set the lowest seat
+
+Why: P-056 (docs/33, hub task sit-and-stand-chair). On the 20 kg model the robot sits on and stands again from
+0.40, 0.45 and 0.50 m seats, with or without armrests, and not from 0.35 m (it sits but cannot rise). The hip's 110
+degrees of flexion, the ankle's 20 degrees of dorsiflexion and the spine's drive (the arms held forward load it past its
+29.7 N m clutch) stop the CoM 6 to 10 cm behind the sole centre at seat-off. So no slow rise exists within the drives,
+and every rise is a trunk swing followed by a knee-led extension gated on the measured CoM. The hands cannot use the
+armrests: they push at most 9 to 25 N each and cannot reach a 0.20 m rest at 0.40 and 0.45 m (the wrist's 1.3 N m, the
+elbow's 8.9 N m, a 0.44 m forearm and hand). Hip lines peak at a safety factor of 3.2 to 3.5. The neck's W-mini slips
+through the swing. Seated, the robot draws 17 to 44 W, because the elbows hold more than their self-lock.
+Alternative: a static rise with more hip flexion or a stronger spine; armrest pushes with a stronger wrist.
+Reverses if: a hip range, spine drive or arm change moves the reach (re-run `tools/sit_static.py` and
+`tools/chair_sweep.py`), or the 26 kg build or the pessimistic motors lose a seat height.

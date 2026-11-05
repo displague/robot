@@ -776,3 +776,18 @@ nothing to remove. `displague/robot` set to public. The release skill now links 
 
 Produced: D-055. `LICENSE` (MIT) and `LICENSE-PRINTABLES.md` (CC BY-SA 4.0, what it covers) here, a README
 licence section; MIT for the sibling (its own PR).
+
+## P-056 (2026-11-05) Agent Hub: start standing (and sitting)
+
+> agenthub has some new things for robots - ready to start standing (and sitting?)
+
+The hub held an owner note (relayed) making `sit-and-stand-chair` the next task, scoped to seat heights 0.35 to 0.50 m,
+with and without armrests, on the 20 kg model; claimed it.
+Produced: docs/33, D-056.
+- The chair: `export_mjcf.CHAIR_GEOMS` (mocap bodies), `Rig.set_chair`, `Rig.chair_load`.
+- `sim_tendon.sit_stand` with the scenes `sit35` to `sit50` and `sitNNa`; `sit45` is in the default gauntlet.
+- `tools/sit_static.py` (static seat-off, `hands`), `tools/chair_sweep.py` (the grid), `docs/img/sit40.gif`.
+- `sim_video` shows SEATED.
+- The other scenes are unchanged to the joule.
+- Result: sits and stands again at 0.40 to 0.50 m, with or without armrests; at 0.35 m it sits but cannot stand.
+- The 26 kg build and the pessimistic motors are not run yet.

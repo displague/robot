@@ -173,6 +173,8 @@ class Recorder:
         dr.rectangle((0, 0, img.width, 92), fill=(0, 0, 0, 150))
         dr.text((12, 8), self.title, font=self.font, fill=(255, 255, 255))
         state = "STANDS" if rig.standing() else "FALLS"
+        if getattr(rig, "chair", None) and rig.chair_load()[0] > 0.3 * rig.mass * 9.81:
+            state = "SEATED"                     # the chair carries the weight (docs/33)
         dr.text((12, 34), "t = %5.2f s   %s   pelvis %.2f m  tilt %.0f deg   motors %4.0f W   CoM %+.0f mm fwd of sole centre"
                 % (rig.data.time, state, z, tilt, self.power, -e[1] * 1e3), font=self.small,
                 fill=(255, 120, 120) if state == "FALLS" else (220, 220, 220))
@@ -226,7 +228,7 @@ def main():
     rec = Recorder(rig, out, fps=fps, gif=gif,
                    gif_scenes=tuple(only) if only else ("stand", "push30", "lean15", "onefoot", "step"))
     for key, title, note, fn in st.scenarios():
-        if only and key not in only:
+        if (only and key not in only) or (not only and key in st.NAMED_ONLY):
             continue
         rec.scene(key, title, note)
         rig.reset()

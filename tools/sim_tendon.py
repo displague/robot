@@ -30,7 +30,7 @@ except ImportError:
 import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from export_mjcf import build   # noqa: E402
+from export_mjcf import CHAIR_GEOMS, build   # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 KG, KDG = 3.0, 0.02             # inner gear loop: volts-fraction per rad of gear error, per rad/s
@@ -194,7 +194,31 @@ AIR_DENSITY = 1.2                # kg/m^3
 NOSLIP = 0                       # noslip solver iterations: 0 lets a foot creep under a sustained side load (docs/25)
 FLOOR_MU = None                  # sliding friction of every contact (the model's is 1.0); a floor test sets it lower
 WIND_DIRS = {"head": 0.0, "left": 90.0, "tail": 180.0, "right": 270.0}
-GEAR_FRICTION = 0.02             # of stall: running friction of the gear train when powered
+CHAIR_FRONT = 0.10               # m: the chair's seat front edge behind the ankles (docs/33; forward is -y)
+ARM_H = 0.20                     # m: armrest top above the seat
+ARM_X = 0.21                     # m: armrest centre from the midline (the hands hang at 0.20); the seat is
+                                 # 0.46 m wide and 0.40 deep, the armrests 0.06 wide (export_mjcf.CHAIR_GEOMS)
+CHAIR_SEATS = (0.35, 0.40, 0.45, 0.50)   # m: the chair scenes sitNN / sitNNa (docs/33); only sit45 runs by default
+NAMED_ONLY = {"sit%02d%s" % (round(h * 100), a) for h in CHAIR_SEATS for a in ("", "a")} - {"sit45"}
+SIT_PRESS = 0.01                 # m: the seat-off pose sits this far into the seat (so the seated robot rests on it)
+SIT_SPINE = math.radians(20)     # the spine's bend at seat-off (it sags from 40 under the arms' and trunk's load)
+SIT_ARM = math.radians(-90)      # the arms forward at seat-off (moves the CoM 3-6 cm forward)
+SIT_HEAD_LEVEL = 1.0             # share of the trunk's lean the neck takes back (1: the head level; 0, the head
+                                 # moving with the trunk, slipped the neck's clutch more and lost the 0.50 m rise)
+SIT_LAP = (math.radians(-25), math.radians(-65))   # seated shoulder and elbow pitch: the hands over the lap (the
+                                 # elbows hold more than their self-lock and do not lock, docs/33;
+                                 # -10, -50 caught an armrest at 0.40 m)
+SIT_SPINE_OVER = math.radians(15)   # the rise commands the spine this much past the path (it sags under the load)
+SIT_DOWN_T = 4.0                 # s: standing to the seat
+SIT_HOLD = 2.0                   # s: seated
+SIT_LEAN_T = (1.0, 1.5, 0.065)   # s: the trunk's swing to the seat-off pose: the first where the static reach is
+                                 # over the third (m behind the sole centre: less margin, more momentum), else the second
+SIT_LEAD = math.radians(12)      # the knee target's lead on the measured knee in the rise
+SIT_KNEE_RATE = math.radians(25)  # rad/s: the knee target's fastest
+SIT_GATE = 0.02                  # m: the knee stops when the CoM is this much further back than planned
+SIT_HIP_K = 3.0                  # rad per m: extra hip flexion per metre the CoM is behind the plan
+SIT_BAL_ON = math.radians(30)    # the balance loop (ankles in torque mode) takes over below this knee angle
+GEAR_FRICTION = 0.02           # of stall: running friction of the gear train when powered
 CURRENT_LIMIT = 0.9              # of the clutch slip torque: the driver's current limit
 
 
@@ -233,7 +257,7 @@ class Rig:
         m.opt.noslip_iterations = NOSLIP
         if FLOOR_MU is not None:
             m.geom_friction[:, 0] = FLOOR_MU
-        self.mass = float(sum(m.body_mass))
+        self.mass = float(sum(m.body_mass[b] for b in range(m.nbody) if m.body_mocapid[b] < 0))   # not the chair
         self.reset()
         mujoco.mj_forward(m, self.data)
         j = lambda n: self.data.xanchor[mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_JOINT, n)]
@@ -303,6 +327,7 @@ class Rig:
             d.eq_active[w["eq_stick"]] = 1
             d.eq_active[w["eq_lock"]] = 0
         self.set_wind(WIND)
+        self.set_chair(None)
 
     def set_wind(self, spec):
         """Wind from now on (a WIND dict, or None for still air); a scene may call it after reset()."""
@@ -540,6 +565,54 @@ class Rig:
                 cur = self.hip_roll_cmd[side]
                 self.hip_roll_cmd[side] = cur + max(-SS_SLEW * dt, min(SS_SLEW * dt, self.hip_shift - cur))
         self._single = single
+
+    def set_chair(self, seat=None, arms=False, back=True):
+        """A chair behind the robot (docs/33): the seat's top at `seat` m (None: no chair), its front edge
+        CHAIR_FRONT behind the ankles; armrests ARM_H above the seat beside the hips; a back. The parts are
+        fixed-size mocap bodies (export_mjcf.CHAIR_GEOMS) placed here and made solid; call after reset()."""
+        m, d = self.model, self.data
+        place = {}
+        if seat is not None:
+            y0 = CHAIR_FRONT
+            hs = CHAIR_GEOMS["chair_seat"]
+            place["chair_seat"] = (0.0, y0 + hs[1], seat - hs[2])
+            if arms:
+                ha = CHAIR_GEOMS["chair_arm.L"]
+                for side, sx in (("L", 1), ("R", -1)):
+                    place["chair_arm." + side] = (sx * ARM_X, y0 + 2 * hs[1] - ha[1], seat + ARM_H - ha[2])
+            if back:
+                hb = CHAIR_GEOMS["chair_back"]
+                place["chair_back"] = (0.0, y0 + 2 * hs[1] + hb[1], seat + hb[2])
+        self._chair_ids = set()
+        for name in CHAIR_GEOMS:
+            g = mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_GEOM, name)
+            mid = m.body_mocapid[mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_BODY, name)]
+            on = name in place
+            d.mocap_pos[mid] = place[name] if on else (0.0, 5.0, -1.0)
+            b = m.geom_bodyid[g]
+            m.geom_contype[g] = m.geom_conaffinity[g] = m.body_contype[b] = m.body_conaffinity[b] = 1 if on else 0
+            m.geom_rgba[g][3] = 1.0 if on else 0.0
+            if on:
+                self._chair_ids.add(g)
+        self.chair = (seat, arms) if seat is not None else None
+
+    def chair_load(self):
+        """Vertical force the chair carries: (seat, armrests), N."""
+        m, d = self.model, self.data
+        f6, seat, arms = np.zeros(6), 0.0, 0.0
+        ids = getattr(self, "_chair_ids", set())
+        for i in range(d.ncon):
+            c = d.contact[i]
+            g = c.geom1 if c.geom1 in ids else (c.geom2 if c.geom2 in ids else None)
+            if g is None:
+                continue
+            mujoco.mj_contactForce(m, d, i, f6)
+            fz = abs(f6[0] * c.frame[2])            # the normal force's vertical part
+            if m.geom(g).name.startswith("chair_arm"):
+                arms += fz
+            elif m.geom(g).name == "chair_seat":
+                seat += fz
+        return seat, arms
 
     def torque_to_angle(self, winch, tau):
         """Joint angle offset that stretches the loop's lines to carry `tau`: both runs taut up to the pretension
@@ -825,6 +898,168 @@ class Rig:
         hdr = ["t"] + sum([[w["name"] + "_A_N", w["name"] + "_B_N", w["name"] + "_motor_Nm"] for w in self.w], [])
         np.savetxt(path, np.array(self.rows), delimiter=",", header=",".join(hdr), comments="")
         print("   wrote %s" % path)
+
+
+def _sym_pose(r, th, kn, an, sp, arm=None, neck=None):
+    """Joint targets for a symmetric sagittal pose (rad): hip pitch, knee, ankle, spine, shoulder pitch (None: the
+    arms hang plumb), neck (None: the head level). The body pitch that keeps the soles flat is -(an + th + kn)."""
+    q = -(an + th + kn)
+    t = {"spine_pitch": sp, "neck_pitch": (-(q + sp) * SIT_HEAD_LEVEL) if neck is None else neck}
+    for s in "LR":
+        t["thigh.%s_pitch" % s], t["shank.%s_pitch" % s], t["foot.%s_pitch" % s] = th, kn, an
+        t["upperarm.%s_pitch" % s] = -(q + sp) if arm is None else arm
+    return t
+
+
+def _pose_com(r, dd, targets):
+    """For a pose with the soles flat: the CoM's distance behind the sole centre (m) and the hip's height above the
+    floor (m), from the kinematics alone (dd: a scratch MjData of the rig's model)."""
+    m = r.model
+    dd.qpos[:] = r.data.qpos
+    for w in r.w:
+        if w["name"].endswith(("_roll", "_yaw")) and w["name"].startswith(("thigh", "foot")):
+            dd.qpos[w["q"]] = 0.0
+    for k, v in targets.items():
+        dd.qpos[r.by_name[k]["q"]] = v
+    q = -(targets["foot.L_pitch"] + targets["thigh.L_pitch"] + targets["shank.L_pitch"])
+    dd.qpos[3:7] = (math.cos(q / 2), math.sin(q / 2), 0.0, 0.0)
+    mujoco.mj_kinematics(m, dd)
+    mujoco.mj_comPos(m, dd)
+    fb = r.feet[0]
+    sole = dd.xpos[fb] + dd.xmat[fb].reshape(3, 3) @ np.array(SOLE_CENTRE)
+    floor = sole[2] - 0.02                      # the sole's underside (export_urdf.FOOT_BOX half height)
+    return dd.subtree_com[0][1] - sole[1], dd.xpos[m.body("thigh.L").id][2] - floor
+
+
+def sit_path(r, seat, n=20):
+    """The sit's planned poses (docs/33), standing to seat-off: the knee bends until the hips reach the seat, the ankles dorsiflex
+    to their 20 degree stop early (the shanks lean forward first), the spine to SIT_SPINE, the arms forward to
+    SIT_ARM, the head level; at each step the hip is solved so the CoM sits a growing share of the seat-off pose's
+    reach behind the sole centre (the reach: the CoM's offset at the hip's 110 degree stop). Returns
+    [(targets, CoM offset m, hip height m)], and the reach."""
+    dd = mujoco.MjData(r.model)
+    an_end, an0 = math.radians(-20.0), STAND_LEAN
+    hip_lo = r.by_name["thigh.L_pitch"]["lo"]
+    # the knee at seat-off: the one that puts the buttock (the hip less the thigh shell's radius, 0.06 m) SIT_PRESS
+    # into the seat with the hip at its stop (the hip is lower the more the knee bends)
+    lo, hi = math.radians(60), r.by_name["shank.L_pitch"]["hi"]
+    for _ in range(30):
+        kn_end = 0.5 * (lo + hi)
+        _, hz = _pose_com(r, dd, _sym_pose(r, hip_lo, kn_end, an_end, SIT_SPINE, SIT_ARM))
+        lo, hi = (kn_end, hi) if hz - 0.06 > seat - SIT_PRESS else (lo, kn_end)
+    reach, _ = _pose_com(r, dd, _sym_pose(r, hip_lo, kn_end, an_end, SIT_SPINE, SIT_ARM))
+    bias_end = reach + 0.003
+    out = []
+    for i in range(n + 1):
+        s = i / n
+        kn, sp, arm = s * kn_end, s * SIT_SPINE, s * SIT_ARM
+        an = an0 + min(1.0, 1.5 * s) * (an_end - an0)
+        lo, hi = hip_lo, math.radians(15)
+        for _ in range(30):                     # the CoM moves back as the hip extends: bisect
+            mid = 0.5 * (lo + hi)
+            off, _ = _pose_com(r, dd, _sym_pose(r, mid, kn, an, sp, arm))
+            lo, hi = (lo, mid) if off > s * bias_end else (mid, hi)
+        t = _sym_pose(r, 0.5 * (lo + hi), kn, an, sp, arm)
+        off, hz = _pose_com(r, dd, t)
+        out.append((t, off, hz))
+    return out, reach
+
+
+def sit_stand(r, seat, arms=False):
+    """Sit on a chair and stand again (docs/33, hub task sit-and-stand-chair). Stand-to-sit: down sit_path with the
+    balance loop on, its CoM target following the path's offset; then the balance loop off, the hips sat back onto
+    the seat, the trunk upright and the hands in the lap. Sit-to-stand: the trunk swings forward to the seat-off pose
+    (in SIT_LEAN_T, faster where the static reach leaves less margin), then the knees lead the rise: their target
+    stays SIT_LEAD ahead of the measured knee and moves at most SIT_KNEE_RATE, slowed to a stop when the CoM falls
+    SIT_GATE further back than planned; the hips, ankles, spine and arms follow the path at the *measured* knee
+    angle, the hips flexing further (SIT_HIP_K) while the CoM is behind. The ankles stay in position mode (the
+    balance loop off) until the knees are under SIT_BAL_ON: in torque mode they gave way under the half-loaded
+    feet and the robot sat back down. Prints whether it sat and stood, and the chair's peak loads."""
+    D = math.radians
+    r.set_chair(seat, arms)
+    r.run(1.0)
+    wp, reach = sit_path(r, seat)
+    seat_peak = [0.0, 0.0]
+
+    def watch(_r):
+        s, a = _r.chair_load()
+        seat_peak[0], seat_peak[1] = max(seat_peak[0], s), max(seat_peak[1], a)
+    hook0 = r.hook
+    r.hook = (lambda _r: (watch(_r), hook0(_r))) if hook0 else watch
+    r.set_phase("sit: down")
+    for t, off, _ in wp[1:]:
+        r.ramp(SIT_DOWN_T / len(wp[1:]), targets=t, bias=(0.0, off))
+    r.set_phase("sit: onto the seat")
+    r.balance = False
+    gate0, r.still_gate = r.still_gate, True     # the drums lock on the CoM's stillness with the balance loop off
+    t_off = wp[-1][0]
+    back = dict(t_off)
+    for s in "LR":
+        back["thigh.%s_pitch" % s] -= D(8)
+        back["shank.%s_pitch" % s] += D(5)
+    r.move(back, 0.6)
+    r.run(0.5)
+    r.set_phase("sit: seated")
+    seated = _sym_pose(r, D(-90), wp[-1][0]["shank.L_pitch"], D(-20), 0.0, SIT_LAP[0], neck=0.0)
+    for s in "LR":
+        seated["forearm.%s_pitch" % s] = SIT_LAP[1]      # the hands over the lap, clear of the seat and the armrests
+    r.move(seated, 1.5)
+    r.run(0.5)
+    # rest: every joint's target where the seat stopped it, so none presses into the chair and the drums can lock
+    for w in r.w:
+        r.target[w["name"]] = float(r.data.qpos[w["q"]])
+    r.set_phase("sit: rest")
+    r.run(SIT_HOLD)
+    sat = r.chair_load()[0] > 0.5 * r.mass * 9.81       # the seat carries most of the weight
+    e_sat = sum(s["e_j"] for s in r.stats.values())
+    r.set_phase("stand: lean")
+    lean = dict(t_off)
+    for s in "LR":
+        lean["forearm.%s_pitch" % s] = 0.0
+    r.move(lean, SIT_LEAN_T[0] if reach > SIT_LEAN_T[2] else SIT_LEAN_T[1])
+    r.set_phase("stand: rise")
+    r.com_bias = np.array((0.0, wp[-1][1]))
+    knees = np.array([t["shank.L_pitch"] for t, _, _ in wp])
+    keys = list(wp[0][0])
+
+    def at(kn):
+        return {k: float(np.interp(kn, knees, [t[k] for t, _, _ in wp])) for k in keys}, \
+            float(np.interp(kn, knees, [o for _, o, _ in wp]))
+    kt = knees[-1]
+    dt = r.model.opt.timestep
+    hip_lo = r.by_name["thigh.L_pitch"]["lo"]
+    for _ in range(int(12.0 / dt)):
+        km = 0.5 * (r.data.qpos[r.by_name["shank.L_pitch"]["q"]] + r.data.qpos[r.by_name["shank.R_pitch"]["q"]])
+        t, off = at(km)
+        so = r.soles()
+        e = r.data.subtree_com[r.pelvis][1] - 0.5 * (so[0][0][1] + so[1][0][1]) - off   # +: further back than planned
+        gate = float(np.clip(1.0 - e / SIT_GATE, 0.0, 1.0))
+        kt = max(0.0, max(km - SIT_LEAD, kt - gate * SIT_KNEE_RATE * dt))
+        t["spine_pitch"] += SIT_SPINE_OVER * t["spine_pitch"] / max(SIT_SPINE, 1e-6)
+        for s in "LR":
+            t["thigh.%s_pitch" % s] = max(hip_lo, t["thigh.%s_pitch" % s] - SIT_HIP_K * max(e, 0.0))
+            t["shank.%s_pitch" % s] = kt
+        if not r.balance and km < SIT_BAL_ON:
+            r.balance, r._com_f = True, None
+        r.target.update(t)
+        r.com_bias = np.array((0.0, off))
+        r.step()
+        if km < D(2) and kt == 0.0:
+            break
+    r.balance, r.still_gate = True, gate0
+    r.set_phase("stand: up")
+    r.move({k: (STAND_LEAN if k.startswith("foot") else 0.0) for k in keys}
+           | {"forearm.%s_pitch" % s: 0.0 for s in "LR"}, 1.0)
+    r.com_bias = np.zeros(2)
+    r.run(3.0)
+    r.hook = hook0
+    stood = r.standing() and r.chair_load()[0] < 1.0
+    r.sit_result = dict(seat=seat, arms=arms, sat=bool(sat), stood=bool(stood), reach=float(reach), e_sat=float(e_sat),
+                        seat_peak=float(seat_peak[0]), arms_peak=float(seat_peak[1]))
+    print("   chair %.2f m%s: %s, %s; static reach: the CoM %.1f cm behind the sole centre at seat-off; peak on the "
+          "seat %.0f N, on the armrests %.0f N; energy to seated %.0f J"
+          % (seat, " with armrests" if arms else "", "sat" if sat else "did not sit",
+             "stood again" if stood else "did not stand", reach * 100, seat_peak[0], seat_peak[1], e_sat))
 
 
 def scenarios():
@@ -1518,6 +1753,12 @@ def scenarios():
             ("walk", "static walk: %d steps of 100 mm, alternating, then the feet level" % WALK_STEPS,
              "Phase 6a gait cycle (docs/23): each foot in turn a step ahead of the other",
              lambda r: take_step(r, WALK_STEPS))]
+    for seat in CHAIR_SEATS:
+        for arms in (False, True):
+            out.append(("sit%02d%s" % (round(seat * 100), "a" if arms else ""),
+                        "sit on a %.2f m chair%s and stand again" % (seat, " with armrests" if arms else ""),
+                        "CoM-keeping descent; knee-led rise gated on the CoM (docs/33)",
+                        (lambda s, a: lambda r: sit_stand(r, s, a))(seat, arms)))
     if STAGGER_ONLY:
         out = [("stagger", "staggered stance: right foot placed ahead, CoM to the middle, held",
                 "the transfer's stance on its own (docs/18)", take_step)]
@@ -1555,7 +1796,7 @@ def main():
           % (mujoco.__version__, rig.model.nbody, rig.model.nv, len(rig.w), 2 * len(rig.w), rig.model.ntendon,
              rig.model.nu, sum(rig.model.body_mass)))
     for key, title, note, fn in scenarios():
-        if only and key not in only:
+        if (only and key not in only) or (not only and key in NAMED_ONLY):
             continue
         rig.reset()
         rig.record_all = csv

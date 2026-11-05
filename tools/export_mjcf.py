@@ -128,7 +128,9 @@ def use_motor_case(spec):
 use_motor_case(MOTOR_SET)   # at import too: export_standin and wmax_options call winch_params without build()
 HIP_ROLL_60 = True   # hip roll on the 60 mm pulley with tackle 3 (D-028, docs/15); False restores the 50 mm, tackle 2 of docs/14
 TACKLE_OVERRIDE = {}  # "joint.axis" -> strands at the joint, over JOINTS (e.g. {"ankle.pitch": 6}; docs/27)
-BAGS = {}             # link -> kg: a carried bag hanging from that link's tail on a ball joint (docs/28)
+CHAIR_GEOMS = {"chair_seat": (0.23, 0.20, 0.30), "chair_arm.L": (0.03, 0.17, 0.10),   # half sizes, m; placed by
+               "chair_arm.R": (0.03, 0.17, 0.10), "chair_back": (0.23, 0.02, 0.25)}     # sim_tendon.Rig.set_chair
+BAGS = {}            # link -> kg: a carried bag hanging from that link's tail on a ball joint (docs/28)
 BAG_HANDLE = 0.10     # m from the grip to the top of the bag
 BAG_SIZE = (0.10, 0.25, 0.30)   # x (across the body), y (front to back), z: a grocery bag, m
 BAG_DAMPING = 0.05    # N m s/rad on the ball joint: the contents settling
@@ -298,6 +300,13 @@ def mjcf(links, data):
            '  <default>\n    <geom friction="1.0 0.005 0.0001" rgba="0.75 0.75 0.75 1"/>\n  </default>\n',
            '  <worldbody>\n    <geom name="floor" type="plane" size="5 5 0.1" rgba="0.9 0.9 0.9 1"/>\n']
     out.extend(walk)
+    # a chair (docs/33): seat, armrests and back as mocap bodies (placed at run time; a geom moved at run time is
+    # missed by the collision tree), out of the way and not colliding until a scene places them
+    # (sim_tendon.Rig.set_chair). After the robot, so its body ids stay; near-massless
+    for name, half in CHAIR_GEOMS.items():
+        out.append('    <body name="%s" mocap="true" pos="0 5 -1">\n'
+                   '      <geom name="%s" type="box" size="%.3f %.3f %.3f" mass="0.001" contype="0" conaffinity="0" '
+                   'rgba="0.55 0.4 0.25 0"/>\n    </body>\n' % ((name, name) + half))
     out.append('  </worldbody>\n  <tendon>\n')
     out.extend(tendons)
     out.append('  </tendon>\n  <equality>\n')

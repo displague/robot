@@ -350,6 +350,18 @@
         </body>
       </body>
     </body>
+    <body name="chair_seat" mocap="true" pos="0 5 -1">
+      <geom name="chair_seat" type="box" size="0.230 0.200 0.300" mass="0.001" contype="0" conaffinity="0" rgba="0.55 0.4 0.25 0"/>
+    </body>
+    <body name="chair_arm.L" mocap="true" pos="0 5 -1">
+      <geom name="chair_arm.L" type="box" size="0.030 0.170 0.100" mass="0.001" contype="0" conaffinity="0" rgba="0.55 0.4 0.25 0"/>
+    </body>
+    <body name="chair_arm.R" mocap="true" pos="0 5 -1">
+      <geom name="chair_arm.R" type="box" size="0.030 0.170 0.100" mass="0.001" contype="0" conaffinity="0" rgba="0.55 0.4 0.25 0"/>
+    </body>
+    <body name="chair_back" mocap="true" pos="0 5 -1">
+      <geom name="chair_back" type="box" size="0.230 0.020 0.250" mass="0.001" contype="0" conaffinity="0" rgba="0.55 0.4 0.25 0"/>
+    </body>
   </worldbody>
   <tendon>
     <fixed name="spine_pitch_clutch" frictionloss="4.4500" solreffriction="0.01 1" solimpfriction="0.99 0.999 0.001">

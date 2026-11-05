@@ -95,7 +95,7 @@ def main():
     pushes = int(sys.argv[sys.argv.index("--pushes") + 1]) if "--pushes" in sys.argv else 24
     winds = int(sys.argv[sys.argv.index("--winds") + 1]) if "--winds" in sys.argv else 0
     jobs = int(sys.argv[sys.argv.index("--jobs") + 1]) if "--jobs" in sys.argv else 8
-    work = [(k, fn) for k, title, note, fn in st.scenarios() if k not in SKIP]
+    work = [(k, fn) for k, title, note, fn in st.scenarios() if k not in SKIP and not k.startswith("sit")]   # no chair
     work += [("push_rand_%02d" % i, _push_scenario(1000 + i)) for i in range(pushes)]
     work += [("wind_rand_%02d" % i, None) for i in range(winds)]
     # scenario functions are closures, so each worker rebuilds its list and picks its own by key

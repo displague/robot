@@ -234,3 +234,29 @@ torque plus the rotor's inertia torque over stall, zero on a locked drum.
 the CoM over a flat front foot, by geometry, within the knee and hip drives and within the ankle drive, per ankle
 dorsiflexion limit (docs/32: 0.90 m at the
 joint's 20 degrees). Re-run it after a leg geometry, ankle range or drive change.
+
+## The chair (docs/33)
+
+```bash
+python tools/sim_tendon.py --only sit40,sit45a     # sit on a 0.40 m chair (sitNNa: with armrests) and stand again
+python tools/chair_sweep.py                        # 0.35-0.50 m x armrests, one process each: sits, stands, line peaks, slip, seated W, J
+ROBOT_MASSES=sim/masses/rollup_775.json ROBOT_MOTORS=low python tools/chair_sweep.py   # another build (K=V sets sim_tendon constants)
+python tools/sit_static.py [margin=0.09 spine=0.9]  # static seat-off poses against the knee, hip, ankle and spine drives
+python tools/sit_static.py hands [armh=0.20]        # can the hands reach the armrests, and how hard can they push
+python tools/sim_video.py --only sit40 --gif --out sit40
+```
+
+The chair is four mocap bodies in `sim/robot.xml` (`export_mjcf.CHAIR_GEOMS`), out of the way and not colliding until
+`Rig.set_chair(seat, arms)` places them (after `reset()`, which clears them). A geom moved or resized at run time is
+missed by MuJoCo's collision tree, and a body whose geoms were all off at compile needs its `body_contype` set too;
+both are why they are mocap bodies. `Rig.chair_load()` is the seat's and the armrests' vertical force; `rig.mass`
+leaves the chair out (counting its 4 g changed the step's energy). Only `sit45` runs in the default gauntlet
+(`NAMED_ONLY`); `record_teacher` skips every `sit` scene.
+
+`sit_stand(r, seat, arms)`: down `sit_path` (the hip solved per pose so the CoM keeps a growing share of the seat-off
+reach behind the sole centre) with the balance loop on; seated with every target set where the seat stopped it and
+`still_gate` on; up by a trunk swing (`SIT_LEAN_T`), then a knee-led rise gated on the measured CoM, with the other
+joints following the path at the *measured* knee angle and the ankles in position mode until `SIT_BAL_ON`. Judge a
+change on `chair_sweep.py` and its nudges (`SIT_KNEE_RATE=radians(18|35)`, `SIT_LEAN_T=(0.8,1.3,0.065)`): 10 of 12
+pass today, so one passing run proves little. The spine's clutch is the binding drive (it sags from 35 to 7 degrees
+with the arms forward); a rise that leans on the chair's back looks like standing: check `chair_load()`.
