@@ -769,3 +769,10 @@ Produced: release v0.4.0 of this repo and sibling v0.4.0.
 Produced: D-054. An audit of the whole history (credentials, keys, tokens, emails, local paths, large files) found
 nothing to remove. `displague/robot` set to public. The release skill now links images by
 `raw.githubusercontent.com`, which renders for everyone. No licence yet.
+
+## P-055 (2026-11-05) Licences
+
+> Cc-by-sa  on printables, mit for code on both
+
+Produced: D-055. `LICENSE` (MIT) and `LICENSE-PRINTABLES.md` (CC BY-SA 4.0, what it covers) here, a README
+licence section; MIT for the sibling (its own PR).

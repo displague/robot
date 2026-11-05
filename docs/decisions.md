@@ -626,5 +626,14 @@ local paths, only GitHub noreply and Anthropic noreply addresses, and no file ov
 gauntlet and step GIFs). The prompt log, which quotes every prompt verbatim, and the Agent Hub references
 (`docs/references.md`, the project-loop skill) are published as they are.
 Alternative: stay private until something is printed.
-Not yet: a licence. Without one the code and parts are all rights reserved; the sibling has none either.
+Not yet: a licence (settled by D-055).
 Reverses if: something that should not be public is found in the history.
+
+## D-055 (2026-11-05) Code is MIT; the printable designs are CC BY-SA 4.0
+
+Why: P-055. The user's choice: MIT for code in this repo and the sibling; CC BY-SA 4.0 for the printables (the
+generated STLs and release STL zips, the part geometry the generators define, the part renders), so prints and
+remixes are free but derived designs stay open and credit the project. `LICENSE` (MIT) and `LICENSE-PRINTABLES.md`.
+Settles D-054's "Not yet".
+Alternative: CERN-OHL-S for the hardware.
+Reverses if: the user changes it.

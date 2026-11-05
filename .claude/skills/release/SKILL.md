@@ -25,5 +25,6 @@ capability in simulation, a printable preset set), patch for fixes.
 5. Assets: `robot-vX.Y.Z-stl.zip` built fresh from the generators at the tag. `cad/out` is gitignored, so
    `git archive` of it is empty: run the generators at the tagged source into a scratch `cad/out` and
    zip that. Also `sim/robot.xml`, `sim/robot_standin.xml/.json` and the GIFs.
+   The STL zip is CC BY-SA 4.0 and the code MIT (D-055): say so in the notes' Attached section.
 6. `gh release create vX.Y.Z -R displague/robot --title "vX.Y.Z — <title>" --notes-file <notes> --verify-tag <assets...>`
 7. Add the entry to `docs/releases.md` (newest first) and name the release in the prompt-log entry.

@@ -114,3 +114,9 @@ python tools/record_teacher.py --pushes 200   # sim/out/teacher/teacher.npz (dem
 
 Design phase. Nothing has been printed yet. First hardware milestone is Phase 0 in the roadmap:
 one printed finger, one W-mini winch, one ESP32, closing and holding without power.
+
+## License
+
+Code (the generators, simulation and tools) is [MIT](LICENSE). The printable designs (the generated
+STLs and release STL zips, the part geometry and the part renders) are
+[CC BY-SA 4.0](LICENSE-PRINTABLES.md): credit displague/robot and share derived designs alike.
