@@ -651,3 +651,14 @@ through the swing. Seated, the robot draws 17 to 44 W, because the elbows hold m
 Alternative: a static rise with more hip flexion or a stronger spine; armrest pushes with a stronger wrist.
 Reverses if: a hip range, spine drive or arm change moves the reach (re-run `tools/sit_static.py` and
 `tools/chair_sweep.py`), or the 26 kg build or the pessimistic motors lose a seat height.
+
+## D-057 (2026-11-05) The chair rise stays tuned on the 20 kg model; the 26 kg build stands again only from 0.50 m
+
+Why: P-057 (docs/33, the full grid). Across the 20 kg model and the 26 kg build, each on the nominal and pessimistic
+motors, the 20 kg model keeps 0.40 and 0.45 m on every motor case (0.50 m loses the case without armrests on the
+weak motors); the 26 kg build stands again only from 0.50 m. Its extra mass is in the pelvis and trunk, so the CoM is
+12 to 17 cm behind the sole centre at seat-off, and thirteen variants of the rise gained no lower seat. 25 degrees of
+spine overshoot (against 15) fixes the 26 kg nominal 0.50 m case but loses two others, so it is not adopted. Another
+reason for the 20 kg target (D-036): the chair needs the weight out of the pelvis and trunk.
+Alternative: retune the rise per build; a stronger spine drive.
+Reverses if: the 26 kg build's mass moves forward or down to the shanks, or the spine drive changes.

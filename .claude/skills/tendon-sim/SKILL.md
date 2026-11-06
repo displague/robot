@@ -260,3 +260,8 @@ joints following the path at the *measured* knee angle and the ankles in positio
 change on `chair_sweep.py` and its nudges (`SIT_KNEE_RATE=radians(18|35)`, `SIT_LEAN_T=(0.8,1.3,0.065)`): 10 of 12
 pass today, so one passing run proves little. The spine's clutch is the binding drive (it sags from 35 to 7 degrees
 with the arms forward); a rise that leans on the chair's back looks like standing: check `chair_load()`.
+Judge it on the full grid too (docs/33): the 20 kg model and `ROBOT_MASSES=sim/masses/rollup_775.json`, each with
+`ROBOT_MOTORS=nom` and `low`. Run the four in sequence (they take a few minutes each at `CHAIR_JOBS=8`) or in
+parallel at `CHAIR_JOBS=2` or 3. The 0.50 m case flips with small changes, so read 0.40 and 0.45 m first; the 26 kg
+build stands only from 0.50 m (D-057). In a shell, `S=... && (...) &` runs the assignment in the background subshell:
+set and export the variable on its own line first.

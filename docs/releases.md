@@ -3,6 +3,24 @@
 Each tag has a GitHub release (github.com/displague/robot/releases) with notes, visuals and assets:
 the generated STLs, the MuJoCo models and the recordings. How to make one: `.claude/skills/release/SKILL.md`.
 
+## v0.5.0 (2026-11-05) — Public, licensed, and sitting on a chair
+
+**State:** the repository is public (D-054), code MIT and the printables CC BY-SA 4.0 (D-055). The robot sits on a
+chair and stands again (docs/33, D-056, D-057): on the 20 kg model from 0.40, 0.45 and 0.50 m seats with or without
+armrests, on the nominal and the pessimistic motors (0.50 m without armrests lost on the weak ones); never from
+0.35 m. The forward reach (the hip's 110 degrees, the ankle's 20 degrees and the spine's drive) is the limit, so the
+rise is a trunk swing then a knee-led extension gated on the CoM. The 26 kg build stands again only from 0.50 m.
+
+**Results:** gauntlet 14 of 14 (the chair at 0.45 m added; the other 13 unchanged to the joule); the chair grid above;
+seated 17 to 44 W; 10 of 12 nudged rises pass.
+
+**Known gaps:** no 0.35 m rise; the hands cannot use the armrests; the 26 kg build below 0.50 m; the neck's drive slips
+through the swing; the seated rest draws power (the elbows); hip lines at a safety factor of 3.2 to 3.5.
+
+**Assets:** robot-v0.5.0-stl.zip, robot.xml, robot_standin.xml/.json, motor_ranges.json, sit40.gif and .mp4.
+
+**Decisions:** D-054 to D-057. **Prompts:** P-054 to P-057.
+
 ## v0.4.0 (2026-11-04) — Wind, energy, a bag, and learned control judged on the tendon model
 
 **State:** the model has wind (MuJoCo drag on every body, gusts from any side; the robot leans into it, standing

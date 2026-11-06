@@ -791,3 +791,16 @@ Produced: docs/33, D-056.
 - The other scenes are unchanged to the joule.
 - Result: sits and stands again at 0.40 to 0.50 m, with or without armrests; at 0.35 m it sits but cannot stand.
 - The 26 kg build and the pessimistic motors are not run yet.
+
+## P-057 (2026-11-05) The chair's full grid, then release v0.5.0
+
+> Yes, let's do the full course for this next release (do so when ready)
+
+Produced: docs/33's full grid, D-057, release v0.5.0.
+- The chair on the 20 kg model and the 26 kg build, each on the nominal and pessimistic motors. At 20 kg it stands
+  again from 0.40 and 0.45 m on every motor case, and from 0.50 m on all but the weak motors without armrests. The
+  26 kg build stands again only from 0.50 m: its pelvis and trunk leave the CoM 12 to 17 cm behind the feet at seat-off.
+- Thirteen variants of the rise on the 26 kg build gained no lower seat. 25 degrees of spine overshoot was not adopted.
+- The tendon-sim skill: judging a chair change on the full grid.
+- The gauntlet: 14 of 14, the first 13 unchanged since v0.4.0. Release v0.5.0 (docs/releases.md) with a fresh STL
+  build; the release skill now names the generators `mass_rollup --build` leaves out.

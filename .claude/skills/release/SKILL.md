@@ -24,7 +24,9 @@ capability in simulation, a printable preset set), patch for fixes.
      verdicts and the numbers that moved), **Known gaps**, **Attached**.
 5. Assets: `robot-vX.Y.Z-stl.zip` built fresh from the generators at the tag. `cad/out` is gitignored, so
    `git archive` of it is empty: run the generators at the tagged source into a scratch `cad/out` and
-   zip that. Also `sim/robot.xml`, `sim/robot_standin.xml/.json` and the GIFs.
+   zip that: `python tools/mass_rollup.py --build --stl <scratch>/cad/out` (chain, ring, winch_bank), then
+   `winch_mini.py` and `finger.py` into the same folder (59 STLs at v0.5.0). Rebuilt STLs differ byte for byte
+   from the last zip (Blender's booleans reorder triangles); compare volumes, not hashes. Also `sim/robot.xml`, `sim/robot_standin.xml/.json` and the GIFs.
    The STL zip is CC BY-SA 4.0 and the code MIT (D-055): say so in the notes' Attached section.
 6. `gh release create vX.Y.Z -R displague/robot --title "vX.Y.Z — <title>" --notes-file <notes> --verify-tag <assets...>`
 7. Add the entry to `docs/releases.md` (newest first) and name the release in the prompt-log entry.

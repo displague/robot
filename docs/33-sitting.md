@@ -106,10 +106,40 @@ the CoM went behind the heels; leaning back on the chair's back looked like stan
 The ankle range and the foot placement allow it from 0.40 m: the feet stay where the robot stood, the shanks lean
 forward to the ankle's 20 degree stop, and the seat's front edge is 0.10 m behind the ankles.
 
+## The full grid: the 26 kg build and the motor ranges (P-057, D-057)
+
+The task's full grid, the same sequence with no retuning: the 20 kg model and the 26 kg build
+(`ROBOT_MASSES=sim/masses/rollup_775.json`), each on the sourced nominal (`ROBOT_MOTORS=nom`) and the pessimistic
+(`low`) end of every drive and line (D-040). Stands again, without / with armrests (every case sits):
+
+| Build | Motors | 0.35 m | 0.40 m | 0.45 m | 0.50 m | Reach at seat-off, 0.35 to 0.50 m | Energy, all | Seated |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 20 kg | model (above) | no / no | yes / yes | yes / yes | yes / yes | 10.4 to 6.2 cm | 1.0 to 1.3 kJ | 17 to 44 W |
+| 20 kg | nom | no / no | yes / yes | yes / yes | yes / yes | 10.4 to 6.2 cm | 2.9 to 3.6 kJ | 26 to 51 W |
+| 20 kg | low | no / no | yes / yes | yes / yes | **no** / yes | 10.4 to 6.2 cm | 7.9 to 13.9 kJ | 58 to 200 W |
+| 26 kg | nom | no / no | **no / no** | **no / no** | **no** / yes | 16.5 to 11.7 cm | 3.3 to 5.1 kJ | 31 to 62 W |
+| 26 kg | low | no / no | **no / no** | **no / no** | yes / yes | 16.5 to 11.7 cm | 9.2 to 18.8 kJ | 89 to 224 W |
+
+- **The 26 kg build stands again only from 0.50 m.** Its extra mass is in the pelvis (5.3 kg) and the trunk (8.5 kg),
+  which sit over the seat at seat-off: the CoM is 12 to 17 cm behind the sole centre against 6 to 10 cm at 20 kg, and
+  a trunk swing within the drives cannot carry it that far. Thirteen variants of the rise on it (a faster or slower
+  swing, a looser CoM gate, more hip flexion while behind, a faster or slower knee, a larger lead, a 30 degree spine
+  at seat-off, 25 or 35 degrees of spine overshoot, and combinations) gained no seat below 0.50 m. 25 degrees of
+  overshoot stands the 26 kg nominal build from 0.50 m without armrests too, but loses the 20 kg 0.50 m case and the
+  26 kg low one, so the overshoot stays at 15 degrees (D-057).
+- **The 0.50 m rise is on a knife edge.** Which 0.50 m cases pass changes with the build and the motors in no
+  monotone way (the 26 kg build stands on the weak motors and not on the nominal ones); the 0.40 and 0.45 m results
+  do not move at 20 kg.
+- **The pessimistic motors cost energy, not seats, at 20 kg.** Their continuous rating is 47 N per line (107 N
+  nominal): the knee, hip and spine lines run 4 to 7 times over it in the sit and the rise, the energy is 8 to 14 kJ and the
+  seated draw 58 to 200 W. A sit-and-stand is a few seconds' load; it is the seated rest that would heat them.
+- **The knee line passes 300 N** in the 26 kg build's deep bend at 0.35 to 0.45 m, and the spine line runs to 385 N:
+  past the 20 kg model's 288 N continuous figure.
+
 ## Not yet
 
-- The 26 kg build and the pessimistic motors (`ROBOT_MASSES=... ROBOT_MOTORS=low python tools/chair_sweep.py`): the
-  task's full grid. This pass was scoped to 20 kg by the owner.
+- A rise for the 26 kg build below 0.50 m: weight off the pelvis and trunk (the 20 kg target), or the 0.35 m list
+  below.
 - The 0.35 m seat: more hip flexion (to 120 degrees), a stronger spine drive, or hands that can push.
 - Hands that use the armrests: a wrist that holds more than 1.3 N m and a shorter reach (or the forearm on the rest).
 - A seated rest at zero power: the elbows' limit cycle, or a rest for the hands that loads nothing.
@@ -117,5 +147,5 @@ forward to the ankle's 20 degree stop, and the seat's front edge is 0.10 m behin
 
 ## Next
 
-The 26 kg and pessimistic-motor rows; then the spine drive's margin, which sets both how low a seat the robot can
-leave and how far it can lean with its arms out.
+The spine drive's margin, which sets both how low a seat the robot can leave and how far it can lean with its arms out,
+and with it the 26 kg build's chair; the seated rest's power.
