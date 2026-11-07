@@ -804,3 +804,17 @@ Produced: docs/33's full grid, D-057, release v0.5.0.
 - The tendon-sim skill: judging a chair change on the full grid.
 - The gauntlet: 14 of 14, the first 13 unchanged since v0.4.0. Release v0.5.0 (docs/releases.md) with a fresh STL
   build; the release skill now names the generators `mass_rollup --build` leaves out.
+
+## P-058 (2026-11-06/07) What's next: the W-max's mass
+
+> what's next?
+
+> yes, good idea
+
+The hub had no new owner priority; recommended bringing the 26 kg build's mass down (hub task `wmax-mass-down`,
+claimed). Produced: docs/34, D-058.
+- `ROBOT_WMAX=bldc` in `export_mjcf` (the 5010 on 1:25, no lock, FOC energy, `kg_scale`); `sim_tendon` skips the lock
+  where there is no holding torque and books brushless energy as copper loss plus shaft power.
+- `sim/masses/rollup_bldc.json` (19.9 kg) and `rollup_775_small.json` (25.0 kg).
+- Result: the drive passes on the model's masses with matched stiffness; the brushless build's trunk (5.8 kg) loses the
+  chair. The baseline is unchanged.

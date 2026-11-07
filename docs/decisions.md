@@ -662,3 +662,14 @@ spine overshoot (against 15) fixes the 26 kg nominal 0.50 m case but loses two o
 reason for the 20 kg target (D-036): the chair needs the weight out of the pelvis and trunk.
 Alternative: retune the rise per build; a stronger spine drive.
 Reverses if: the 26 kg build's mass moves forward or down to the shanks, or the spine drive changes.
+
+## D-058 (2026-11-07) The brushless W-max is a model variant, its servo tuned to the 775's stiffness; the trunk's mass, not the total, decides
+
+Why: P-058 (docs/34, hub task wmax-mass-down). `ROBOT_WMAX=bldc` runs every W-max joint on the 5010 on 1:25 at 24 V:
+no self-lock, FOC energy (copper loss plus shaft power), and gains scaled by the stall-torque ratio (2.09) so the
+drum stiffness matches the 775's. On the model's masses it passes the gauntlet (the step judged on its grid, 12 of
+12) and holds one foot on 36 % less energy; unscaled it loses the 40 N push. On the 19.9 kg brushless roll-up the
+chair rise falls with either motor: the trunk is 5.8 kg against the model's 3.5.
+Alternative: retune every gain per drive; keep the 775 and accept 25 kg.
+Reverses if: the bench shows the 5010's continuous current or the printed 1:25's efficiency far below the sourced
+range, or a FOC position loop cannot reach the 775's stiffness.

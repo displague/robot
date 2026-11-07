@@ -685,11 +685,11 @@ class Rig:
             ratio = p["tackle"] * p["r_p"] / p["r_d"]
             phi_des = ratio * (tgt + g * KQ * err - g * KD_JOINT.get(bone, 0.0) * dq + w["_trim"])
             gerr = phi_des - phi
-            ctrl = KG * gerr - KDG * dphi
+            ctrl = p["kg_scale"] * (KG * gerr - KDG * dphi)   # kg_scale: the same drum stiffness on a weaker drive
             # lock with hysteresis: engage when the gear is on target and still, release when it has drifted
             was = w.get("_locked", False)
             tol = LOCK_TOL * LOCK_TOL_SCALE.get(w["name"].split(".")[0].split("_")[0], 1.0)
-            locked = (self.lock_enabled and (LOCK_STILL is None or (LOCK_STILL_BONES is not None and bone not in LOCK_STILL_BONES)
+            locked = (self.lock_enabled and p["t_hold"] > 0.0 and (LOCK_STILL is None or (LOCK_STILL_BONES is not None and bone not in LOCK_STILL_BONES)
                                              or self._still > LOCK_STILL)
                       and abs(dphi) < LOCK_RATE and abs(err) < 3 * LOCK_TOL
                       and (not torque_mode or self._quiet > ANKLE_QUIET)
@@ -755,7 +755,11 @@ class Rig:
             s["over"] += abs(tq) > p["motor"].cont_fraction * p["t_stall"]
             ctrl = d.ctrl[w["act"]]
             current = p["i_stall"] * tq / p["t_stall"]
-            s["e_j"] += abs(ctrl * p["volt"] * current) * dt
+            if p["bldc"]:   # FOC: copper loss (phase amplitude, 3/4 I^2 R line to line) plus the shaft power out
+                pw = 0.75 * current * current * p["r_ohm"] + max(0.0, tq * d.qvel[w["gdof"]]) / p["eta"]
+            else:           # brushed: the H-bridge's duty x bus volts x motor current
+                pw = abs(ctrl * p["volt"] * current)
+            s["e_j"] += pw * dt
             s["locked"] += w["_locked"]
             s["hot"] = s["hot"] + dt if max(fA, fB) > p["f_cont"] else 0.0
             s["hot_max"] = max(s["hot_max"], s["hot"])
@@ -765,7 +769,7 @@ class Rig:
                 q["f"] = max(q["f"], fA, fB)
                 q["slack"] += (fA <= 0.0) + (fB <= 0.0)
                 q["locked"] += w["_locked"]
-                q["e_j"] += abs(ctrl * p["volt"] * current) * dt
+                q["e_j"] += pw * dt
                 q["n"] += 1
             s["n"] += 1
             if record or self.record_all:

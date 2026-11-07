@@ -20,9 +20,10 @@ ROBOT_MASSES=masses.json python tools/sim_tendon.py # variant: per-bone masses f
 ROBOT_TORSO_WORM=1 python tools/sim_tendon.py        # variant: spine and shoulders on the 10 rpm worm gearmotor
 ROBOT_MOTORS=low python tools/sim_tendon.py         # variant: every drive and line at the pessimistic end of its sourced range
 ROBOT_MOTORS=high | nom | <file.json>[:case]         # the optimistic end, the sourced nominal, or a file in the same format
+ROBOT_WMAX=bldc [ROBOT_WMAX_KG=2.09]                 # variant: W-max on the 5010 on 1:25, 24 V: no lock, FOC energy, gains x kg (docs/34)
 ```
 
-`ROBOT_MASSES`, `ROBOT_TORSO_WORM` and `ROBOT_MOTORS` are read by `export_mjcf`, so they also apply to `step_sweep.py`
+`ROBOT_MASSES`, `ROBOT_TORSO_WORM`, `ROBOT_MOTORS` and `ROBOT_WMAX` are read by `export_mjcf`, so they also apply to `step_sweep.py`
 (its children inherit the environment) and `step_trace.py`. Running `export_mjcf.py` with any of them set rewrites
 `sim/robot.xml` as the variant: re-run it without them before committing, and check `git diff sim/robot.xml` is empty.
 

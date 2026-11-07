@@ -53,6 +53,18 @@ CLASSES = {
     # cannot be back-driven), figures at the output so eta 1.0
     "W-worm": dict(motor="WORM_10RPM", eta=1.00, r_drum=0.015, line="braid_200lb", rotor_J=2.0e-6, ratio=634, hold=3.0),
 }
+# variant (ROBOT_WMAX=bldc, docs/34): every W-max joint on a 5010 360 KV outrunner, FOC, printed 1:25, 24 V (docs/21).
+# Back-drivable: hold 0, so its drums never lock and a standing joint holds on current. rotor_J: the outrunner's
+# bell (~50 g at ~25 mm). bldc: the energy is copper loss plus shaft power, not the brushed duty x V x I.
+WMAX_VARIANT = os.environ.get("ROBOT_WMAX", "")
+if WMAX_VARIANT == "bldc":
+    CLASSES["W-max"] = dict(motor="5010_PLAN25_24V", eta=0.60, r_drum=0.015, line="braid_200lb", rotor_J=3.0e-5,
+                            ratio=25, hold=0.0, bldc=True)
+    # its servo tuned to the 775's drum stiffness (torque per rad of gear error): the gains scale with stall torque
+    CLASSES["W-max"]["kg_scale"] = float(os.environ.get("ROBOT_WMAX_KG", MOTORS_MODEL["775_PLAN40"].stall_torque_nm
+                                                        / MOTORS_MODEL["5010_PLAN25_24V"].stall_torque_nm))
+elif WMAX_VARIANT:
+    raise SystemExit("ROBOT_WMAX: bldc or unset, not %r" % WMAX_VARIANT)
 # line stretch: 2 % at a quarter of break (docs/08) -> EA = break / 0.08
 STRETCH_AT_QUARTER_BREAK = 0.02
 PRETENSION_FRACTION = 0.25        # of the continuous line force. docs/02 said ~10 %; the simulation (docs/13)
@@ -168,6 +180,7 @@ def winch_params(joint_name, axis, cls_name):
                 t_stall=t_stall, w_noload=w_noload, f_stall=f_stall, f_cont=f_cont, k=k, pre=pre,
                 t_clutch=min(t_clutch, 0.95 * t_stall), t_hold=c["hold"] * t_stall,
                 armature=c["rotor_J"] * c["ratio"] ** 2, i_stall=m.stall_current_a, volt=m.voltage,
+                bldc=bool(c.get("bldc")), r_ohm=m.r_ohm or 0.0, eta=c["eta"], kg_scale=c.get("kg_scale", 1.0),
                 # drum + clutch plate inertia: a few percent of the reflected rotor inertia keeps the
                 # soft friction constraint of the clutch well conditioned (a massless drum creeps)
                 drum_J=max(1e-4, 0.05 * c["rotor_J"] * c["ratio"] ** 2),
