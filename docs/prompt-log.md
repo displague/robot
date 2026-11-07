@@ -818,3 +818,28 @@ claimed). Produced: docs/34, D-058.
 - `sim/masses/rollup_bldc.json` (19.9 kg) and `rollup_775_small.json` (25.0 kg).
 - Result: the drive passes on the model's masses with matched stiffness; the brushless build's trunk (5.8 kg) loses the
   chair. The baseline is unchanged.
+
+## P-059 (2026-11-07) Lighten the large continuous body areas: a keyed shell like a lifecast mother mold
+
+> I was imagining a way to lighten the larger continuous body areas.. these words came to mind, I googled it and got this response:
+>
+> An interlocking rigid open mold taken directly from a living body is typically referred to as a multi-piece rigid mother mold (or jacket) used over a flexible lifecasting skin.
+> Because the human body has natural undercuts (such as around the chin, ears, or nose), a single-piece rigid mold would lock onto the person and become impossible to remove safely. To bypass this, lifecasters construct the rigid support shell in interlocking segments that separate cleanly.
+>
+> 🧱 Structural Mechanics of the Mold
+>
+> An interlocking open-body mold relies on a two-layer system designed to balance accuracy, comfort, and release capability:
+> • The Face Coat (Flexible Layer): A skin-safe material like Smooth-On Body Double Silicone or cosmetic alginate is applied directly to the body. This captures fine details like pores and wrinkles. It remains flexible enough to bend out of minor undercuts.
+> • The Mother Mold (Rigid Layer): Because the flexible layer is too floppy to hold its shape once removed, a rigid shell—made of plaster bandages or polyurethane resin—is built over it. This shell is divided into interlocking sections.
+> • Shim Lines / Seams: To create sections that interlock without sticking together, dividers called "shims" (often made of thin plastic strips, clay walls, or overlapping built-up edges) are placed along the body’s natural parting lines.
+> • Keys and Registrations: Raised bumps, notches, or ridges are carved or built into the seams of the rigid sections. When section B is poured against section A, it molds into those notches. This ensures that when the pieces are taken apart and put back together later, they interlock perfectly with zero shifting.
+>
+> (the rest of the pasted search answer: a table of materials, lifecasting safety rules, an offer to lay out parting lines)
+
+> yes, shell next
+
+Produced: docs/35, D-059. `cad/blender/shell.py` (the torso in four panels, the pelvis in two halves: a 1.2 mm ribbed
+wall, lap strips with keys and M3 screws into heat-set inserts, bank bosses, openings; all manifold, each panel on a
+256 mm bed), `docs/img/shell_torso.png` and `shell_pelvis.png`. `mass_rollup.py`: the shells are generated parts,
+the frames become bracket guesses (`--frame` restores the old ones), `--build` runs `shell.py`. Result: 0.1 kg less
+against the frames, and the cover included; 0.33 kg less at a 0.8 mm wall; the trunk's mass is in its drives.

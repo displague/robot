@@ -673,3 +673,14 @@ chair rise falls with either motor: the trunk is 5.8 kg against the model's 3.5.
 Alternative: retune every gain per drive; keep the 775 and accept 25 kg.
 Reverses if: the bench shows the 5010's continuous current or the printed 1:25's efficiency far below the sourced
 range, or a FOC position loop cannot reach the 775's stiffness.
+
+## D-059 (2026-11-07) The torso and pelvis are keyed thin shells, the structure and the cover in one
+
+Why: P-059 (docs/35), from a lifecaster's mother mold: thin rigid sections that part along planned lines and
+register on keys. `cad/blender/shell.py`: a 1.2 mm ribbed wall split into panels that print flat on a 256 mm bed,
+joined by lap strips with keys and M3 screws into heat-set inserts, with bosses for the drive banks. The torso is
+711 g and the pelvis 259 g; with 350 g of brackets they replace the 1.4 kg of frame guesses for 0.1 kg less, and
+the robot has its cover (a plain cover alone would be about 620 g on the torso). The trunk's mass is in its drives,
+wiring and fasteners, which the shell does not reach.
+Alternative: an inner frame with a separate cover; a 0.8 mm wall (0.33 kg lighter, untested).
+Reverses if: a printed panel is too flexible to carry the drive banks, or the laps do not fit.

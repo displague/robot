@@ -54,6 +54,10 @@ PARTS = {
     "hip_rot_hub": (2, "thigh"), "hip_rot_rotor": (2, "thigh"),
     "neck_yaw_hub": (1, "neck"), "neck_yaw_rotor": (1, "neck"),
     "waist_yaw_hub": (1, "spine"), "waist_yaw_rotor": (1, "spine"),
+    # the keyed thin shells (cad/blender/shell.py, docs/35): the torso and pelvis structure and cover in one
+    "torso_shell_back_lower": (1, "spine"), "torso_shell_front_lower": (1, "spine"),
+    "torso_shell_back_upper": (1, "spine"), "torso_shell_front_upper": (1, "spine"),
+    "pelvis_shell_right": (1, "pelvis"), "pelvis_shell_left": (1, "pelvis"),
     # W-mini banks of 5: 2 per forearm (7 hand + 2 wrist winches), 1 in the torso (neck), 1 in the head (face)
     "bank5_housing": (6, None), "bank5_lid": (6, None), "bank_drum": (25, None),
 }
@@ -63,8 +67,9 @@ IGNORE = {"forearm_6808_hub", "forearm_6808_rotor", "forearm_6808_cap",         
 
 # --------------------------------------------------------------- printed parts with no generator yet (est, g)
 UNGENERATED = [
-    ("pelvis frame (battery and hip W-max bank mount)", "pelvis", 600),
-    ("torso frame (spine/shoulder W-max bank, electronics)", "spine", 800),
+    # with the shells (docs/35) the frames are brackets bolted to the shells' bosses; --frame restores the old guesses
+    ("pelvis brackets on the shell bosses (battery tray, hip W-max bank)", "pelvis", 150),
+    ("torso brackets on the shell bosses (spine/shoulder W-max bank, electronics)", "spine", 200),
     ("head shell and face mechanisms", "head", 350),
     ("clavicle brackets", "clavicle", 150),
     ("foot soles (long feet, D-015)", "foot", 500),
@@ -173,7 +178,7 @@ def stl_volume_area(path):
 
 def build(out):
     os.makedirs(out, exist_ok=True)
-    for script, extra in (("chain.py", []), ("ring.py", []), ("winch_bank.py", ["--n", "5"])):
+    for script, extra in (("chain.py", []), ("ring.py", []), ("winch_bank.py", ["--n", "5"]), ("shell.py", [])):
         print("building %s ..." % script, flush=True)
         subprocess.run([BLENDER, "-b", "-P", os.path.join(ROOT, "cad", "blender", script), "--", "--out", out] + extra,
                        check=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT, cwd=ROOT)
@@ -199,6 +204,8 @@ def main():
                     help="W-max motor: 775 + printed 1:40, or 5010 BLDC + B-G431B-ESC1 + printed 1:16 (docs/21)")
     ap.add_argument("--wmax-driver", choices=("bts7960", "small"), default="bts7960",
                     help="the 775's H-bridge: BTS7960 with heatsink (65 g) or a VNH5019-class module (10 g)")
+    ap.add_argument("--frame", action="store_true",
+                    help="the pre-shell estimate: a 600 g pelvis frame and an 800 g torso frame, no shells (docs/20)")
     ap.add_argument("--json", help="write {bone: kg per side} for the model (ROBOT_MASSES=<file>, export_mjcf.py)")
     args = ap.parse_args()
     global TORSO_WORM
@@ -207,6 +214,12 @@ def main():
     WMAX, WMAX_DRIVER = args.wmax, args.wmax_driver
     if args.build:
         build(args.stl)
+    if args.frame:
+        for k in [k for k in PARTS if "_shell_" in k]:
+            del PARTS[k]
+            IGNORE.add(k)
+        UNGENERATED[0:2] = [("pelvis frame (battery and hip W-max bank mount)", "pelvis", 600),
+                            ("torso frame (spine/shoulder W-max bank, electronics)", "spine", 800)]
 
     seg = {}
 

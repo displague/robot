@@ -22,6 +22,7 @@ B="/c/Program Files/Blender Foundation/Blender 5.1/blender.exe"
 | `winch_mini.py` | W-mini housing, drum, lid | `... winch_mini.py -- --out cad/out` |
 | `winch_bank.py` | N W-mini housings as one block | `... winch_bank.py -- --out cad/out --n 5` |
 | `finger.py` | Phase 0 finger | `... finger.py -- --out cad/out` |
+| `shell.py` | torso (4 panels) and pelvis (2 halves) as keyed thin shells: ribbed wall, lap strips, keys, M3 inserts, bank bosses (docs/35) | `... shell.py -- --out cad/out [--preset torso] [--wall 0.8]` |
 | `skeleton_rig.py` | whole-body armature from `cad/skeleton.json`, posed to its limits | `... skeleton_rig.py -- --json cad/skeleton.json --out cad/out` |
 | `render.py` | PNG of one generated assembly, or a gallery of every STL in a folder | below |
 
@@ -40,7 +41,7 @@ B="/c/Program Files/Blender Foundation/Blender 5.1/blender.exe"
 - **Mass roll-up** (`tools/mass_rollup.py`, docs/20): every generated part at print settings (walls and skins
   1.2 mm solid, 25 % infill by default; `--infill`, `--wall`), the parts with no generator yet (estimates),
   and the bought parts, per body segment against `cad/skeleton.json`. `--build` runs the generators first
-  (into `--stl`, default `cad/out`); `--json masses.json` writes per-bone masses for the model variant
+  (chain, ring, winch_bank and shell into `--stl`, default `cad/out`); `--frame` books the pre-shell 600 + 800 g frame guesses instead of the shells; `--json masses.json` writes per-bone masses for the model variant
   `ROBOT_MASSES=masses.json` (tendon-sim skill); `--torso-worm` rolls up the worm-gearmotor torso variant; `--wmax-driver small` puts the 775s on a VNH5019-class
   driver (10 g) instead of the BTS7960 (65 g); `--wmax bldc` makes the W-max a 5010 + B-G431B-ESC1 + printed 1:16
   (docs/21). The flags combine. A new generator part must be added to `PARTS` (count and
