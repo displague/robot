@@ -113,6 +113,15 @@ the clutch's 29.7 N m at the joint (297 N x 50 mm x 2 strands):
   - the down phase's dynamics;
   - the servo's integral trim;
   - lines that cross the spine.
+- **One cause found: the trunk sits on the thighs.** Seated and in the rise, each thigh's capsule presses on the
+  spine body's box with 410 to 430 N. The box is 0.26 x 0.16 x 0.40 m from the spine's base, just above the hips.
+  That puts a constraint torque of -58 N m at the spine pitch joint, against the lines' +29 N m and gravity's -30.
+  The trunk cannot fold forward because its lower front edge meets the thighs.
+- **Removing that contact does not lower the peak** (311 to 345 N, the spine's collision off, as an upper bound).
+  The spine then folds further and meets its clutch there. So the contact explains the 8 degrees reached, not the
+  line's peak.
+- **For the hardware:** the torso shell's lower front edge needs a chamfer or a recess where the thighs come up.
+  The deeper thigh of D-060 (165 to 175 mm, docs/37) makes it worse.
 
 ## Not yet
 
@@ -124,6 +133,8 @@ the clutch's 29.7 N m at the joint (297 N x 50 mm x 2 strands):
 
 ## Next
 
-docs/37's item on the brushless 0.50 m chair is closed. The spine is the next limit in the chair. Trace the spine's
-torque per phase with 3 strands: the servo's demand, the trim and the line forces against `qfrc_bias`. Find the
-third to half that the static weight does not explain, then choose between 3 strands and a stronger drive.
+docs/37's item on the brushless 0.50 m chair is closed. The spine is the next limit in the chair. Give the spine's collision box
+a chamfered lower front edge (two boxes, or a box and a capsule) and measure:
+- how far the seated spine then reaches;
+- the line's peak, the 0.45 m and 0.50 m rises and the gauntlet;
+- the static demand at the reached angle, against 3 strands.
