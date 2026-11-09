@@ -783,3 +783,16 @@ Cost: the neck pitches at half speed, and needs one running sheave.
 Alternative: a W-max at the neck (heavier), or the head allowed to follow the trunk (tried: worse).
 Reverses if: the head's pitch speed turns out to matter (a look-around task).
 
+## D-067 (2026-11-09) The chair's rise paces the hips at 22.5 degrees per second
+
+Why: P-064, docs/41. In the rise the trunk leaves the thighs while the hips extend at about 37 deg/s. The pelvis
+rotates back under the lagging trunk, and the spine folds to its 40 degree stop, with the extensor at its clutch
+(the 775 layout's spine slipped 87 degrees). Capping the hip extension at 22.5 deg/s (`SIT_HIP_RATE`):
+- stands all six chair cases (3 builds x 0.45 and 0.50 m), with no spine slip;
+- cuts the rises' energy by 10 to 48%;
+- keeps the gauntlet standing (the chair 954 to 842 J) and the chain grid at 17 of 24.
+20 and 27.5 deg/s each lose cases.
+Alternative: gate the knees on the spine's error (`SIT_SPINE_GATE`, kept as an option): no slip, but it lost the
+brushless layout's 0.50 m rise and cost energy.
+Reverses if: a faster rise is needed (the limit adds about a second).
+

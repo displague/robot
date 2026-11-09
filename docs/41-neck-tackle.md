@@ -164,6 +164,33 @@ At 5 degrees the spine stops slipping on every build, and the peak drops by 2 to
 the 0.50 m rise, and the rises take more energy (the 20 kg 0.45 m chair: 1010 to 1264 J). It stays off by default,
 as an option.
 
+## The fix: the hips extend no faster than the trunk can follow (D-067)
+
+`SIT_HIP_RATE` caps how fast the rise's hip targets extend. Six chair cases (3 builds x 0.45 and 0.50 m):
+
+| Rate (deg/s) | Rises stood | Spine slip |
+| --- | --- | --- |
+| none (before) | 6 of 6 | 87 deg (775 layout, 0.45 m) |
+| 15 | 1 of 6 | - |
+| 20 | 5 of 6 | 0 |
+| **22.5** | **6 of 6** | **0** |
+| 25 | 6 of 6 | 0 |
+| 27.5 | 3 of 6 | up to 51 deg |
+| 30 | 3 of 6 | up to 35 deg |
+
+At 22.5 deg/s the rises take less energy:
+- 20 kg: 836 J at 0.45 m (was 1010) and 929 J at 0.50 m (was 1176);
+- 775 layout: 1024 J and 933 J (was 1309 and 1782);
+- brushless layout: 977 J and 1618 J (was 1206 and 1793).
+
+The spine line still peaks at 304 to 328 N: it works at its clutch while the trunk swings up, but nothing slips.
+It is now the default:
+- **The gauntlet:** all 14 stand; the 0.45 m chair goes from 954 J to 842 J.
+- **The other chairs:** 0.40 and 0.50 m, with and without armrests, all stand (836 to 992 J). The 0.35 m chair
+  still falls, as in docs/33.
+- **The chain grid:** 17 of 24, unchanged.
+- At 0.40 m the limit changes nothing: the layouts fail there either way.
+
 ## Not yet
 
 - The neck's roll and yaw stay on one strand. Neither was flagged.
@@ -174,7 +201,6 @@ as an option.
 
 ## Next
 
-docs/37's item on the brushless 0.50 m chair is closed. The spine is the next limit in the chair. The rise's weak moment
-is the trunk leaving the thighs while the hips extend fast. Try the hip extension rate-limited for the half second
-after the trunk lifts off, rather than gating the knees. Model the deeper D-060 thigh first, since it changes when
-the contact lets go.
+docs/37's item on the brushless 0.50 m chair is closed. The spine is the next limit in the chair. The rise is fixed by
+pacing the hips (D-067). Next are the layouts at 0.40 m (both fail with or without the limit), and the deeper D-060
+thigh in the collision model, which changes when the trunk leaves the thighs.

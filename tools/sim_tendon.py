@@ -222,6 +222,7 @@ SIT_HOLD = 2.0                   # s: seated
 SIT_LEAN_T = (1.0, 1.5, 0.065)   # s: the trunk's swing to the seat-off pose: the first where the static reach is
                                  # over the third (m behind the sole centre: less margin, more momentum), else the second
 SIT_SPINE_GATE = 0.0             # rad: the rise's knees stop when the spine is folded this far past its path (docs/41); 0: off
+SIT_HIP_RATE = math.radians(22.5)  # rad/s: the rise's hip extension rate limit (D-067, docs/41): the trunk keeps up
 SIT_LEAD = math.radians(12)      # the knee target's lead on the measured knee in the rise
 SIT_KNEE_RATE = math.radians(25)  # rad/s: the knee target's fastest
 SIT_GATE = 0.02                  # m: the knee stops when the CoM is this much further back than planned
@@ -1184,6 +1185,9 @@ def sit_stand(r, seat, arms=False):
         t["spine_pitch"] += SIT_SPINE_OVER * t["spine_pitch"] / max(SIT_SPINE, 1e-6)
         for s in "LR":
             t["thigh.%s_pitch" % s] = max(hip_lo, t["thigh.%s_pitch" % s] - SIT_HIP_K * max(e, 0.0))
+            if SIT_HIP_RATE:     # docs/41: the hips extend no faster than this, so the trunk keeps up with the pelvis
+                k = "thigh.%s_pitch" % s
+                t[k] = min(t[k], r.target[k] + SIT_HIP_RATE * dt)
             t["shank.%s_pitch" % s] = kt
         if not r.balance and km < SIT_BAL_ON:
             r.balance, r._com_f = True, None

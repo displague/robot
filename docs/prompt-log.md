@@ -952,3 +952,9 @@ Continued:
 Continued: the neck's pitch now runs on two strands (D-066, docs/41). The chair no longer slips it, and the brushless
 layout stands from 0.50 m with and without armrests.
 
+Continued:
+- The chair's spine overload traced: the trunk rests on the thighs, then folds to the spine's stop as the hips
+  extend fast in the rise.
+- Pacing the hip extension at 22.5 deg/s (D-067) stands every chair case with no spine slip and 10 to 48% less
+  energy (docs/41).
+
