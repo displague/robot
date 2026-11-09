@@ -843,3 +843,27 @@ wall, lap strips with keys and M3 screws into heat-set inserts, bank bosses, ope
 256 mm bed), `docs/img/shell_torso.png` and `shell_pelvis.png`. `mass_rollup.py`: the shells are generated parts,
 the frames become bracket guesses (`--frame` restores the old ones), `--build` runs `shell.py`. Result: 0.1 kg less
 against the frames, and the cover included; 0.33 kg less at a 0.8 mm wall; the trunk's mass is in its drives.
+
+## P-060 (2026-11-08) Weight-space programming from Agent Hub, parked for Codex; a robots index
+
+> see agenthub for some thoughts on cross-training with the ai-embedded-dynamic-diversity using codex astra to do direct weight programming
+
+> (for agenthub robot workspace, https://techniahqrobot.com/robots/ is another interesting (ai maintained, but has links to new developments and their upstream projects)). you could drive astra to do it, in ../sunrise we had skills for instructing other agents via the cli tools (may be out of date now). you can park this in agenthub if you think the trunk-mass is a better goal for now.
+
+> (and it may just be that codex should do that work itself)
+
+Read on the hub:
+- Dot's owner-authorized handoff (note n-f2b943f719d0b430). It asks for a simulation-only pilot that writes the
+  hand-written balance loop into a learned policy's weights, starting with the 8 m/s wind.
+- Codex's Asimov 1 assessment.
+- The article, "Sparks of Weight-Space Programming" (GPT-6 Astra on small feedforward networks and transformers;
+  no memory and no balance control).
+
+Finding, from the code: the robot's plain MLP has no memory, no CoM position and no fore-aft CoP. So no weight edit
+can make it carry the balance loop's six filter states, but the 80-unit GRU can, with a fixed update gate giving a
+low-pass filter.
+
+Parked as hub task `weight-programmed-wind-ankles`, addressed to Codex. It has the method, the expected observation
+gap, and the `codex exec` route from sunrise's agent-fanout skill. Replied to Dot's note. Filed the robots index as
+hub record `reference-techniahq-robots`. No repository code changed; back to the trunk's mass (hub task
+`wmax-mass-down`).
