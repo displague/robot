@@ -12,9 +12,9 @@ Short answers:
   model 14 and 14. The brushless layout stands 6 steps and 2 walks; the 20 kg model stands 14 and 9.
 - **How it fails:** the robot places the front foot 105 mm ahead (planned 102). About 2 s later it falls while
   moving its weight onto that foot (775 layout, base model, 0.10 m, held feet; `F4g` in the grid).
-- **This meets one of D-060's reversal conditions** ("the heavier swing leg fails the full step grid"). It is not
-  yet known which move costs it: the hips on the thighs or the battery up. The run that separates them (below) was
-  stopped by the host for low memory before it finished.
+- **This meets one of D-060's reversal conditions** ("the heavier swing leg fails the full step grid"). The hip
+  drives on the thighs cost it; the battery move does not (below). Putting only part of the hip bank on the thighs
+  does not get both the chair and the held step.
 - **The model stays on the 20 kg masses (D-061).** D-036 said it moves to the roll-up when the mass comes to about
   22 kg. The brushless layout is 19.8 kg, but it fails the contact the model is judged on.
 
@@ -54,12 +54,30 @@ foot, with the lift gate then timing out. On held feet the 775 layout's second f
 On the pessimistic motors the layout does better than the 20 kg model, perhaps because the lighter pelvis asks
 less of the weak hip drives. That was not traced.
 
-## The run that was stopped
+## One move at a time, and part of the hip bank (P-062)
 
-The next run gives the 775 build one move at a time, on held feet:
-`--masses sp=...,hips=...,bat=...`, made with `mass_rollup.py --spread` alone, with `--hips-on-thighs` and with
-`--battery-up`. The host stopped it for low memory: `step_sweep.py` starts all 42 runs at once. Rerun it with
-fewer at a time, or as three runs of 14.
+The run the host stopped was rerun as three calls of 14. Then `mass_rollup.py --hips-on-thighs N` put only N of the
+six hip drives on the thighs. All rows are on held feet, 7 lengths x 2 models, with `--spread`. The reach is at
+0.45 m.
+
+| Build | Moves | Step on held feet | Reach | 0.45 m chair |
+| --- | --- | --- | --- | --- |
+| 775 | spread only | 7 / 14 | - | - |
+| 775 | + battery up | 6 / 14 | 12.8 cm | no (docs/33) |
+| 775 | + battery up, 2 hip drives on the thighs | 8 / 14 | 11.9 | - |
+| 775 | + battery up, 4 hip drives on the thighs | 3 / 14 | 10.9 | no (0.50 m yes) |
+| 775 | + 6 hip drives on the thighs, battery as before | **0 / 14** | - | - |
+| 775 | + battery up, 6 hip drives on the thighs (the layout) | 0 / 14 | 10.0 | yes |
+| brushless | + battery up, 4 hip drives on the thighs | 4 / 14 | 8.6 | yes (0.50 m: the neck slips 631 degrees) |
+| brushless | + battery up, 6 (the layout) | 6 / 14 | 8.0 | yes |
+
+- **The hip drives on the thighs lose held feet; the battery move does not.** Moving the battery alone keeps the
+  step at the spread roll-up's level (6 against 7).
+- **No layout gets both.** The chair from 0.45 m needs the reach at about 8.7 cm on the brushless build and
+  10.0 cm on the 775. Each hip drive on the thighs buys about 0.45 cm of reach and costs the held step. The 775
+  needs all six for the chair, and with six it steps 0 of 14.
+- **So the conflict is in the control, not the layout.** The forward weight transfer on held feet does not carry a
+  heavier swing leg. Even the old roll-up stands only 8 of 14 there, against 14 for the 20 kg model.
 
 ## Packaging the thigh bank (no generator yet)
 
@@ -89,14 +107,15 @@ The thigh is 430 mm (`cad/skeleton.json`). About 300 mm of it is clear of the hi
 
 ## Not yet
 
-- Which move loses held feet: the single-move run above.
-- A fix for the forward weight transfer on held feet with heavy thighs, for example retuning the transfer for the
-  heavier swing leg or putting only some of the hip drives on the thighs.
-- The 0.50 m chair on the brushless layout (the neck slip, docs/36); the chair with armrests.
+- A forward weight transfer that holds on held feet with heavy thighs. That is the old hub task `step-on-held-feet`
+  (D-043), now with the layout masses as its hardest case.
+- The 0.50 m chair on the brushless layouts (the neck slips); the chair with armrests.
 - The battery tray and the thigh bank as generators (the W-max itself has no generator; task item 3, the gearbox).
+- The deeper thigh (165 to 175 mm) in the model's collision shapes.
 
 ## Next
 
-Rerun the single-move held-feet grid, 14 runs at a time. If the battery-up move alone keeps held feet at the old
-roll-up's level, keep it and put back only as many hip drives on the thighs as the chair needs. If the hips on the
-thighs alone lose it, trace the forward transfer with the heavy swing leg (`F4g`) before any retune.
+Trace the forward transfer (phase 4) on held feet: the 775 layout at 0.10 m against the 20 kg model, and where
+their CoM, CoP and hip-line forces part. Retune it for the heavy swing leg, then rerun the held grid on the layout.
+Keep the battery-up move whatever the outcome (D-061). It costs nothing on held feet and buys 0.6 to 0.7 cm of
+reach.

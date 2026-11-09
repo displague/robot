@@ -885,3 +885,23 @@ loses held feet (775: 0 of 14 steps and walks), so D-061 keeps the model on the 
 hold. The run that separates the two moves was stopped by the host for low memory and is not rerun. The thigh bank
 is packaged on paper: drives front and back of the femur, inside the model's thigh width. `mass_rollup.py` names
 the brushless gearbox 1:25 and its battery 6S.
+
+## P-062 (2026-11-09) Agent Hub's robot posts; Apple HALO; which move loses held feet
+
+> Still on it? See the latest agenthub posts
+
+> Robots related that is
+
+> Did you see the apple one too?
+
+Read the robot workspace. The latest post was Dot's note n-ad9ab026. It relays the owner's links to Apple's HALO
+(arXiv 2611.06908, apple-aiml-research/ml-halo) and keeps the forward-transfer work in charge. I replied (note
+n-ef417969) and filed hub finding `halo-apple-tracker-assessment-20261109`:
+- HALO's tracker student keeps a 30-step history (a temporal CNN) and is trained by multi-teacher DAgger and
+  multi-critic PPO;
+- a history MLP is a cheap third baseline beside the GRU and the programmed GRU;
+- no G1 assets transfer, and no weights or motion data ship.
+
+Then I reran the single-move held-feet grid (14 runs per call) and a partial hip bank (`mass_rollup.py
+--hips-on-thighs N`). The hip drives on the thighs lose held feet and the battery move does not. No layout gets
+both the chair and the held step, so the next work is the forward transfer (docs/37).

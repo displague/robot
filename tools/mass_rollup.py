@@ -89,7 +89,7 @@ SPREAD = False       # --spread: wiring, fasteners, line and joint sensors over 
 SPREAD_ITEMS = ("wiring", "M3 inserts", "line, PTFE", "AS5600")
 
 
-HIPS_ON_THIGHS = False  # --hips-on-thighs: the 6 hip W-max ride on the thighs (3 per thigh), pulling against the pelvis
+HIPS_ON_THIGHS = 0      # --hips-on-thighs [N]: N of the 6 hip W-max (default all 6, 3 per thigh) ride on the thighs, pulling against the pelvis
 BATTERY_UP = False      # --battery-up: the battery and the E-stop in the torso shell, not the pelvis
 SHOULDERS_LOW = False   # --shoulders-low: the 6 shoulder W-max in the pelvis bank, their lines up longer sheaths
 
@@ -101,8 +101,8 @@ def wmax_at():
         at["spine"] -= 6
         at["pelvis"] += 6
     if HIPS_ON_THIGHS:
-        at["pelvis"] -= 6
-        at["thigh"] += 6
+        at["pelvis"] -= HIPS_ON_THIGHS
+        at["thigh"] += HIPS_ON_THIGHS
     return {s: (0 if TORSO_WORM and s == "spine" else n) for s, n in at.items()}
 
 
@@ -226,8 +226,8 @@ def main():
                     help="book wiring, fasteners, line and joint sensors over the segments by their mass (default: all in the trunk)")
     ap.add_argument("--shoulders-low", action="store_true",
                     help="the 6 shoulder W-max drives in the pelvis bank, their lines up longer sheaths")
-    ap.add_argument("--hips-on-thighs", action="store_true",
-                    help="the 6 hip W-max drives on the thighs (3 each), not in the pelvis bank")
+    ap.add_argument("--hips-on-thighs", type=int, nargs="?", const=6, default=0, choices=(0, 2, 4, 6),
+                    help="N of the 6 hip W-max drives on the thighs (N/2 each; default 6), not in the pelvis bank")
     ap.add_argument("--battery-up", action="store_true", help="the battery and E-stop in the torso, not the pelvis")
     ap.add_argument("--json", help="write {bone: kg per side} for the model (ROBOT_MASSES=<file>, export_mjcf.py)")
     args = ap.parse_args()

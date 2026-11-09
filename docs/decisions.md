@@ -713,3 +713,6 @@ D-060 is on hold until the run that separates the two moves is done.
 Alternative: move the model to the layout's roll-up now and retune the transfer on held feet.
 Reverses if: a layout (one move, both, or part of the hip bank on the thighs) passes held feet at the old roll-up's
 level or better, and the 0.45 m chair.
+Update (P-062): the hip drives on the thighs cost held feet, and the battery move does not. With 2, 4 or 6 hip
+drives on the thighs, no build passes both, so the battery-up move stays and the hip bank waits on a forward
+transfer retuned for held feet.
