@@ -82,7 +82,8 @@ CLUTCH_LINE_FRACTION = 1 / 3.0    # clutch slips when the line reaches this frac
 # --stiff-mini (sim_tendon.py) raises the W-mini pulleys to 25 mm and their pretension to 25 % (see docs/13).
 JOINTS = {
     "waist":    dict(tackle=2, pulley={"pitch": 0.050, "roll": 0.050, "yaw": 0.050}, bowden=0.30),
-    "neck":     dict(tackle=1, pulley={"pitch": 0.025, "roll": 0.025, "yaw": 0.025}, bowden=0.30),   # D-032
+    "neck":     dict(tackle=1, pulley={"pitch": 0.025, "roll": 0.025, "yaw": 0.025}, bowden=0.30,    # D-032
+                     tackle_by_axis={"pitch": 2}),   # D-066: the pitch on 2 strands (the chair's trunk swing slipped it)
     "shoulder": dict(tackle=2, pulley={"pitch": 0.040, "roll": 0.040, "yaw": 0.040}, bowden=0.40),
     "elbow":    dict(tackle=2, pulley={"pitch": 0.030, "yaw": 0.028}, bowden=0.50, tackle_by_axis={"yaw": 1}),
     "wrist":    dict(tackle=1, pulley={"pitch": 0.018, "roll": 0.018}, bowden=0.30),                  # D-032

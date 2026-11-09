@@ -772,3 +772,14 @@ Alternative: carry the bag through the sit with the forearm raised, or on the la
 collide with the robot.
 Reverses if: a sit that holds the bag clear passes the chain grid as well.
 
+## D-066 (2026-11-09) The neck's pitch runs on two strands
+
+Why: P-064, docs/41. The chair's trunk swing loaded the neck's W-mini to twice its 37 N line rating and slipped its
+clutch (23 degrees in the gauntlet's 0.45 m chair, and up to 534 in docs/33). It also cost the brushless layout the
+0.50 m chair (docs/36). Letting the head follow the trunk made it worse. Two strands at the pitch cut the peak to 36
+to 52 N with no slip, on the 20 kg model and the brushless layout, at 0.45 and 0.50 m. The gauntlet stands (the
+chair 1025 J to 954 J), and the 20 kg walk and step grids stay at 14 of 14.
+Cost: the neck pitches at half speed, and needs one running sheave.
+Alternative: a W-max at the neck (heavier), or the head allowed to follow the trunk (tried: worse).
+Reverses if: the head's pitch speed turns out to matter (a look-around task).
+

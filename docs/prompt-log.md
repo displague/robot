@@ -949,3 +949,6 @@ Continued:
 - A slower, damped weight ramp (`TP_B=6 ROLL_KD=0.5`) walks the 775 layout on held feet 13 of 14 (was 4), but not
   the brushless layout (2), so it stays a per-build setting (docs/40).
 
+Continued: the neck's pitch now runs on two strands (D-066, docs/41). The chair no longer slips it, and the brushless
+layout stands from 0.50 m with and without armrests.
+

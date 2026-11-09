@@ -394,11 +394,11 @@
     <fixed name="neck_pitch_clutch" frictionloss="0.2220" solreffriction="0.01 1" solimpfriction="0.99 0.999 0.001">
       <joint joint="neck_pitch_gear" coef="1"/><joint joint="neck_pitch_drum" coef="-1"/>
     </fixed>
-    <fixed name="neck_pitch_lineA" stiffness="9250.0" springlength="-100 -0.000993" damping="185.00">
-      <joint joint="neck_pitch" coef="0.02500"/><joint joint="neck_pitch_drum" coef="-0.00300"/>
+    <fixed name="neck_pitch_lineA" stiffness="4625.0" springlength="-100 -0.001986" damping="92.50">
+      <joint joint="neck_pitch" coef="0.05000"/><joint joint="neck_pitch_drum" coef="-0.00300"/>
     </fixed>
-    <fixed name="neck_pitch_lineB" stiffness="9250.0" springlength="-100 -0.000993" damping="185.00">
-      <joint joint="neck_pitch" coef="-0.02500"/><joint joint="neck_pitch_drum" coef="0.00300"/>
+    <fixed name="neck_pitch_lineB" stiffness="4625.0" springlength="-100 -0.001986" damping="92.50">
+      <joint joint="neck_pitch" coef="-0.05000"/><joint joint="neck_pitch_drum" coef="0.00300"/>
     </fixed>
     <fixed name="neck_roll_clutch" frictionloss="0.2220" solreffriction="0.01 1" solimpfriction="0.99 0.999 0.001">
       <joint joint="neck_roll_gear" coef="1"/><joint joint="neck_roll_drum" coef="-1"/>

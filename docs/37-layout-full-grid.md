@@ -109,7 +109,8 @@ The thigh is 430 mm (`cad/skeleton.json`). About 300 mm of it is clear of the hi
 
 - A forward weight transfer that holds on held feet with heavy thighs. That is the old hub task `step-on-held-feet`
   (D-043), now with the layout masses as its hardest case.
-- The 0.50 m chair on the brushless layouts (the neck slips); the chair with armrests.
+- The 0.50 m chair on the brushless layouts (the neck slips); the chair with armrests. Done in docs/41: the neck's
+  pitch on two strands (D-066), and the brushless layout stands from 0.50 m with and without armrests.
 - The battery tray and the thigh bank as generators (the W-max itself has no generator; task item 3, the gearbox).
 - The deeper thigh (165 to 175 mm) in the model's collision shapes.
 
