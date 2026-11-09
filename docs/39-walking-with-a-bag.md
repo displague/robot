@@ -104,6 +104,9 @@ The 7 left:
 - six walks with the 3.0 kg tall bag or the 4.5 kg box;
 - the ball rolling off its top once (`F:place`).
 
+The put-down now waits, for up to 2 s, until the item is still on its top before letting go (a person does the
+same). The ball stays put, and the grid is **18 of 24**. The only failures left are the six heavy one-handed walks.
+
 The heavy bags are past what one hand walks with (docs/28 and the single walks above).
 
 ## What was built

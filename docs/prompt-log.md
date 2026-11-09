@@ -944,3 +944,8 @@ Continued: the planner sets a held bag down before a sit and takes it up after (
 grid goes from 12 to 17 of 24, and every sit with a bag now stands (docs/39). With the press fix, every partial hip
 bank steps on held feet but none walks on them (docs/40).
 
+Continued:
+- The put-down waits until the item is still, and the chain grid is 18 of 24.
+- A slower, damped weight ramp (`TP_B=6 ROLL_KD=0.5`) walks the 775 layout on held feet 13 of 14 (was 4), but not
+  the brushless layout (2), so it stays a per-build setting (docs/40).
+

@@ -89,6 +89,11 @@ def segments(st, r, item):
         low, xy = bottom_xy()
         r.place_stool(1, xy, low - 0.003)
         r.run(0.3)
+        q, v = r.item_qadr(item)
+        for _ in range(int(round(2.0 / r.model.opt.timestep))):   # let go once it is still on the top (a ball rolls)
+            if np.linalg.norm(r.data.qvel[v:v + 3]) < 0.02 and np.linalg.norm(r.data.qvel[v + 3:v + 6]) < 0.2:
+                break
+            r.step()
         r.grip(HAND, item, False)
         r.run(1.5)
         state["held"] = False

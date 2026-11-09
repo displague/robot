@@ -103,7 +103,8 @@ and 16 and 13 (walk), against 42 on soft contact.
 length. It is **on by default since D-064** (docs/40). It takes the D-060 layout's held step from 0 to 14 of 14,
 costs the gauntlet's step 66 J, and leaves every 20 kg grid level or better. Off, the landed leg is replanned at
 its unpressed length and pulls up; a heavier leg then kicks the body sideways over the stance foot. On held feet
-with the layout masses the walk still stands only 4 of 14. Gain sweeps (`SS_SLEW`, `SWING_ROLL_TAU`, `SS_KP`,
+with the layout masses the walk still stands only 4 of 14. `TP_B=6 ROLL_KD=0.5` makes it 13 on the 775 layout
+but not the brushless one (2), so it is a per-build setting, not a default (docs/40). Gain sweeps (`SS_SLEW`, `SWING_ROLL_TAU`, `SS_KP`,
 `WALK_BACK`) stay within the scatter, as P-045's did.
 For the energy of a walk per drive, sum `rig.stats[name]["e_j"]` after the scene (docs/27: hip roll, ankle
 pitch and knee carry three quarters, all holding torque). `COM_REF_BACK` moves the balance loop's CoM target
@@ -300,8 +301,9 @@ memory. `--one <seed>` prints one run's full log.
   fails nearly every walk. `GRIP_DAMP` is an explicit torque: 1.0 spikes a light bag and 2.0 blows up, because the
   hand's inertia is small. Both act only when the model has items.
 - **Sitting with a bag:** `chain.SIT_SETDOWN` (on, D-065) sets the bag down on a top before a sit and takes it up
-  after. A bag held through the sit lands on the floor, and the robot cannot stand. Today's grid: 17 of 24 chains
-  done. The failures left are one-handed walks with 3 kg or more, and the ball rolling off a top.
+  after. A bag held through the sit lands on the floor, and the robot cannot stand. The put-down lets go only once
+  the item is still. Today's grid: 18 of 24 chains done. The six failures left are one-handed walks with 3 kg or
+  more.
 - **To diagnose a carried item,** give the balance loop the item's true CoM (`Rig.com_est` overridden) as an upper
   bound. That separates "the loop does not know it" from "the walk cannot carry it".
 

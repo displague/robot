@@ -115,6 +115,46 @@ new stance sole's centre. The shift has given the body lateral momentum: the loa
 the foot lifts, and the CoM carries on past the sole's edge. The heavier build's slower lateral swing makes this
 worse.
 
+## A slower, damped weight ramp: the 775 layout walks, the brushless one does not
+
+The early unloading comes from lateral momentum, so the next lever was the weight ramp's length (`TP_B`, 3 s) with
+more damping on the lateral shift (`ROLL_KD`, 0.2). Held walk, out of 14:
+
+| Variant | 775 layout | Brushless layout |
+| --- | --- | --- |
+| base | 4 | 4 |
+| `TP_B=5` | 7 | - |
+| `TP_B=8` | 2 | - |
+| `TP_B=5 ROLL_KD=0.5` | 9 | 2 |
+| `TP_B=5 ROLL_KD=0.8` | 3 | - |
+| `TP_B=5 ROLL_KD=0.5 SS_SLEW=1.0` | 12 | 0 |
+| `TP_B=4 ROLL_KD=0.5` | 8 | - |
+| **`TP_B=6 ROLL_KD=0.5`** | **13** | 2 |
+| `TP_B=6 ROLL_KD=0.4` | 10 | 0 (falls in the first shift) |
+| `TP_B=6 ROLL_KD=0.6` | 7 | - |
+| `TP_B=7 ROLL_KD=0.5` | 10 | 5 |
+
+`TP_B=6 ROLL_KD=0.5` on the other grids:
+- the 775 layout's held step: 14 of 14.
+- 20 kg, out of 14:
+
+  | Grid | Default | `TP_B=6 ROLL_KD=0.5` |
+  | --- | --- | --- |
+  | held walk | 13 | 14 |
+  | soft walk | 14 | 14 |
+  | `low` walk | 7 | 5 |
+  | held step | 14 | 13 |
+  | soft step | 14 | 14 |
+  | `low` step | 9 | 11 |
+
+- **The 775 layout gets a held walk** (13 of 14, with its neighbours at 7 to 10), at no clear cost to the 20 kg
+  model.
+- **The brushless layout gets nothing**, and its lateral loop breaks at `ROLL_KD=0.4`. Its walk fails differently
+  and was not traced.
+- **So the defaults stay.** `TP_B=6 ROLL_KD=0.5` is the 775 layout's setting, to be used when that build is the
+  model. The robot's eventual walk is the learned policy's job (the sibling repo), and these grids are its
+  teacher's test.
+
 ## Not yet
 
 - The held walk on the layouts: the trailing foot slides outward through the weight ramp, and the CoM leaves at
@@ -123,7 +163,8 @@ worse.
 
 ## Next
 
-Make the walk's release a staged hand-off for the heavier builds. Release the trailing foot only once the CoM is
+For the brushless layout, trace why its lateral loop breaks (`ROLL_KD=0.4` falls in the first shift) before
+tuning it further. For both, make the walk's release a staged hand-off. Release the trailing foot only once the CoM is
 over the new stance sole's centre, not just once the foot is light. Hold the shift's integral through the release,
 and ramp the trailing leg's lift. The 26 kg 775 layout's held walk at 0.095 m is the test case (w3). Tried and not
 enough on their own:
