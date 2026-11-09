@@ -72,6 +72,22 @@ The gauntlet's line flag (a safety factor under 4) sits below the clutch's own s
 at its clutch is flagged. The flag is right that the spine runs at its limit. It does not mean the line is at risk:
 the clutch caps the line at 297 N, with brief dynamic peaks of up to 1.2 times that.
 
+### Where: the spine cannot bend the trunk forward from a reclined pelvis
+
+A smaller seat-off bend (`SIT_SPINE` 10 or 15 degrees, 20 today) does not lower the peak either (319 to 363 N), and at
+10 degrees most rises fail. Tracing the 20 kg model's 0.45 m chair:
+- **Going down,** line A holds the trunk from falling forward, up to 294 N, with the spine 1 to 2 degrees past its
+  target.
+- **Onto the seat,** the pelvis tips back and the spine's flexion line B pulls at 278 to 295 N. The spine stays at
+  8 degrees against a 20 degree target.
+- **In the rise,** the spine is commanded to 34 degrees: the path plus `SIT_SPINE_OVER`, docs/33's overdrive for
+  its sag. B sits at 297 N, the clutch, with the spine near 13 degrees.
+
+So the spine's drive cannot bend the trunk forward from a reclined pelvis. docs/33 overdrove it on purpose, and the
+clutch caps the result. The hips do the rest of the lean, and every build stands. A stronger spine drive, or a W-max
+in its place, would be the hardware answer. The planner could also lean the pelvis forward before it asks the spine
+for anything.
+
 ## Not yet
 
 - The neck's roll and yaw stay on one strand. Neither was flagged.
@@ -82,7 +98,6 @@ the clutch caps the line at 297 N, with brief dynamic peaks of up to 1.2 times t
 
 ## Next
 
-docs/37's item on the brushless 0.50 m chair is closed. The spine's seat-off pose asks more than its drive holds.
-Plan the sit's spine target from what the drive can hold: the trunk's static moment at seat-off against the clutch
-torque. Let the hips take more of the lean, as `SIT_HIP_K` already does when the CoM lags, and rerun the chair
-seats.
+docs/37's item on the brushless 0.50 m chair is closed. The spine is the next limit in the chair. Try the sit with
+the pelvis rolled forward before the spine is asked to bend: the hips lead the lean in `stand: lean`. Compare the
+spine line, the slip and the reach on the three builds.
