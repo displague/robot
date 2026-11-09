@@ -299,6 +299,9 @@ memory. `--one <seed>` prints one run's full log.
   `GRIP_DAMP` (0.5 N m s/rad) damps an item's rotation against the hand. A freely pivoting bag with no felt weight
   fails nearly every walk. `GRIP_DAMP` is an explicit torque: 1.0 spikes a light bag and 2.0 blows up, because the
   hand's inertia is small. Both act only when the model has items.
+- **Sitting with a bag:** `chain.SIT_SETDOWN` (on, D-065) sets the bag down on a top before a sit and takes it up
+  after. A bag held through the sit lands on the floor, and the robot cannot stand. Today's grid: 17 of 24 chains
+  done. The failures left are one-handed walks with 3 kg or more, and the ball rolling off a top.
 - **To diagnose a carried item,** give the balance loop the item's true CoM (`Rig.com_est` overridden) as an upper
   bound. That separates "the loop does not know it" from "the walk cannot carry it".
 

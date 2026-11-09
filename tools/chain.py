@@ -15,6 +15,8 @@ Output per run: the seed, the bag, the order, and per segment ok or the first fa
 time, the bag's peak load on the hand and the energy.
 """
 import json
+
+import numpy as np
 import math
 import os
 import random
@@ -38,6 +40,8 @@ HAND = "hand.L"
 SEAT = 0.45
 HANDBACK = True              # chain.py ... HANDBACK=0 (via --no-handback): each skill starts from where the last left it
 LIFT = math.radians(-50)     # elbow flexion that lifts the bag off the stool (- is flexion, as SIT_LAP)
+SIT_SETDOWN = True           # docs/40: a bag in hand is set down on a top before a sit and taken up again after it
+REACH_TOL = 0.06             # m: the furthest the hand's grip may be from the resting bag's handle to take it up again
 
 
 def segments(st, r, item):
@@ -95,17 +99,41 @@ def segments(st, r, item):
             raise Fail("the bag is not resting on the top (its bottom %.0f mm, the top %.0f mm)" % (low2 * 1e3, top * 1e3))
         return "on the top at %.2f m" % top
 
+    def take_up(r):
+        """Take the bag up again from the top it rests on, where the hand now is (after a sit)."""
+        r.run(0.5)
+        gap = float(np.linalg.norm(r.grip_site(HAND) - r.item_grip(item)))
+        if gap > REACH_TOL:
+            raise Fail("the bag's handle is %.0f mm from the hand" % (gap * 1e3))
+        r.grip(HAND, item, True)
+        r.run(0.3)
+        r.move({"forearm.L_pitch": LIFT}, 1.0)
+        r.run(0.5)
+        r.place_stool(1, None)
+        r.move({"forearm.L_pitch": 0.0}, 1.0)
+        r.run(1.0)
+        state["held"] = True
+        return gap
+
     def walk(r):
         scenes["walk"](r)
         return ""
 
     def sit(r):
+        down = SIT_SETDOWN and state["held"]
+        if down:                                   # the planner sets the bag down first (docs/40)
+            place(r)
+            r.to_stand()
         r.origin = r.feet_origin()
         st.sit_stand(r, SEAT, False)
         r.set_chair(None)
         if not r.sit_result["stood"]:
             raise Fail("did not stand again" if r.sit_result["sat"] else "did not sit")
-        return "reach %.1f cm" % (r.sit_result["reach"] * 100)
+        note = "reach %.1f cm" % (r.sit_result["reach"] * 100)
+        if down:
+            r.to_stand()
+            note += ", the bag set down and taken up again (%.0f mm off)" % (take_up(r) * 1e3)
+        return note
 
     def stand(r):
         r.run(2.0)

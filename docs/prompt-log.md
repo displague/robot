@@ -939,3 +939,8 @@ Grip friction (`GRIP_DAMP`) plus the felt weight (`FEEL_LOAD`), now the defaults
 Continued under P-064: the docs/37 Next. The layout's held-feet step failure was the transfer's press. The existing
 `TP_PRESS_FROM_LANDED` takes the 775 layout's held step from 0 to 14 of 14, and it is now on by default (docs/40,
 D-064). The layouts' held walk is still 4 of 14; gain sweeps did not move it past the scatter.
+
+Continued: the planner sets a held bag down before a sit and takes it up after (`chain.SIT_SETDOWN`, D-065). The chain
+grid goes from 12 to 17 of 24, and every sit with a bag now stands (docs/39). With the press fix, every partial hip
+bank steps on held feet but none walks on them (docs/40).
+

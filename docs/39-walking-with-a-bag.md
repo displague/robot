@@ -86,6 +86,26 @@ within the grid's scatter. 1 against 6 of 10 is not.
 below its grip, so it lands on the floor. The robot sits but does not stand, with or without the fixes. Its
 reach at seat-off is computed without the bag.
 
+## Sitting with a bag: set it down first (D-065)
+
+`chain.SIT_SETDOWN` (on) is the planner rule a person follows. Before a sit with a bag in hand, the robot sets the
+bag down on a top under where it hangs. It then sits, stands, takes a quiet stand, and takes the bag up again from
+where it rests. If the handle is more than 60 mm from the hand (`REACH_TOL`), that counts as a failure. After the
+stand the handle is 28 to 30 mm from the hand, and the grip closes that gap.
+
+The chain grid, with the press default of D-064:
+
+| | Chains done | Bag in hand into a sit |
+| --- | --- | --- |
+| The bag held through the sit | 12 / 24 | 0 / 5 |
+| **Set down first** | **17 / 24** | **5 / 5** |
+
+The 7 left:
+- six walks with the 3.0 kg tall bag or the 4.5 kg box;
+- the ball rolling off its top once (`F:place`).
+
+The heavy bags are past what one hand walks with (docs/28 and the single walks above).
+
 ## What was built
 
 - `sim_tendon.GRIP_DAMP` (N m s/rad, now 0.5) and `Rig._grip_damp`: on each closed grip, a torque against the

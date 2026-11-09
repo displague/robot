@@ -761,3 +761,14 @@ stands.
 Alternative: keep it off and judge held feet with it as a variant (docs/25's choice, made for a soft-walk cost that
 does not show on this grid).
 Reverses if: a broader soft-contact walk grid loses more than the scatter with it on.
+
+## D-065 (2026-11-09) The planner sets a held bag down before it sits
+
+Why: P-064, docs/39. Carrying a bag into a sit failed in 5 of 5 chains. Seated, the bag lands on the floor, and the
+seat-off plan cannot account for a load that comes back as the robot rises. Putting the felt load into the sit's
+plan made it worse. Setting the bag down on a top first, then taking it up again after standing, does all 5, and
+the chain grid goes from 12 to 17 of 24 (`chain.SIT_SETDOWN`).
+Alternative: carry the bag through the sit with the forearm raised, or on the lap. The second needs the items to
+collide with the robot.
+Reverses if: a sit that holds the bag clear passes the chain grid as well.
+
