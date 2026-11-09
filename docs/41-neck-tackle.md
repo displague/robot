@@ -135,6 +135,35 @@ the clutch's 29.7 N m at the joint (297 N x 50 mm x 2 strands):
   trunk's lower front and the top of the thighs are load-bearing seated. **For the hardware:** design them as pads,
   not as a gap to clear. The deeper thigh of D-060 (165 to 175 mm, docs/37) brings that contact sooner.
 
+### When the trunk leaves the thighs, the spine folds to its stop
+
+The rise, traced with the trunk-thigh contact alongside the spine line (0.45 m chair):
+
+| | 20 kg model | 775 layout |
+| --- | --- | --- |
+| The trunk rests on the thighs | to 12.4 s, 400 to 1000 N | to 13.2 s, 600 to 870 N |
+| The hips extend after it leaves | -96 to -74 deg in 0.6 s | -94 to -71 deg in 0.6 s |
+| The spine | folds to 39.6 deg (its stop is 40), target 15 to 25 | folds to 41 deg and stays past 15.4 s |
+| The spine's extensor line | 230 to 295 N for 1.6 s | 230 to 307 N for over 2 s |
+
+The hips rotate the pelvis back under a trunk that lags, and the spine takes up the difference until it reaches its
+stop. The line peak in the rise is the extensor pulling the trunk back from there.
+
+A gate on the rise, like the CoM's (`SIT_SPINE_GATE`: the knees stop while the spine is folded past its path):
+
+| Build, seat | Off | 5 deg | 10 deg |
+| --- | --- | --- | --- |
+| 20 kg, 0.45 m | 320 N, 0 slip | 307 N, 0 slip | 374 N, 44 deg |
+| 20 kg, 0.50 m | 339 N, 0 slip | 302 N, 0 slip | 370 N, 19 deg |
+| 775 layout, 0.45 m | 338 N, 87 deg | 330 N, **0 slip** | 383 N, 45 deg |
+| 775 layout, 0.50 m | 354 N, 0 slip | 315 N, 0 slip | 372 N, 52 deg |
+| brushless layout, 0.45 m | 324 N | 317 N | 388 N |
+| brushless layout, 0.50 m | 323 N, stands | 316 N, **does not stand** | 387 N, does not stand |
+
+At 5 degrees the spine stops slipping on every build, and the peak drops by 2 to 11%. But the brushless layout loses
+the 0.50 m rise, and the rises take more energy (the 20 kg 0.45 m chair: 1010 to 1264 J). It stays off by default,
+as an option.
+
 ## Not yet
 
 - The neck's roll and yaw stay on one strand. Neither was flagged.
@@ -145,8 +174,7 @@ the clutch's 29.7 N m at the joint (297 N x 50 mm x 2 strands):
 
 ## Next
 
-docs/37's item on the brushless 0.50 m chair is closed. The spine is the next limit in the chair. The trunk resting on
-the thighs is part of the sit, so the spine's limit is its drive's in the rise. Trace the rise with the trunk-thigh
-contact force alongside the spine line: when the contact lets go, the spine carries the trunk alone. A 3-strand
-spine or a stronger drive is for that moment. Model the deeper D-060 thigh first, since it changes when the contact
-comes.
+docs/37's item on the brushless 0.50 m chair is closed. The spine is the next limit in the chair. The rise's weak moment
+is the trunk leaving the thighs while the hips extend fast. Try the hip extension rate-limited for the half second
+after the trunk lifts off, rather than gating the knees. Model the deeper D-060 thigh first, since it changes when
+the contact lets go.

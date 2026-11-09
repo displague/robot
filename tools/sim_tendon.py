@@ -221,6 +221,7 @@ SIT_DOWN_T = 4.0                 # s: standing to the seat
 SIT_HOLD = 2.0                   # s: seated
 SIT_LEAN_T = (1.0, 1.5, 0.065)   # s: the trunk's swing to the seat-off pose: the first where the static reach is
                                  # over the third (m behind the sole centre: less margin, more momentum), else the second
+SIT_SPINE_GATE = 0.0             # rad: the rise's knees stop when the spine is folded this far past its path (docs/41); 0: off
 SIT_LEAD = math.radians(12)      # the knee target's lead on the measured knee in the rise
 SIT_KNEE_RATE = math.radians(25)  # rad/s: the knee target's fastest
 SIT_GATE = 0.02                  # m: the knee stops when the CoM is this much further back than planned
@@ -1176,6 +1177,9 @@ def sit_stand(r, seat, arms=False):
         so = r.soles()
         e = r.data.subtree_com[r.pelvis][1] - 0.5 * (so[0][0][1] + so[1][0][1]) - off   # +: further back than planned
         gate = float(np.clip(1.0 - e / SIT_GATE, 0.0, 1.0))
+        if SIT_SPINE_GATE:   # docs/41: the rise waits while the spine is folded past its plan (the trunk lagging the hips)
+            over = r.data.qpos[r.by_name["spine_pitch"]["q"]] - t["spine_pitch"]
+            gate *= float(np.clip(1.0 - over / SIT_SPINE_GATE, 0.0, 1.0))
         kt = max(0.0, max(km - SIT_LEAD, kt - gate * SIT_KNEE_RATE * dt))
         t["spine_pitch"] += SIT_SPINE_OVER * t["spine_pitch"] / max(SIT_SPINE, 1e-6)
         for s in "LR":
