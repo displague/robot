@@ -311,7 +311,8 @@ memory. `--one <seed>` prints one run's full log.
 - **Sitting with a bag:** `chain.SIT_SETDOWN` (on, D-065) sets the bag down on a top before a sit and takes it up
   after. A bag held through the sit lands on the floor, and the robot cannot stand. The put-down lets go only once
   the item is still. Today's grid: 18 of 24 chains done. The six failures left are one-handed walks with 3 kg or
-  more.
+  more. `chain.SPLIT` (off) carries a bag over `ONE_HAND_KG` in both hands, split; its two-hand take-up and
+  put-down are not reliable yet (docs/39).
 - **To diagnose a carried item,** give the balance loop the item's true CoM (`Rig.com_est` overridden) as an upper
   bound. That separates "the loop does not know it" from "the walk cannot carry it".
 

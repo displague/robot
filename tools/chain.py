@@ -41,38 +41,71 @@ SEAT = 0.45
 HANDBACK = True              # chain.py ... HANDBACK=0 (via --no-handback): each skill starts from where the last left it
 LIFT = math.radians(-50)     # elbow flexion that lifts the bag off the stool (- is flexion, as SIT_LAP)
 SIT_SETDOWN = True           # docs/40: a bag in hand is set down on a top before a sit and taken up again after it
+SPLIT = False                # docs/39: True puts a bag over ONE_HAND_KG in both hands, split (the two-hand take-up and put-down need work)
+ONE_HAND_KG = 2.5            # kg: the most one hand walks with (docs/39)
 REACH_TOL = 0.06             # m: the furthest the hand's grip may be from the resting bag's handle to take it up again
+
+
+def carry_for(item):
+    """[(hand, item name)] for a bag: one hand up to ONE_HAND_KG, else its weight split into two items, one per hand
+    (docs/39: one hand walks about 2.5 kg, two about 4.5 kg split)."""
+    it = [b for b in BAGS if b["name"] == item][0]
+    if SPLIT and it["kg"] > ONE_HAND_KG:
+        return [("hand.L", item + "_L"), ("hand.R", item + "_R")]
+    return [(HAND, item)]
+
+
+def items_for(item):
+    """The export_mjcf.ITEMS a run needs."""
+    it = [b for b in BAGS if b["name"] == item][0]
+    carry = carry_for(item)
+    return [dict(it, name=n, kg=it["kg"] / len(carry)) for _, n in carry]
 
 
 def segments(st, r, item):
     """The segments of a run, by name: each a function(r) that returns a short note or raises Fail."""
     scenes = {k: fn for k, _, _, fn in st.scenarios()}
     it = [b for b in BAGS if b["name"] == item][0]
+    carry = carry_for(item)
     from export_mjcf import item_half_z
     hz = item_half_z(it)
     state = dict(held=False)
 
+    def arms(q, t):
+        r.move({"forearm.%s_pitch" % h[-1]: q for h, _ in carry}, t)
+
+    def still(names, seconds):
+        """Step until every item is still (a ball rolls, a bag swings), or for `seconds`."""
+        adr = [r.item_qadr(n)[1] for n in names]
+        for _ in range(int(round(seconds / r.model.opt.timestep))):
+            if all(np.linalg.norm(r.data.qvel[v:v + 3]) < 0.02 and np.linalg.norm(r.data.qvel[v + 3:v + 6]) < 0.2
+                   for v in adr):
+                break
+            r.step()
+
     def pick(r):
         r.run(0.5)
-        p = r.grip_site(HAND)
-        bottom = p[2] - it["handle"] - 2 * hz
-        r.place_stool(0, p[:2], bottom - 0.002)
-        r.place_item(item, p + (0.0, 0.0, 0.002))
+        for k, (hand, name) in enumerate(carry):
+            p = r.grip_site(hand)
+            r.place_stool(k, p[:2], p[2] - it["handle"] - 2 * hz - 0.002)
+            r.place_item(name, p + (0.0, 0.0, 0.002))
         r.run(0.3)
-        r.grip(HAND, item, True)
+        for hand, name in carry:
+            r.grip(hand, name, True)
         r.run(0.3)
-        r.move({"forearm.L_pitch": LIFT}, 1.0)
+        arms(LIFT, 1.0)
         r.run(0.5)
-        r.place_stool(0, None)
-        r.move({"forearm.L_pitch": 0.0}, 1.0)        # the arm hangs again, the bag below the hand
+        for k in range(len(carry)):
+            r.place_stool(k, None)
+        arms(0.0, 1.0)                                # the arms hang again, the bags below the hands
         r.run(1.0)
         state["held"] = True
-        return "load %.0f N" % r.held_load(HAND, item)
+        return "load %s N" % "/".join("%.0f" % r.held_load(h, n) for h, n in carry)
 
-    def bottom_xy():
+    def bottom_xy(name):
         """The item's lowest point (z) and its body's centre (x, y), from its geom's pose and shape."""
         m, d = r.model, r.data
-        gid = m.geom("item." + item).id
+        gid = m.geom("item." + name).id
         c, R, sz = d.geom_xpos[gid], d.geom_xmat[gid].reshape(3, 3), m.geom_size[gid]
         if it["shape"] == "box":
             low = c[2] - sum(abs(R[2, i]) * sz[i] for i in range(3))
@@ -84,41 +117,45 @@ def segments(st, r, item):
         return low, c[:2].copy()
 
     def place(r):
-        # set the bag down on a counter-height top under where it hangs (arm down, settled), then let go
+        # set each bag down on a counter-height top under where it hangs (arms down, settled), then let go once
+        # it is still on its top
         r.run(1.0)
-        low, xy = bottom_xy()
-        r.place_stool(1, xy, low - 0.003)
+        tops = []
+        for k, (hand, name) in enumerate(carry):
+            low, xy = bottom_xy(name)
+            r.place_stool(2 + k, xy, low - 0.003)
+            tops.append(low - 0.003)
         r.run(0.3)
-        q, v = r.item_qadr(item)
-        for _ in range(int(round(2.0 / r.model.opt.timestep))):   # let go once it is still on the top (a ball rolls)
-            if np.linalg.norm(r.data.qvel[v:v + 3]) < 0.02 and np.linalg.norm(r.data.qvel[v + 3:v + 6]) < 0.2:
-                break
-            r.step()
-        r.grip(HAND, item, False)
+        still([n for _, n in carry], 2.0)
+        for hand, name in carry:
+            r.grip(hand, name, False)
         r.run(1.5)
         state["held"] = False
-        low2, xy2 = bottom_xy()
-        top = low - 0.003
-        q, v = r.item_qadr(item)
-        if abs(low2 - top) > 0.02 or abs(r.data.qvel[v + 2]) > 0.05:
-            raise Fail("the bag is not resting on the top (its bottom %.0f mm, the top %.0f mm)" % (low2 * 1e3, top * 1e3))
-        return "on the top at %.2f m" % top
+        for (hand, name), top in zip(carry, tops):
+            low2, _ = bottom_xy(name)
+            q, v = r.item_qadr(name)
+            if abs(low2 - top) > 0.02 or abs(r.data.qvel[v + 2]) > 0.05:
+                raise Fail("%s is not resting on its top (its bottom %.0f mm, the top %.0f mm)"
+                           % (name, low2 * 1e3, top * 1e3))
+        return "on the top%s at %.2f m" % ("s" if len(carry) > 1 else "", tops[0])
 
     def take_up(r):
-        """Take the bag up again from the top it rests on, where the hand now is (after a sit)."""
+        """Take the bags up again from the tops they rest on, where the hands now are (after a sit)."""
         r.run(0.5)
-        gap = float(np.linalg.norm(r.grip_site(HAND) - r.item_grip(item)))
-        if gap > REACH_TOL:
-            raise Fail("the bag's handle is %.0f mm from the hand" % (gap * 1e3))
-        r.grip(HAND, item, True)
+        gaps = [float(np.linalg.norm(r.grip_site(h) - r.item_grip(n))) for h, n in carry]
+        if max(gaps) > REACH_TOL:
+            raise Fail("a handle is %.0f mm from its hand" % (max(gaps) * 1e3))
+        for hand, name in carry:
+            r.grip(hand, name, True)
         r.run(0.3)
-        r.move({"forearm.L_pitch": LIFT}, 1.0)
+        arms(LIFT, 1.0)
         r.run(0.5)
-        r.place_stool(1, None)
-        r.move({"forearm.L_pitch": 0.0}, 1.0)
+        for k in range(len(carry)):
+            r.place_stool(2 + k, None)
+        arms(0.0, 1.0)
         r.run(1.0)
         state["held"] = True
-        return gap
+        return max(gaps)
 
     def walk(r):
         scenes["walk"](r)
@@ -126,7 +163,7 @@ def segments(st, r, item):
 
     def sit(r):
         down = SIT_SETDOWN and state["held"]
-        if down:                                   # the planner sets the bag down first (docs/40)
+        if down:                                   # the planner sets the bag down first (D-065)
             place(r)
             r.to_stand()
         r.origin = r.feet_origin()
@@ -144,7 +181,7 @@ def segments(st, r, item):
         r.run(2.0)
         return ""
 
-    return dict(pick=pick, place=place, walk=walk, sit=sit, stand=stand), state
+    return dict(pick=pick, place=place, walk=walk, sit=sit, stand=stand), state, carry
 
 
 class Fail(Exception):
@@ -172,7 +209,8 @@ def one(argv):
     seed = int(argv[0])
     item, order = order_for(seed)
     import export_mjcf
-    export_mjcf.ITEMS = [dict(b) for b in BAGS if b["name"] == item]
+    export_mjcf.ITEMS = items_for(item)
+    export_mjcf.STOOLS = 4                       # a pick and a put-down top per hand
     sys.path.insert(0, HERE)
     import sim_tendon as st
     st.STOOL_HALF = export_mjcf.STOOL_HALF
@@ -181,11 +219,11 @@ def one(argv):
         setattr(st, k, eval(v, vars(st)))
     r = st.Rig()
     r.reset()
-    segs, state = segments(st, r, item)
+    segs, state, carry = segments(st, r, item)
     peak = [0.0]
 
     def hook(_r):
-        peak[0] = max(peak[0], _r.held_load(HAND, item))
+        peak[0] = max(peak[0], max(_r.held_load(h, n) for h, n in carry))
     r.hook = hook
     notes, failed = [], None
     for name in order:

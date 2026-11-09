@@ -172,6 +172,13 @@ The heavy bags are past what one hand walks with (docs/28 and the single walks a
 
 ## Next
 
-One hand walks about 2.5 kg, and two hands about 4.5 kg split, on soft contact. Next:
-- add the split to the chain (a second item for the right hand, and the rule to use it above 2.5 kg);
+One hand walks about 2.5 kg, and two hands about 4.5 kg split, on soft contact. The split is in the chain as an
+option (`chain.SPLIT`, off; `ONE_HAND_KG` 2.5). With it on the grid is 15 of 24, against 17:
+- it gains the tall bag's walks;
+- it loses three sits: after standing, the right hand comes back up to 158 mm from its handle;
+- it loses two put-downs: one robot fell setting both bags down at once.
+
+Next:
+- make the two-hand take-up reach for each handle (the right arm's return pose), and set the two bags down one at a
+  time;
 - take the carried load onto held feet, where 2 x 2.25 kg still falls. That is the same held walk as docs/40's.
