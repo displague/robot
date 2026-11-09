@@ -92,6 +92,28 @@ Leaning with the hips first (60% of the lean's time before the spine moves, with
 the peak at 310 to 354 N. The down and onto-the-seat phases reach the clutch before the lean starts, so planning
 cannot remove it. The answer is the spine's drive (tried and reverted).
 
+### What the spine needs
+
+The trunk's gravity torque at the spine pitch joint, from the seated and rising poses (`qfrc_bias`, at rest), against
+the clutch's 29.7 N m at the joint (297 N x 50 mm x 2 strands):
+
+| Build | Seated, as reached (7-8 deg) | Seated, at the 20 deg target | Rising, as reached | Rising, at 20 deg |
+| --- | --- | --- | --- | --- |
+| 20 kg | 29.6 N m | 32.8 | 30.1 | 31.3 |
+| 775 layout | 29.5 | 34.4 | 30.3 | 33.2 |
+| brushless layout | 27.0 | 30.7 | 27.4 | 29.1 |
+
+- **The spine stops where gravity meets its clutch.** That is the 8 degrees seated, against a 20 degree target.
+- **`tendon_calc.py` now has the case** ("SIT spine pitch", 35 N m, 700 N at the 50 mm pulley):
+  - the 775 W-max at 2 strands gives 28.8 N m continuous: not enough;
+  - at 3 strands, 43.2 N m: enough, with the line at a safety factor of 3.8.
+- **In the simulation, 3 strands without the overdrive still run the line at 284 to 310 N** (43 to 46 N m at the
+  joint). The 775 layout's 0.50 m rise fails. So the spine carries more than the trunk's static weight in the sit,
+  by a third to a half. Where that comes from is not traced. Candidates:
+  - the down phase's dynamics;
+  - the servo's integral trim;
+  - lines that cross the spine.
+
 ## Not yet
 
 - The neck's roll and yaw stay on one strand. Neither was flagged.
@@ -102,7 +124,6 @@ cannot remove it. The answer is the spine's drive (tried and reverted).
 
 ## Next
 
-docs/37's item on the brushless 0.50 m chair is closed. The spine is the next limit in the chair, and it is the
-drive's. Size the spine pitch for the seated trunk: its torque from a reclined pelvis against the W-max's clutch at
-2 strands (about 30 N m). Put the result into `tendon_calc.py`'s requirements table, so the drive choice comes from
-the chair and not only from standing.
+docs/37's item on the brushless 0.50 m chair is closed. The spine is the next limit in the chair. Trace the spine's
+torque per phase with 3 strands: the servo's demand, the trim and the line forces against `qfrc_bias`. Find the
+third to half that the static weight does not explain, then choose between 3 strands and a stronger drive.

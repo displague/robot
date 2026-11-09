@@ -198,6 +198,15 @@ SCENARIOS = [
              joint_moment_arm_mm=50, excursion_mm=122, required_force_n=400, line="braid_200lb", target_time_s=2.0),
     Scenario("knee (slow stand) / JGB37 1:270, 8 mm drum, 4:1 tackle", "JGB37_1:270", 8.0, tackle=4,
              joint_moment_arm_mm=50, excursion_mm=122, required_force_n=400, line="braid_200lb", target_time_s=2.0),
+    # Spine pitch in a chair (docs/41): the trunk's gravity torque at the spine, seated with the pelvis reclined and in
+    # the rise, measured 27-34 N m (20 kg model and both layouts; the W-max clutch holds 29.7 N m at 2:1) -> 35 N m,
+    # 50 mm pulley -> 700 N; 20 deg in 1 s -> 17 mm
+    Scenario("SIT spine pitch / 775 + printed 1:40 planetary, 15 mm drum, 2:1 tackle", "775_PLAN40", 15.0,
+             tackle=2, eta_gear=0.6, joint_moment_arm_mm=50, excursion_mm=17, required_force_n=700,
+             line="braid_200lb", target_time_s=1.0),
+    Scenario("SIT spine pitch / 775 + printed 1:40 planetary, 15 mm drum, 3:1 tackle", "775_PLAN40", 15.0,
+             tackle=3, eta_gear=0.6, joint_moment_arm_mm=50, excursion_mm=17, required_force_n=700,
+             line="braid_200lb", target_time_s=1.0),
     # ---- walking (docs/07-locomotion.md): 20 kg robot, gait peaks scaled from human biomechanics
     # Ankle push-off: 1.6 Nm/kg -> 32 Nm, 50 mm pulley -> 640 N, 30 deg in 0.25 s -> 26 mm
     Scenario("WALK ankle push-off / wiper motor, 15 mm drum, 2:1 tackle", "WIPER", 15.0, tackle=2, eta_gear=0.5,

@@ -109,6 +109,8 @@ but not the brushless one (2), so it is a per-build setting, not a default (docs
 For the energy of a walk per drive, sum `rig.stats[name]["e_j"]` after the scene (docs/27: hip roll, ankle
 pitch and knee carry three quarters, all holding torque). `COM_REF_BACK` moves the balance loop's CoM target
 toward the ankle (off: it costs the arm hold and the walk grid).
+The gauntlet's line flag (a safety factor under 4) sits below the clutch's own setting (a third of break), so a
+drive working at its clutch is always flagged. The chair's spine pitch is one, at 290 to 350 N (docs/41).
 `JOINTS[...]["tackle_by_axis"]` gives one axis its own strand count (the neck's pitch is 2 since D-066, docs/41:
 the chair's trunk swing slipped its W-mini on 1). `export_mjcf.TACKLE_OVERRIDE` sets the strands at a joint axis (`{"ankle.pitch": 4}`); the line stiffness follows.
 From a sweep variant: `"a4: _=__import__('export_mjcf').TACKLE_OVERRIDE.update({'ankle.pitch':4})"`. Always run the
