@@ -126,7 +126,14 @@ The heavy bags are past what one hand walks with (docs/28 and the single walks a
 
 ## Not yet
 
-- Bags over 3 kg in the walk. docs/28's 3.9 kg walk had the bag inside the robot's CoM from the first step.
+- Bags over 3 kg in the walk. docs/28's 3.9 kg walk had the bag inside the robot's CoM from the first step. With
+  the end-of-day defaults (D-064, D-066, D-067) single walks give:
+  - 3.0 kg: stands (it fell before);
+  - 3.9 and 4.5 kg: fall, with or without the slower ramp `TP_B=6 ROLL_KD=0.5` (it only delays the fall);
+  - on held feet: falls from 3.0 kg up.
+
+  So one hand walks about 3 kg on soft contact. The chain's tall bag (3.0 kg) still fails its walks there: they come
+  right after the pick.
 - **Sitting with a bag.** Tried: the felt weight at the gripping hand in the sit's planned poses, and `com_est` in
   the stand-up gate. It made things worse. The arms are forward at seat-off, so the bag moved the planned reach
   from 7.7 cm to between -2.6 and +1.9 cm. The planner then leaned too little, and the jug no longer sat. The real
