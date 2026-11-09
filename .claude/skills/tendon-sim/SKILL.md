@@ -100,8 +100,11 @@ The default contact is MuJoCo's soft one with friction 1.0, and a loaded foot cr
 `step_sweep.py ... "held: NOSLIP=5"` and `"hard: NOSLIP=5 FLOOR_MU=0.4"`. Today these stand 23 and 40 of 42 (step)
 and 16 and 13 (walk), against 42 on soft contact.
 `TP_PRESS_FROM_LANDED=True` (with `TP_PRESS_CATCHUP`, 0.05 m/s) starts the landed leg's press from its measured
-length. On held feet the step then stands 40 and the walk 23; it is off by default because the soft-contact walk
-drops to 39 (docs/25, P-042). P-045's sweep of the press and swing settings found nothing past the grid's scatter.
+length. It is **on by default since D-064** (docs/40). It takes the D-060 layout's held step from 0 to 14 of 14,
+costs the gauntlet's step 66 J, and leaves every 20 kg grid level or better. Off, the landed leg is replanned at
+its unpressed length and pulls up; a heavier leg then kicks the body sideways over the stance foot. On held feet
+with the layout masses the walk still stands only 4 of 14. Gain sweeps (`SS_SLEW`, `SWING_ROLL_TAU`, `SS_KP`,
+`WALK_BACK`) stay within the scatter, as P-045's did.
 For the energy of a walk per drive, sum `rig.stats[name]["e_j"]` after the scene (docs/27: hip roll, ankle
 pitch and knee carry three quarters, all holding torque). `COM_REF_BACK` moves the balance loop's CoM target
 toward the ankle (off: it costs the arm hold and the walk grid).

@@ -138,9 +138,10 @@ WALK_STEPS = 4                   # the walk scene's steps (docs/23); the step sc
 TP_SETTLE = "load"               # the transfer first settles the landing as the centring does (docs/20): hold the landed
                                  # foot pressed until it carries LAND_LOAD and the CoM is still (or 3 s) before the CoM moves
 TP_PRESS_RATE = 0.02             # m/s: how fast TP_SETTLE="load" deepens the landed leg's press while it is unloaded
-TP_PRESS_FROM_LANDED = False     # the press starts from the landed leg's measured length, not the plan's unpressed
+TP_PRESS_FROM_LANDED = True      # the press starts from the landed leg's measured length, not the plan's unpressed
                                  # length: a heavier body lands with the knee still bent, and straightening it at once
-                                 # rolls the pelvis and kicks the lightly loaded foot out when it cannot slide (D-043)
+                                 # rolls the pelvis and kicks the lightly loaded foot out when it cannot slide (D-043).
+                                 # On by default since D-064 (docs/40): the layout masses step on held feet with it
 TP_PRESS_CATCHUP = 0.05          # m/s: the press's rate while it is still shorter than the plan's unpressed length
 COM_REF_BACK = 0.0               # m: the balance loop's CoM target this far behind the sole centre, toward the ankle (the
                                  # sole centre is 80 mm ahead of it, so centred the ankle holds weight x 80 mm; docs/27)

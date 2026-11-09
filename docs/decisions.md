@@ -717,6 +717,9 @@ Update (P-062): the hip drives on the thighs cost held feet, and the battery mov
 drives on the thighs, no build passes both, so the battery-up move stays and the hip bank waits on a forward
 transfer retuned for held feet.
 
+Update (P-064, D-064, docs/40): with the press from the landed length, the layouts step on held feet (775 14 of 14,
+brushless 10). Their held walk is 4 of 14, so the model stays on 20 kg.
+
 ## D-062 (2026-11-09) Skills are also judged chained, with a hand-back between them; the felt weight stays off
 
 Why: P-063, docs/38. Starting each skill from a fresh stand hid a hand-off bug. The walk leaves the planner's
@@ -743,3 +746,18 @@ the wrist or palm.
 Alternative: a swing observer from a 3-axis wrist force (tried: it does not track the swing).
 Reverses if: an implicit grip model (a soft weld) shows the damping is a step-size artefact, or the hardware's grip
 pivots freely.
+
+## D-064 (2026-11-09) The landed leg's press starts from its measured length by default
+
+Why: P-064, docs/40. The D-060 layout's held-feet step failure (docs/37) was the transfer's press. It replanned the
+landed leg at its unpressed length, so the leg pulled up, and the heavier leg's landing kicked the body sideways
+over the stance foot. `TP_PRESS_FROM_LANDED` (P-042) fixes it:
+- the 775 layout's held step: 0 to 14 of 14; the brushless layout's: 6 to 10.
+- 20 kg grids: equal or better (`ROBOT_MOTORS=low` step 7 to 9, walk 3 to 7).
+- The gauntlet: all 14 scenes stand; the step costs 66 J more and the walk 70 J.
+- The chain grid: 12 of 24 against 13, within the scatter.
+It is now on by default. The layouts' held walk is still 4 of 14, so D-061 (the model stays on the 20 kg masses)
+stands.
+Alternative: keep it off and judge held feet with it as a variant (docs/25's choice, made for a soft-walk cost that
+does not show on this grid).
+Reverses if: a broader soft-contact walk grid loses more than the scatter with it on.

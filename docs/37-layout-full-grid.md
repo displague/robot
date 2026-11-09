@@ -115,6 +115,10 @@ The thigh is 430 mm (`cad/skeleton.json`). About 300 mm of it is clear of the hi
 
 ## Next
 
+Done in docs/40 (P-064): the transfer's landing press was the failure. With it fixed (D-064) the 775 layout
+steps 14 of 14 on held feet; the held walk, 4 of 14, is open.
+
+
 Trace the forward transfer (phase 4) on held feet: the 775 layout at 0.10 m against the 20 kg model, and where
 their CoM, CoP and hip-line forces part. Retune it for the heavy swing leg, then rerun the held grid on the layout.
 Keep the battery-up move whatever the outcome (D-061). It costs nothing on held feet and buys 0.6 to 0.7 cm of

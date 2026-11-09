@@ -935,3 +935,7 @@ Filed hub tasks:
 Worked the docs/38 Next until 5 pm. The bag's swing was not the cause; the balance loop not knowing the bag was.
 Grip friction (`GRIP_DAMP`) plus the felt weight (`FEEL_LOAD`), now the defaults with items, take the chain grid from
 10 to 13 of 24 and walks with a bag in hand from 1 to 6 of 10 (docs/39, D-063).
+
+Continued under P-064: the docs/37 Next. The layout's held-feet step failure was the transfer's press. The existing
+`TP_PRESS_FROM_LANDED` takes the 775 layout's held step from 0 to 14 of 14, and it is now on by default (docs/40,
+D-064). The layouts' held walk is still 4 of 14; gain sweeps did not move it past the scatter.

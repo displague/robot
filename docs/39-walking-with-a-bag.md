@@ -104,7 +104,12 @@ reach at seat-off is computed without the bag.
 ## Not yet
 
 - Bags over 3 kg in the walk. docs/28's 3.9 kg walk had the bag inside the robot's CoM from the first step.
-- Sitting with a bag: lift the forearm while seated, or set the bag down first (a planner rule).
+- **Sitting with a bag.** Tried: the felt weight at the gripping hand in the sit's planned poses, and `com_est` in
+  the stand-up gate. It made things worse. The arms are forward at seat-off, so the bag moved the planned reach
+  from 7.7 cm to between -2.6 and +1.9 cm. The planner then leaned too little, and the jug no longer sat. The real
+  bag rests on the floor while the robot is seated, so it is not in the hand at seat-off. Reverted. What is needed
+  is a planner rule, not a CoM term: set the bag down before sitting, or hold it clear of the floor and lift it only
+  once standing.
 - An implicit grip damping (a weld with soft rotation, or a joint switched in), so stiffer grips do not spike.
 - The ball's 1.2 kg walk in the chain falls although 1.2 kg walks alone. The chain's walk comes right after the pick,
   with the bag possibly still swinging.
