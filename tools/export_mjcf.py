@@ -206,6 +206,7 @@ def winch_params(joint_name, axis, cls_name):
 # body shapes: radius of the printed shell per segment (capsule from bone head to tail), or a box
 # (x width, y depth, z height) for the trunk segments and the hand. These are the collision shapes too,
 # so the self-collision check is against the printed envelope, not a 50 mm stick. Masses are unchanged.
+SPINE_RELIEF = 0.0   # m: the trunk's collision box relieved this high at its lower front edge (docs/41); 0: one box
 SHELL = {"pelvis": ("box", (0.28, 0.16, 0.10)), "spine": ("box", (0.26, 0.16, 0.40)),
          "neck": ("capsule", 0.040), "head": ("capsule", 0.08), "clavicle": ("capsule", 0.02),
          "upperarm": ("capsule", 0.045), "forearm": ("capsule", 0.035), "hand": ("box", (0.08, 0.03, 0.18)),
@@ -226,6 +227,18 @@ def geom_shape(l, tint="0.75 0.75 0.75 1"):
     if kind == "box":
         size = tuple(max(abs(v), w) for v, w in zip(d, dim))
         origin = tuple(v / 2 for v in d)
+        if l["base"] == "spine" and SPINE_RELIEF > 0:
+            # docs/41: the trunk shell's lower front edge relieved where the thighs come up seated. The mass box stays
+            # as it was but collides with nothing; two weightless boxes collide: the back half at full height, the
+            # front half (-y is forward) with its bottom raised by SPINE_RELIEF
+            hx, hy, hz = size[0] / 2, size[1] / 2, size[2] / 2
+            c = SPINE_RELIEF
+            return (BOX_GEOM.replace('rgba', 'contype="0" conaffinity="0" rgba')
+                    % (hx, hy, hz, origin[0], origin[1], origin[2], l["mass"], tint)
+                    + BOX_GEOM.replace('rgba', 'group="3" rgba')
+                    % (hx, hy / 2, hz, origin[0], origin[1] + hy / 2, origin[2], 0.0, tint)
+                    + BOX_GEOM.replace('rgba', 'group="3" rgba')
+                    % (hx, hy / 2, hz - c / 2, origin[0], origin[1] - hy / 2, origin[2] + c / 2, 0.0, tint))
         return BOX_GEOM % (size[0] / 2, size[1] / 2, size[2] / 2, origin[0], origin[1], origin[2], l["mass"], tint)
     # capsule: the hemispherical ends overlap the neighbours at the joint, as a printed shell does
     length = math.sqrt(sum(v * v for v in d))

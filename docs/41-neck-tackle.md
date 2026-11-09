@@ -120,8 +120,20 @@ the clutch's 29.7 N m at the joint (297 N x 50 mm x 2 strands):
 - **Removing that contact does not lower the peak** (311 to 345 N, the spine's collision off, as an upper bound).
   The spine then folds further and meets its clutch there. So the contact explains the 8 degrees reached, not the
   line's peak.
-- **For the hardware:** the torso shell's lower front edge needs a chamfer or a recess where the thighs come up.
-  The deeper thigh of D-060 (165 to 175 mm, docs/37) makes it worse.
+- **Relieving the edge makes it worse** (`export_mjcf.SPINE_RELIEF`, the collision box's lower front raised):
+
+  | Build, seat | As is | 40 mm relief | 80 mm relief |
+  | --- | --- | --- | --- |
+  | 20 kg, 0.45 m | 320 N, stands | 365 N, stands | 312 N, stands |
+  | 20 kg, 0.50 m | 339 N, stands | 371 N (75 deg slip), stands | 313 N, stands |
+  | 775 layout, 0.45 m | 338 N, stands | 380 N, stands | 317 N, **does not stand** |
+  | 775 layout, 0.50 m | 354 N, stands | 394 N (165 deg slip), stands | 316 N, stands |
+  | brushless layout, 0.45 m | 324 N, stands | 355 N, stands | 331 N, stands |
+  | brushless layout, 0.50 m | 323 N, stands | 393 N, **does not stand** | 324 N, stands |
+
+  The thigh contact carries part of the trunk, as a person rests their trunk on their thighs to stand. So the
+  trunk's lower front and the top of the thighs are load-bearing seated. **For the hardware:** design them as pads,
+  not as a gap to clear. The deeper thigh of D-060 (165 to 175 mm, docs/37) brings that contact sooner.
 
 ## Not yet
 
@@ -133,8 +145,8 @@ the clutch's 29.7 N m at the joint (297 N x 50 mm x 2 strands):
 
 ## Next
 
-docs/37's item on the brushless 0.50 m chair is closed. The spine is the next limit in the chair. Give the spine's collision box
-a chamfered lower front edge (two boxes, or a box and a capsule) and measure:
-- how far the seated spine then reaches;
-- the line's peak, the 0.45 m and 0.50 m rises and the gauntlet;
-- the static demand at the reached angle, against 3 strands.
+docs/37's item on the brushless 0.50 m chair is closed. The spine is the next limit in the chair. The trunk resting on
+the thighs is part of the sit, so the spine's limit is its drive's in the rise. Trace the rise with the trunk-thigh
+contact force alongside the spine line: when the contact lets go, the spine carries the trunk alone. A 3-strand
+spine or a stronger drive is for that moment. Model the deeper D-060 thigh first, since it changes when the contact
+comes.
