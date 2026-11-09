@@ -155,6 +155,25 @@ more damping on the lateral shift (`ROLL_KD`, 0.2). Held walk, out of 14:
   model. The robot's eventual walk is the learned policy's job (the sibling repo), and these grids are its
   teacher's test.
 
+## The brushless layout's walk: a different failure
+
+0.085 m, held feet, the first transfer. Before the release the CoM is where it should be. At the release it lurches
+80 mm backward:
+- the trailing foot is dragged 20 to 50 mm while it still carries 37 N;
+- the stance foot shifts 36 mm sideways, rolling on an edge;
+- the next step is then planned 295 mm long and lands 3 mm ahead.
+
+The transfer runs the brushless drives over their continuous line rating (184 N against the 775's 288):
+
+| Line | Peak | Times continuous |
+| --- | --- | --- |
+| right ankle pitch | 254 N | 1.4 |
+| left ankle pitch | 237 N | 1.3 |
+| right hip pitch | 222 N | 1.2 |
+
+Nothing slips, so it is not a hard limit. But it points at the brushless W-max's 1:25 being light for the held-feet
+transfer, where the 775's 1:40 carries the same scene under its rating.
+
 ## Not yet
 
 - The held walk on the layouts: the trailing foot slides outward through the weight ramp, and the CoM leaves at
@@ -163,8 +182,8 @@ more damping on the lateral shift (`ROLL_KD`, 0.2). Held walk, out of 14:
 
 ## Next
 
-For the brushless layout, trace why its lateral loop breaks (`ROLL_KD=0.4` falls in the first shift) before
-tuning it further. For both, make the walk's release a staged hand-off. Release the trailing foot only once the CoM is
+For the brushless layout, try a 1:30 to 1:40 W-max on the leg drives (`tendon_calc.py`'s 5010 entry) on the held
+walk grid. Its transfer runs the ankle and hip lines at 1.2 to 1.4 times their continuous rating. For both, make the walk's release a staged hand-off. Release the trailing foot only once the CoM is
 over the new stance sole's centre, not just once the foot is light. Hold the shift's integral through the release,
 and ramp the trailing leg's lift. The 26 kg 775 layout's held walk at 0.095 m is the test case (w3). Tried and not
 enough on their own:
