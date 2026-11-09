@@ -88,6 +88,10 @@ clutch caps the result. The hips do the rest of the lean, and every build stands
 in its place, would be the hardware answer. The planner could also lean the pelvis forward before it asks the spine
 for anything.
 
+Leaning with the hips first (60% of the lean's time before the spine moves, with and without the overdrive) leaves
+the peak at 310 to 354 N. The down and onto-the-seat phases reach the clutch before the lean starts, so planning
+cannot remove it. The answer is the spine's drive (tried and reverted).
+
 ## Not yet
 
 - The neck's roll and yaw stay on one strand. Neither was flagged.
@@ -98,6 +102,7 @@ for anything.
 
 ## Next
 
-docs/37's item on the brushless 0.50 m chair is closed. The spine is the next limit in the chair. Try the sit with
-the pelvis rolled forward before the spine is asked to bend: the hips lead the lean in `stand: lean`. Compare the
-spine line, the slip and the reach on the three builds.
+docs/37's item on the brushless 0.50 m chair is closed. The spine is the next limit in the chair, and it is the
+drive's. Size the spine pitch for the seated trunk: its torque from a reclined pelvis against the W-max's clutch at
+2 strands (about 30 N m). Put the result into `tendon_calc.py`'s requirements table, so the drive choice comes from
+the chair and not only from standing.
