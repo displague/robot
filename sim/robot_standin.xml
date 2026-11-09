@@ -104,7 +104,7 @@
     <position name="spine_pitch" joint="spine_pitch" kp="370.83" kv="9.454" timeconst="0.030" ctrlrange="-0.8491 1.1981" ctrllimited="true" forcerange="-29.667 29.667" forcelimited="true"/>
     <position name="spine_roll" joint="spine_roll" kp="370.83" kv="9.454" timeconst="0.030" ctrlrange="-0.9363 0.9363" ctrllimited="true" forcerange="-29.667 29.667" forcelimited="true"/>
     <position name="spine_yaw" joint="spine_yaw" kp="370.83" kv="9.454" timeconst="0.030" ctrlrange="-1.2854 1.2854" ctrllimited="true" forcerange="-29.667 29.667" forcelimited="true"/>
-    <position name="neck_pitch" joint="neck_pitch" kp="11.56" kv="0.475" timeconst="0.030" ctrlrange="-1.3727 1.3727" ctrllimited="true" forcerange="-1.850 1.850" forcelimited="true"/>
+    <position name="neck_pitch" joint="neck_pitch" kp="23.13" kv="1.437" timeconst="0.030" ctrlrange="-1.3727 1.3727" ctrllimited="true" forcerange="-3.700 3.700" forcelimited="true"/>
     <position name="neck_roll" joint="neck_roll" kp="11.56" kv="0.475" timeconst="0.030" ctrlrange="-1.1109 1.1109" ctrllimited="true" forcerange="-1.850 1.850" forcelimited="true"/>
     <position name="neck_yaw" joint="neck_yaw" kp="11.56" kv="0.475" timeconst="0.030" ctrlrange="-1.8963 1.8963" ctrllimited="true" forcerange="-1.850 1.850" forcelimited="true"/>
     <position name="upperarm.L_pitch" joint="upperarm.L_pitch" kp="178.00" kv="4.864" timeconst="0.030" ctrlrange="-3.4671 1.2854" ctrllimited="true" forcerange="-23.733 23.733" forcelimited="true"/>

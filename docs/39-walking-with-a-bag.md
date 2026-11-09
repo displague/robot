@@ -1,6 +1,6 @@
 ---
 title: "39 - Walking with a bag in hand: the balance loop must know the bag, and the grip must damp it (P-064, D-063)"
-summary: "Why walking with a gripped bag failed: the balance loop did not know the bag, not the swing. A damped grip plus the felt weight walks 0.8 to 2.3 kg; the chain grid goes from 10 to 13 of 24 (D-063)"
+summary: "Why walking with a gripped bag failed: the balance loop did not know the bag, not the swing. A damped grip plus the felt weight walks 0.8 to 2.3 kg; with the bag set down before a sit (D-065), the chain grid goes from 10 to 17 or 18 of 24. One hand walks about 2.5 kg, two about 4.5 kg split (D-063)"
 section: "Skills: wind, bags, chairs, chains"
 ---
 

@@ -984,3 +984,7 @@ Continued:
 - Hi-WBC (the hub's daily paper) was read. Its payload sensing from joint current alone is the same move as D-063's
   felt weight, and its tutor-to-generalist distillation is the sibling's teacher plan. Release readiness was answered
   in chat: a v0.6.0 on P-058 to P-064 is warranted.
+
+Continued ("Yes"): GitHub Pages turned on (the docs site at https://displague.github.io/robot/), the chain
+recorded (`tools/chain_video.py`, `docs/img/chain.gif`: the grocery bag picked, walked, set down for a sit, taken up
+and put down; all four segments ok), the stale stand-in regenerated (the neck tackle, D-066), and release v0.6.0 cut.

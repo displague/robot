@@ -291,6 +291,11 @@ walk, sit (0.45 m) and place in a random order, with no reset between them. Each
 (`chain.BAGS`: shapes, sizes and 0.8 to 4.5 kg). Keep `--jobs` at 12 to 14, or the host kills the runs for
 memory. `--one <seed>` prints one run's full log.
 
+`tools/chain_video.py --bag grocery --order pick-walk-sit-place --gif --out chain` records one chained run with
+`sim_video.Recorder` (`--seed N` takes a seed's bag and order; K=V overrides as chain.py). The recorder's own GIF
+is about 20 MB for a 140 s chain: remake it from the MP4 at 4x speed, 480 px, 10 fps with an ffmpeg palette
+(`setpts=PTS/4,fps=10,scale=480:-1,split[a][b];[a]palettegen=max_colors=96[p];[b][p]paletteuse`), about 4 MB.
+
 - **Items** (`export_mjcf.ITEMS`, or `ROBOT_ITEMS` as a JSON file or string) are free bodies with a handle.
   - A hand holds one through a connect equality between `grip.hand.L` and `item.<name>.grip`. `Rig.grip(hand, name, on)` switches it.
   - `Rig.held_load` is the grip's vertical force: the felt weight, ground truth.

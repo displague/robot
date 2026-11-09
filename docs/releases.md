@@ -3,6 +3,30 @@
 Each tag has a GitHub release (github.com/displague/robot/releases) with notes, visuals and assets:
 the generated STLs, the MuJoCo models and the recordings. How to make one: `.claude/skills/release/SKILL.md`.
 
+## v0.6.0 (2026-11-09) — Chained skills: a bag carried through a walk and a chair
+
+**State:** skills run back to back in random orders with no reset (docs/38, D-062): pick a bag up from a stool, walk,
+sit on a 0.45 m chair and stand again, put the bag down. Walking with a bag in hand works once the grip damps the
+bag's swing and the balance loop feels its weight (docs/39, D-063). The planner sets a bag down before a sit and
+takes it up after (D-065). The chair no longer slips the neck (two strands, D-066) or the spine (the hips paced at
+22.5 deg/s, D-067, docs/41). The landing press starts from the landed leg's length, which gives the heavier
+layouts their held-feet step (docs/40, D-064). Also since v0.5.0: the brushless W-max as a model variant (D-058,
+docs/34), the torso and pelvis as keyed thin shells (D-059, docs/35), and where the mass sits (D-060, D-061,
+docs/36, docs/37). The docs are a site, https://displague.github.io/robot/, indexed from their front matter (D-068).
+
+**Results:** gauntlet 14 of 14 (step 533 J, walk 1130 J, chair 842 J, was 1025); chain grid 17 to 18 of 24 (10
+before D-063); one hand walks about 2.5 kg, two about 4.5 kg split; the 775 layout's held step 0 to 14 of 14; the 20
+kg model on the pessimistic motors: step 7 to 13 of 14, walk 3 to 12; every chair case stands with no slip, on 10
+to 48% less energy.
+
+**Known gaps:** the heavier layouts' held walk (4 of 14); bags over about 2.5 kg in one hand (all six chain failures
+left); the two-hand pick-up and put-down (`chain.SPLIT`, off); the 0.40 m chair on the layouts; the brushless
+layout's lurch at its first release; still nothing printed.
+
+**Assets:** robot-v0.6.0-stl.zip, robot.xml, robot_standin.xml/.json, motor_ranges.json, chain.gif and .mp4.
+
+**Decisions:** D-058 to D-068. **Prompts:** P-058 to P-065.
+
 ## v0.5.0 (2026-11-05) — Public, licensed, and sitting on a chair
 
 **State:** the repository is public (D-054), code MIT and the printables CC BY-SA 4.0 (D-055). The robot sits on a
