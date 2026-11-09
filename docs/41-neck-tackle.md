@@ -40,6 +40,24 @@ With the tackle in the model (`sim/robot.xml` regenerated):
   generator (`chain.py --preset neck`) does not draw tackles for any joint, so nothing there changes.
 - **Line stiffness:** two strands halve the line's stretch per newton, so the pitch is stiffer at the head.
 
+## The spine pitch: a third strand at the waist does not help
+
+The waist's pitch on three strands (`TACKLE_OVERRIDE={"waist.pitch": 3}`, two today), chair scenes. The spine line's
+peak against its continuous rating (288 N on the 775 drive, 184 N on the brushless one):
+
+| Build, seat | 2 strands (today) | 3 strands |
+| --- | --- | --- |
+| 20 kg, 0.45 m | 320 N, stands | 304 N, stands |
+| 20 kg, 0.50 m | 339 N, stands | 296 N, **does not stand** |
+| 775 layout, 0.45 m | 338 N (87 deg slip), stands | 310 N, **does not stand** (neck 100 N, 254 deg) |
+| 775 layout, 0.50 m | 354 N, stands | 309 N, **does not stand** |
+| brushless layout, 0.45 m | 324 N, stands | 316 N, stands |
+| brushless layout, 0.50 m | 323 N, stands | 313 N, stands |
+
+The third strand takes off only 5 to 13% and slows the trunk's swing, so half the rises fail. The spine line runs over
+its continuous rating on every build, for the second or two of the swing. That is a question for the line and its
+rating (docs/12's table), not the tackle.
+
 ## Not yet
 
 - The neck's roll and yaw stay on one strand. Neither was flagged.
@@ -50,6 +68,6 @@ With the tackle in the model (`sim/robot.xml` regenerated):
 
 ## Next
 
-docs/37's item on the brushless 0.50 m chair is closed. Next is the spine pitch line the brushless layout's chair now
-loads. Check whether a 3:1 tackle on the waist's pitch (2 today) clears it the way the neck's two strands did, on the
-gauntlet and the chair seats.
+docs/37's item on the brushless 0.50 m chair is closed. The spine pitch line comes next. Check its peak (300 to 354 N
+for a second or two of the swing) against the line's break strength and its creep rating, not its continuous drive
+rating. Then decide whether the spine needs a heavier line, or whether the swing should be slower.
