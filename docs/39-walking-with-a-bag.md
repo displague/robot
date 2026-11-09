@@ -135,6 +135,20 @@ The heavy bags are past what one hand walks with (docs/28 and the single walks a
   So one hand walks about 3 kg on soft contact, for the grocery bag's shape. The chain's tall bag (3.0 kg, hanging
   lower on a shorter handle) still fails its walks. Waiting up to 3 s for it to hang still after the pick does not
   change that (tried and reverted), so the shape matters as well as the weight.
+- **All six shapes at 3.0 kg, single walks:**
+
+  | Shape | Grip to centre (m) | Walk |
+  | --- | --- | --- |
+  | grocery | 0.25 | stands |
+  | heavy box | 0.14 | stands |
+  | pillow bag | 0.25 | stands |
+  | jug | 0.18 | falls at 41 s |
+  | tall | 0.28 | falls at 32 s |
+  | ball | 0.26 | falls at 34 s |
+
+  No single property splits them: not the hang length, and not the height off the floor. These are one run each on a
+  knife-edge walk, so 3 kg is the edge, where the shape tips it either way. The planner rule follows: one hand walks
+  bags up to about 2.5 kg. Heavier ones need both hands or a strap at the body (D-049).
 - **Sitting with a bag.** Tried: the felt weight at the gripping hand in the sit's planned poses, and `com_est` in
   the stand-up gate. It made things worse. The arms are forward at seat-off, so the bag moved the planned reach
   from 7.7 cm to between -2.6 and +1.9 cm. The planner then leaned too little, and the jug no longer sat. The real
@@ -147,6 +161,6 @@ The heavy bags are past what one hand walks with (docs/28 and the single walks a
 
 ## Next
 
-Find why the tall bag fails where the grocery bag of the same weight walks. Run the single walk with the chain's
-six shapes at 3.0 kg, and compare their swing and the hand's load. Then decide on a planner rule for bags one hand
-should not walk with (over about 3 kg, or long and heavy).
+One hand walks up to about 2.5 kg; 3 kg is the edge, by shape. Next is the other hand: carry a heavy bag's weight
+split across both hands (two items, or one with two grips), or on a strap at the body (D-049). Run the chain's
+4.5 kg box both ways.
