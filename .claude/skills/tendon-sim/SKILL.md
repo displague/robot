@@ -21,9 +21,10 @@ ROBOT_TORSO_WORM=1 python tools/sim_tendon.py        # variant: spine and should
 ROBOT_MOTORS=low python tools/sim_tendon.py         # variant: every drive and line at the pessimistic end of its sourced range
 ROBOT_MOTORS=high | nom | <file.json>[:case]         # the optimistic end, the sourced nominal, or a file in the same format
 ROBOT_WMAX=bldc [ROBOT_WMAX_KG=2.09]                 # variant: W-max on the 5010 on 1:25, 24 V: no lock, FOC energy, gains x kg (docs/34)
+ROBOT_SHOULDERS_LOW=1                                # variant: the shoulder sheaths 0.85 m (drives in the pelvis; rejected, docs/36)
 ```
 
-`ROBOT_MASSES`, `ROBOT_TORSO_WORM`, `ROBOT_MOTORS` and `ROBOT_WMAX` are read by `export_mjcf`, so they also apply to `step_sweep.py`
+`ROBOT_MASSES`, `ROBOT_TORSO_WORM`, `ROBOT_MOTORS`, `ROBOT_WMAX` and `ROBOT_SHOULDERS_LOW` are read by `export_mjcf`, so they also apply to `step_sweep.py`
 (its children inherit the environment) and `step_trace.py`. Running `export_mjcf.py` with any of them set rewrites
 `sim/robot.xml` as the variant: re-run it without them before committing, and check `git diff sim/robot.xml` is empty.
 
@@ -264,5 +265,8 @@ with the arms forward); a rise that leans on the chair's back looks like standin
 Judge it on the full grid too (docs/33): the 20 kg model and `ROBOT_MASSES=sim/masses/rollup_775.json`, each with
 `ROBOT_MOTORS=nom` and `low`. Run the four in sequence (they take a few minutes each at `CHAIR_JOBS=8`) or in
 parallel at `CHAIR_JOBS=2` or 3. The 0.50 m case flips with small changes, so read 0.40 and 0.45 m first; the 26 kg
-build stands only from 0.50 m (D-057). In a shell, `S=... && (...) &` runs the assignment in the background subshell:
+build stands only from 0.50 m (D-057), and from 0.45 m on the D-060 layout (`sim/masses/rollup_775_layout.json`).
+The rise is decided by the static reach (`sit_path`'s second return, the CoM behind the sole centre at seat-off;
+the model passes at 7.8 cm at 0.45 m). To see what a mass change does, compute the reach per mass set first (one
+process each, seconds): docs/36 has the reach per kilogram of each segment. In a shell, `S=... && (...) &` runs the assignment in the background subshell:
 set and export the variable on its own line first.

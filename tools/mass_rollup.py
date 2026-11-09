@@ -85,11 +85,25 @@ PVC_KG_M = {"1": 0.446, "1-1/4": 0.605, "1-1/2": 0.722, "2": 0.970}   # Schedule
 TORSO_WORM = False   # --torso-worm: spine and shoulders on a bought worm gearmotor (export_mjcf ROBOT_TORSO_WORM)
 WMAX = "775"         # --wmax 775 | bldc: the W-max motor (docs/21; bldc = 5010 360 KV + B-G431B-ESC1 + 1:16 planetary)
 WMAX_DRIVER = "bts7960"   # --wmax-driver bts7960 | small: the 775's H-bridge (small = VNH5019 class, docs/21)
+SPREAD = False       # --spread: wiring, fasteners, line and joint sensors over the segments by their mass, not all in the trunk
+SPREAD_ITEMS = ("wiring", "M3 inserts", "line, PTFE", "AS5600")
+
+
+HIPS_ON_THIGHS = False  # --hips-on-thighs: the 6 hip W-max ride on the thighs (3 per thigh), pulling against the pelvis
+BATTERY_UP = False      # --battery-up: the battery and the E-stop in the torso shell, not the pelvis
+SHOULDERS_LOW = False   # --shoulders-low: the 6 shoulder W-max in the pelvis bank, their lines up longer sheaths
 
 
 def wmax_at():
     """W-max drives per segment that still use the 775 and the printed planetary."""
-    return {s: (0 if TORSO_WORM and s == "spine" else n) for s, n in WMAX_AT.items()}
+    at = dict(WMAX_AT)
+    if SHOULDERS_LOW:
+        at["spine"] -= 6
+        at["pelvis"] += 6
+    if HIPS_ON_THIGHS:
+        at["pelvis"] -= 6
+        at["thigh"] += 6
+    return {s: (0 if TORSO_WORM and s == "spine" else n) for s, n in at.items()}
 
 
 def bought():
@@ -152,11 +166,13 @@ def bought():
     add("ICM-42688 IMU (torso, feet)", "foot", 2, 5, "est")
     add("ICM-42688 IMU (torso, feet)", "spine", 1, 5, "est")
     add("FSR 402, 4 per foot", "foot", 8, 1, "est")
-    add("battery 3S LiPo 10 Ah", "pelvis", 1, 543, "listing")
-    add("E-stop, 200 A relay, fuse", "pelvis", 1, 196, "listing")
+    add("battery 3S LiPo 10 Ah", "spine" if BATTERY_UP else "pelvis", 1, 543, "listing")
+    add("E-stop, 200 A relay, fuse", "spine" if BATTERY_UP else "pelvis", 1, 196, "listing")
     add("wiring (12 and 18 AWG runs, signal), est", "spine", 1, 400, "est")
     add("M3 inserts and screws, est", "spine", 1, 300, "est")
     add("line, PTFE sheath, crimps, adjusters", "spine", 1, 250, "est")
+    if SHOULDERS_LOW:   # 6 lines up from the pelvis: ~0.45 m more PTFE sheath (4 mm OD, ~12 g/m) and braid each, 2 per drive
+        add("extra sheath and line, shoulders from the pelvis", "spine", 12, 0.45 * 13, "calc")
     return rows
 
 
@@ -206,12 +222,23 @@ def main():
                     help="the 775's H-bridge: BTS7960 with heatsink (65 g) or a VNH5019-class module (10 g)")
     ap.add_argument("--frame", action="store_true",
                     help="the pre-shell estimate: a 600 g pelvis frame and an 800 g torso frame, no shells (docs/20)")
+    ap.add_argument("--spread", action="store_true",
+                    help="book wiring, fasteners, line and joint sensors over the segments by their mass (default: all in the trunk)")
+    ap.add_argument("--shoulders-low", action="store_true",
+                    help="the 6 shoulder W-max drives in the pelvis bank, their lines up longer sheaths")
+    ap.add_argument("--hips-on-thighs", action="store_true",
+                    help="the 6 hip W-max drives on the thighs (3 each), not in the pelvis bank")
+    ap.add_argument("--battery-up", action="store_true", help="the battery and E-stop in the torso, not the pelvis")
     ap.add_argument("--json", help="write {bone: kg per side} for the model (ROBOT_MASSES=<file>, export_mjcf.py)")
     args = ap.parse_args()
     global TORSO_WORM
     TORSO_WORM = args.torso_worm
     global WMAX, WMAX_DRIVER
     WMAX, WMAX_DRIVER = args.wmax, args.wmax_driver
+    global SPREAD, SHOULDERS_LOW
+    SPREAD, SHOULDERS_LOW = args.spread, args.shoulders_low
+    global HIPS_ON_THIGHS, BATTERY_UP
+    HIPS_ON_THIGHS, BATTERY_UP = args.hips_on_thighs, args.battery_up
     if args.build:
         build(args.stl)
     if args.frame:
@@ -289,10 +316,22 @@ def main():
     p("| Part | Segment | Qty | g each | g total | Source |")
     p("| --- | --- | --- | --- | --- | --- |")
     tot_bought = 0.0
+    deferred = 0.0
     for name, s, n, g, src in bought():
         tot_bought += n * g
-        put(s, "bought", n * g)
+        if SPREAD and name.startswith(SPREAD_ITEMS):
+            deferred += n * g
+            s = "spread"
+        else:
+            put(s, "bought", n * g)
         p("| %s | %s | %d | %.1f | %.0f | %s |" % (name, s, n, g, n * g, src))
+    if deferred:
+        base = {k: v["printed"] + v["est"] + v["bought"] for k, v in seg.items()}
+        tot = sum(base.values())
+        for k, v in base.items():
+            put(k, "bought", deferred * v / tot)
+        p()
+        p("Spread (`--spread`): %.0f g of wiring, fasteners, line and joint sensors over the segments by their mass." % deferred)
     p()
     model, budget = skeleton_masses()
     p("## Per segment against the model (cad/skeleton.json; mirrored segments are both sides)")

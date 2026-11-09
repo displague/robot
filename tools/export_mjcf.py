@@ -92,6 +92,11 @@ JOINTS = {
 }
 
 
+SHOULDERS_LOW = bool(os.environ.get("ROBOT_SHOULDERS_LOW"))   # variant (docs/36): the shoulder W-max drives in the
+                     # pelvis bank, so their sheaths run ~0.45 m further (0.85 m) and the lines are about half as stiff
+if SHOULDERS_LOW:
+    JOINTS["shoulder"]["bowden"] = 0.85
+
 STIFF_MINI = False   # variant: every W-mini pulley at least 25 mm (docs/13 finding; since D-032 the neck is at 25 mm
                      # in the baseline and the wrist at 18, so this now only raises the wrist)
 TORSO_WORM = bool(os.environ.get("ROBOT_TORSO_WORM"))   # variant: spine and shoulders on W-worm (docs/20; hub

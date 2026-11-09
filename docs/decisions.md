@@ -684,3 +684,19 @@ the robot has its cover (a plain cover alone would be about 620 g on the torso).
 wiring and fasteners, which the shell does not reach.
 Alternative: an inner frame with a separate cover; a 0.8 mm wall (0.33 kg lighter, untested).
 Reverses if: a printed panel is too flexible to carry the drive banks, or the laps do not fit.
+
+## D-060 (2026-11-08) The hip drives ride on the thighs and the battery sits in the torso; the trunk's mass is not the chair's problem
+
+Context: docs/34 and 35 blamed the brushless build's lost 0.45 m chair on its 5.9 kg trunk. docs/36 measured the
+static reach (the CoM behind the sole centre at seat-off) per kilogram per segment. The pelvis costs +1.2 cm/kg and
+the trunk only +0.4. The forearms and hands help the most (-1.8 and -2.6), and they are 1 kg lighter in the roll-up
+than in the model.
+Decision: the planned layout puts the 6 hip W-max on the thighs (3 each) and the battery and E-stop in the torso
+(`mass_rollup.py --spread --hips-on-thighs --battery-up`; snapshots `sim/masses/rollup_bldc_layout.json` and
+`rollup_775_layout.json`). With it the brushless build stands again from 0.45 m, passes the gauntlet, and stands
+6/6 on the step grid and 5/6 on the walk grid (4/6 on the 20 kg masses). The 26 kg 775 build stands from 0.45 m
+(was 0.50 only), with step and walk 6/6. Moving the shoulder drives into the pelvis (docs/35's Next) is rejected:
+reach +1.4 cm. Wiring, fasteners, line and joint sensors are booked over the segments (`--spread`).
+Alternative: the old layout (hip bank and battery in the pelvis); the shoulder drives in the pelvis.
+Reverses if: the thigh bank cannot be packaged (its lines must cross the hip to the pelvis), the heavier swing leg
+fails the full step grid, or the printed arms come out as heavy as the model's guesses.

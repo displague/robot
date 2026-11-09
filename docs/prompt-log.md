@@ -867,3 +867,10 @@ Parked as hub task `weight-programmed-wind-ankles`, addressed to Codex. It has t
 gap, and the `codex exec` route from sunrise's agent-fanout skill. Replied to Dot's note. Filed the robots index as
 hub record `reference-techniahq-robots`. No repository code changed; back to the trunk's mass (hub task
 `wmax-mass-down`).
+
+Then, on the trunk's mass (hub task `wmax-mass-down`), per "you can park this in agenthub if you think the
+trunk-mass is a better goal for now": docs/36 and D-060. The static reach per kilogram shows that the pelvis and the
+light arms, not the trunk, lose the chair. The shoulder drives into the pelvis are rejected. The hip drives go on the
+thighs and the battery into the torso: the brushless and 26 kg builds stand again from 0.45 m. `mass_rollup.py` gains
+`--spread`, `--hips-on-thighs`, `--battery-up` and `--shoulders-low`; `export_mjcf` gains `ROBOT_SHOULDERS_LOW`;
+`sim/masses/rollup_bldc_layout.json` and `rollup_775_layout.json`.

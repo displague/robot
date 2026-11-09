@@ -7,6 +7,8 @@ Short answers:
 - **The drive passes the gauntlet on the 20 kg model's masses once its servo is tuned to the 775's stiffness.**
   It also holds one foot on 36 % less energy, because it pays copper loss rather than the brushed drive's duty times
   volts times amps.
+- **Corrected by docs/36 (D-060):** the trunk's mass is close to neutral for the chair. The pelvis and the light arms
+  push the CoM back, and the build stands from 0.45 m once the hip drives ride on the thighs and the battery moves up.
 - **The 19.9 kg brushless build is not the 20 kg model.** Its trunk is 5.8 kg against the model's 3.5 kg, so its
   CoM is high. With the 775 or the 5010 at these masses the chair rise at 0.45 m falls. Getting the total under
   20 kg is not enough: the mass has to come out of the trunk (next: docs/35, the shell).

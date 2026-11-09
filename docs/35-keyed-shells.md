@@ -13,6 +13,8 @@ Short answers:
   over this torso alone is about 620 g. Against a covered robot the shells save about half a kilogram.
 - **At a 0.8 mm wall** (two perimeters, the ribs carrying the stiffness) the two shells are 725 g against 970, and
   0.33 kg under the old frame guesses. To try on a printed panel before it is the default.
+- **Corrected by docs/36 (D-060):** the trunk's mass is not what loses the chair. The pelvis and the light arms are,
+  and the Next below (shoulder drives into the pelvis) makes it worse.
 - **The shell does not fix the trunk's mass.** On the brushless build (docs/34) the trunk is 5.9 kg against the
   model's 3.5: nine drives at about 295 g, their wiring (0.4 kg), the fasteners (0.3 kg) and the line (0.25 kg) are
   booked there. That is what the chair rise feels.
