@@ -149,6 +149,17 @@ The heavy bags are past what one hand walks with (docs/28 and the single walks a
   No single property splits them: not the hang length, and not the height off the floor. These are one run each on a
   knife-edge walk, so 3 kg is the edge, where the shape tips it either way. The planner rule follows: one hand walks
   bags up to about 2.5 kg. Heavier ones need both hands or a strap at the body (D-049).
+- **A bag in each hand** (two free items, the same shape, today's defaults), single walks:
+
+  | Per hand | Grocery | Tall | Heavy box |
+  | --- | --- | --- | --- |
+  | 1.5 kg | stands | - | stands |
+  | 2.25 kg | stands | stands | falls at 17 s |
+  | 3.0 kg | falls at 14 s | - | falls at 17 s |
+
+  Split across both hands, 4.5 kg walks for two of the three shapes on soft contact. On held feet, 2 x 2.25 kg falls
+  at 21 s. docs/28 found both hands worse than one (2.3 kg each fell). Damping the grip and feeling the weight turns
+  that round. The planner rule: up to about 2.5 kg in one hand, and about 4.5 kg split across two.
 - **Sitting with a bag.** Tried: the felt weight at the gripping hand in the sit's planned poses, and `com_est` in
   the stand-up gate. It made things worse. The arms are forward at seat-off, so the bag moved the planned reach
   from 7.7 cm to between -2.6 and +1.9 cm. The planner then leaned too little, and the jug no longer sat. The real
@@ -161,6 +172,6 @@ The heavy bags are past what one hand walks with (docs/28 and the single walks a
 
 ## Next
 
-One hand walks up to about 2.5 kg; 3 kg is the edge, by shape. Next is the other hand: carry a heavy bag's weight
-split across both hands (two items, or one with two grips), or on a strap at the body (D-049). Run the chain's
-4.5 kg box both ways.
+One hand walks about 2.5 kg, and two hands about 4.5 kg split, on soft contact. Next:
+- add the split to the chain (a second item for the right hand, and the rule to use it above 2.5 kg);
+- take the carried load onto held feet, where 2 x 2.25 kg still falls. That is the same held walk as docs/40's.
