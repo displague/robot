@@ -958,3 +958,10 @@ Continued:
 - Pacing the hip extension at 22.5 deg/s (D-067) stands every chair case with no spine slip and 10 to 48% less
   energy (docs/41).
 
+Continued:
+- The sibling loads `sim_tendon` live, so the new defaults reach it. Its tendon tests pass (4 of 4).
+- Its standing policies' gate on the new model (`stand-cascade-bc` seeds 0 to 2) stands 9 scenes against the
+  recorded 10, within their seed scatter; wind 5 is lost on all three.
+- Hub task `tendon-policies-after-p064-defaults` (filed and finished): no retrain for the standing policies.
+  Regenerate the step, walk and chair teacher demos before training on them.
+- A heavier brushless ratio (1:35, 1:40; `ROBOT_WMAX_RATIO`) swings too slowly: 0 of 14 (docs/40).
