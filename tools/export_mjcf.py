@@ -151,6 +151,16 @@ BAGS = {}            # link -> kg: a carried bag hanging from that link's tail o
 BAG_HANDLE = 0.10     # m from the grip to the top of the bag
 BAG_SIZE = (0.10, 0.25, 0.30)   # x (across the body), y (front to back), z: a grocery bag, m
 BAG_DAMPING = 0.05    # N m s/rad on the ball joint: the contents settling
+# free objects the hands grip and let go (docs/38): each a free body with a handle, gripped by a connect equality
+# between a hand's grip site and the handle's site (off until Rig.grip turns it on), resting on stools (mocap boxes).
+# They collide only with the stools and the floor (contype/conaffinity bit 2), not with the robot, as BAGS do not.
+# A list of {"name", "shape": box|cylinder|sphere|capsule, "size": MuJoCo half sizes (box: x y z; cylinder and
+# capsule: r h; sphere: r), "kg", "handle": m from the grip to the top}; from ROBOT_ITEMS (a JSON file or string)
+# or set by a tool. Empty: the model is unchanged.
+ITEMS = []
+STOOLS = 2            # mocap stools for the items, placed by Rig.place_stool
+STOOL_HALF = (0.20, 0.20, 0.40)   # a counter-sized top, 0.4 m square
+GRIP_HANDS = ("hand.L", "hand.R")
 
 
 def winch_params(joint_name, axis, cls_name):
@@ -237,6 +247,34 @@ def winch_body_xml(pad, name, p, pos):
                p["drum_J"], pad, max(p["r_d"], 0.004), pad))
 
 
+def item_half_z(it):
+    sz = it["size"]
+    return {"box": sz[2] if len(sz) > 2 else 0, "cylinder": sz[-1], "capsule": sz[-1] + sz[0], "sphere": sz[0]}[it["shape"]]
+
+
+def items_xml(equalities):
+    """The stools and the free items (docs/38); appends each hand-to-item grip to equalities."""
+    out = []
+    for k in range(STOOLS if ITEMS else 0):
+        out.append('    <body name="stool.%d" mocap="true" pos="%d 5 -1">\n'
+                   '      <geom name="stool.%d" type="box" size="%.3f %.3f %.3f" mass="0.001" contype="2" '
+                   'conaffinity="2" rgba="0.45 0.5 0.4 1"/>\n    </body>\n' % ((k, k + 1, k) + STOOL_HALF))
+    for i, it in enumerate(ITEMS):
+        n, h, hz = it["name"], it.get("handle", 0.10), item_half_z(it)
+        size = " ".join("%.4f" % v for v in it["size"])
+        out.append('    <body name="item.%s" pos="%d 6 %.3f">\n      <freejoint name="item.%s"/>\n'
+                   '      <site name="item.%s.grip" size="0.008"/>\n'
+                   '      <geom type="capsule" size="0.004" fromto="0 0 0 0 0 %.4f" mass="0.01" contype="0" '
+                   'conaffinity="0" rgba="0.9 0.9 0.6 1"/>\n'
+                   '      <geom name="item.%s" type="%s" size="%s" pos="0 0 %.4f" mass="%.3f" contype="2" '
+                   'conaffinity="2" rgba="0.85 0.7 0.45 1"/>\n    </body>\n'
+                   % (n, i + 1, h + 2 * hz + 0.01, n, n, -h, n, it["shape"], size, -h - hz, it["kg"]))
+        for hand in GRIP_HANDS:
+            equalities.append('    <connect name="grip.%s.%s" site1="grip.%s" site2="item.%s.grip" active="false" '
+                              'solref="0.01 1"/>\n' % (hand, n, hand, n))
+    return out
+
+
 def mjcf(links, data):
     joint_defs = {j["bone"]: j for j in data["joints"] if j.get("bone")}
     by = {l["name"]: l for l in links}
@@ -273,6 +311,9 @@ def mjcf(links, data):
                 out.append(winch_body_xml(pad, name, p, pos))
         for c in children.get(l["name"], []):
             out.extend(body(c, indent + 1))
+        if ITEMS and l["name"] in GRIP_HANDS:
+            g = sub(l["tail"], l["head"])
+            out.append('%s  <site name="grip.%s" pos="%.4f %.4f %.4f" size="0.008"/>\n' % ((pad, l["name"]) + tuple(g)))
         if l["name"] in BAGS:
             # the bag swings from the grip at the link's tail; it does not collide (the legs pass through it)
             g = sub(l["tail"], l["head"])
@@ -325,6 +366,7 @@ def mjcf(links, data):
         out.append('    <body name="%s" mocap="true" pos="0 5 -1">\n'
                    '      <geom name="%s" type="box" size="%.3f %.3f %.3f" mass="0.001" contype="0" conaffinity="0" '
                    'rgba="0.55 0.4 0.25 0"/>\n    </body>\n' % ((name, name) + half))
+    out.extend(items_xml(equalities))
     out.append('  </worldbody>\n  <tendon>\n')
     out.extend(tendons)
     out.append('  </tendon>\n  <equality>\n')
@@ -335,6 +377,9 @@ def mjcf(links, data):
     return "".join(out), winches
 
 
+if os.environ.get("ROBOT_ITEMS"):                 # variant (docs/38): free items to grip, a JSON file or string
+    _it = os.environ["ROBOT_ITEMS"]
+    ITEMS = json.load(open(_it)) if os.path.exists(_it) else json.loads(_it)
 MASSES = os.environ.get("ROBOT_MASSES")   # variant: a JSON file {bone: kg per side} (tools/mass_rollup.py --json)
                                           # replacing skeleton.json's mass_kg; children of step_sweep inherit it
 

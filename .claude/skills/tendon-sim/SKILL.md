@@ -22,6 +22,7 @@ ROBOT_MOTORS=low python tools/sim_tendon.py         # variant: every drive and l
 ROBOT_MOTORS=high | nom | <file.json>[:case]         # the optimistic end, the sourced nominal, or a file in the same format
 ROBOT_WMAX=bldc [ROBOT_WMAX_KG=2.09]                 # variant: W-max on the 5010 on 1:25, 24 V: no lock, FOC energy, gains x kg (docs/34)
 ROBOT_SHOULDERS_LOW=1                                # variant: the shoulder sheaths 0.85 m (drives in the pelvis; rejected, docs/36)
+ROBOT_ITEMS=items.json                               # free items a hand can grip, and two stools (docs/38; tools/chain.py sets them itself)
 ```
 
 `ROBOT_MASSES`, `ROBOT_TORSO_WORM`, `ROBOT_MOTORS`, `ROBOT_WMAX` and `ROBOT_SHOULDERS_LOW` are read by `export_mjcf`, so they also apply to `step_sweep.py`
@@ -270,3 +271,25 @@ The rise is decided by the static reach (`sit_path`'s second return, the CoM beh
 the model passes at 7.8 cm at 0.45 m). To see what a mass change does, compute the reach per mass set first (one
 process each, seconds): docs/36 has the reach per kilogram of each segment. Judge any mass layout on the full grid's held feet too (`"held: NOSLIP=5"`, 7 lengths): docs/37's layout passed soft contact and failed there. `step_sweep.py` starts every run of a call at once (42 runs for three mass sets); split big grids into calls of 14 to 28, or the host may kill them for memory. In a shell, `S=... && (...) &` runs the assignment in the background subshell:
 set and export the variable on its own line first.
+
+## Chains: skills back to back, and items to pick up and put down (docs/38)
+
+`tools/chain.py --runs 24 --jobs 12 [--no-handback] [K=V ...]` runs one episode per seed. Each episode does pick,
+walk, sit (0.45 m) and place in a random order, with no reset between them. Each seed draws one of six bags
+(`chain.BAGS`: shapes, sizes and 0.8 to 4.5 kg). Keep `--jobs` at 12 to 14, or the host kills the runs for
+memory. `--one <seed>` prints one run's full log.
+
+- **Items** (`export_mjcf.ITEMS`, or `ROBOT_ITEMS` as a JSON file or string) are free bodies with a handle.
+  - A hand holds one through a connect equality between `grip.hand.L` and `item.<name>.grip`. `Rig.grip(hand, name, on)` switches it.
+  - `Rig.held_load` is the grip's vertical force: the felt weight, ground truth.
+  - The items collide only with the floor and the stools (contact bit 2), never with the robot.
+- **Stools** are mocap boxes. `Rig.place_stool(k, xy, top)` places one, or parks it when `xy` is None.
+- **Placing things where the robot now stands:** `Rig.feet_origin()` is where it stands, relative to the start.
+  Set `r.origin` to it before `sit_stand`, and `set_chair` places the chair from there.
+- **`Rig.to_stand()` hands back a quiet stand between skills.** It clears the swing flags, the CoM bias and the
+  knee torque sources, and eases every target back to the standing pose. The walk leaves the swing flags set,
+  the hip shift at 7 degrees and the arms out, so a chair right after it fails without the hand-back.
+- **Code that sums the whole world must skip the items.** Use `subtree_com[pelvis]` rather than
+  `subtree_com[0]`. Skip floor contacts with contype bit 2 in `cop()`. `Rig.mass` leaves out the items.
+  With no items the model and every scene are unchanged.
+

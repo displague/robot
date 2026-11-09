@@ -905,3 +905,25 @@ n-ef417969) and filed hub finding `halo-apple-tracker-assessment-20261109`:
 Then I reran the single-move held-feet grid (14 runs per call) and a partial hip bank (`mass_rollup.py
 --hips-on-thighs N`). The hip drives on the thighs lose held feet and the battery move does not. No layout gets
 both the chair and the held step, so the next work is the forward transfer (docs/37).
+
+## P-063 (2026-11-09) Chained skills, a bag to pick up and put down, cross-training, outside teachers, perception
+
+> Are stepping and sitting and carrying a bag, putting it down,  in the same run, in different order, as simultaneous mujoco batches? Does it make sense to have crossing model train to avoid losing traits? Can the supervisor be the other trained models, from the various robot experiments from other orgs, insofar as they can operate in the environment and succeed in naive ways that the hand tuned algorithms have not yet mastered?
+
+> Yes. 24 cores? We are using the 5080 GPU, right? 30 step history, how many step prediction? 'Command don't fit our body' with open models, this is where ai-embedded-dynamic-diversity is to excel -- transfer. The bag, yes, different shapes and sizes and weights. We also need a pillow fluff and position, and a jug/container/glass pour/transfer (one hand for each, pouring back and forth, differing sizes on both ends). Does this practice and exercise the audio and visual and percepived weight in hand (however that is sensed)  input nodes too?
+
+Answered:
+- The GPU trains the networks; the MuJoCo physics runs as CPU processes.
+- HALO looks back 30 steps and forward 5 reference frames plus 30 plan frames.
+- The policy senses no audio, vision or touch yet.
+
+Built `tools/chain.py`, grippable items and stools (`export_mjcf.ITEMS`), and the `Rig` grip, stool, felt-weight
+and `to_stand` helpers (docs/38, D-062). Chaining found the walk's leftover planner state. Walking with a bag fails,
+and the felt weight did not fix it.
+
+Filed hub tasks:
+- `mixed-skill-training-gate`;
+- `external-teacher-transfer`;
+- `hands-pillow-and-pour`;
+- `perception-channels`;
+- `tendon-physics-on-gpu`.

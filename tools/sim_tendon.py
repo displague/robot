@@ -30,7 +30,10 @@ except ImportError:
 import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from export_mjcf import CHAIR_GEOMS, build   # noqa: E402
+from export_mjcf import CHAIR_GEOMS, STOOL_HALF, build   # noqa: E402
+
+FEEL_TAU = 0.5       # s, the felt weight's low-pass
+FEEL_LOAD = False    # docs/38: the balance loop adds the weight the hands feel (Rig.felt) to its CoM; False: it does not
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 KG, KDG = 3.0, 0.02             # inner gear loop: volts-fraction per rad of gear error, per rad/s
@@ -257,9 +260,15 @@ class Rig:
         m.opt.noslip_iterations = NOSLIP
         if FLOOR_MU is not None:
             m.geom_friction[:, 0] = FLOOR_MU
-        self.mass = float(sum(m.body_mass[b] for b in range(m.nbody) if m.body_mocapid[b] < 0))   # not the chair
+        self.items = [m.body(b).name[5:] for b in range(m.nbody) if m.body(b).name.startswith("item.")]
+        if self.items:                    # the items (docs/38) rest on the floor too (contact bit 2), not on the robot
+            m.geom_conaffinity[self.floor] |= 2
+            m.body_conaffinity[m.geom_bodyid[self.floor]] |= 2   # the broad phase filters on the body's bits too
+        self.mass = float(sum(m.body_mass[b] for b in range(m.nbody)          # not the chair, the stools or the items
+                              if m.body_mocapid[b] < 0 and not m.body(b).name.startswith("item.")))
         self.reset()
         mujoco.mj_forward(m, self.data)
+        self._feet0 = 0.5 * (self.data.xpos[self.feet[0]][:2] + self.data.xpos[self.feet[1]][:2])
         j = lambda n: self.data.xanchor[mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_JOINT, n)]
         self.leg = float(np.linalg.norm(j("thigh.L_pitch") - j("foot.L_pitch")))   # hip to ankle, m
         self.thigh_len = float(np.linalg.norm(j("thigh.L_pitch") - j("shank.L_pitch")))
@@ -326,8 +335,108 @@ class Rig:
             m.eq_data[w["eq_lock"]][0] = d.qpos[w["gq"]]
             d.eq_active[w["eq_stick"]] = 1
             d.eq_active[w["eq_lock"]] = 0
+        self._felt_f = (0.0, None)       # the felt weight in the hands, filtered (kg, where)
+        self.origin = np.zeros(2)        # planner: where scenes place the chair and stools from (the start: zero)
         self.set_wind(WIND)
         self.set_chair(None)
+        for k in range(len([1 for b in range(m.nbody) if m.body(b).name.startswith("stool.")])):
+            self.place_stool(k, None)
+
+    def to_stand(self, t=1.5, hold=1.5):
+        """Hand back a quiet two-footed stand between skills (docs/38): the planner's swing and support flags off,
+        no CoM bias or knee torque source, the weight shared, and every joint target eased back to the standing
+        pose. A scene ends wherever its last phase left these (the walk leaves the swing flags set, the hip shift
+        at 7 degrees and the arms out), and a skill chained after it starts from that."""
+        self.swing, self.swing_land, self.swing_parallel = None, False, False
+        self.knee_tau = {"L": None, "R": None}
+        self.com_bias = np.zeros(2)
+        self.weight = (0.5, 0.5)
+        self.move({w["name"]: (STAND_LEAN if w["name"].startswith("foot.") and w["name"].endswith("_pitch") else 0.0)
+                   for w in self.w}, t)
+        self.run(hold)
+
+    # ----------------------------------------------------------------- items, stools and grips (docs/38)
+    def felt(self):
+        """The weight the hands feel (FEEL_LOAD): (kg, its centre) from each closed grip's vertical force at the grip
+        site, as a wrist load cell or the wrist and finger line tensions would give it. (0, None) with nothing held."""
+        if not (FEEL_LOAD and self.items):
+            return 0.0, None
+        kg, mom = 0.0, np.zeros(3)
+        for hand in ("hand.L", "hand.R"):
+            for name in self.items:
+                f = self.held_load(hand, name)
+                if f > 0.0:
+                    kg += f / 9.81
+                    mom += f / 9.81 * self.grip_site(hand)
+        return (kg, mom / kg) if kg > 0 else (0.0, None)
+
+    def com_est(self):
+        """The balance loop's CoM: the robot's own, plus the felt weight in the hands at the grips (FEEL_LOAD)."""
+        com = self.data.subtree_com[self.pelvis]
+        kg, at = getattr(self, "_felt_f", (0.0, None))
+        if kg <= 0.05 or at is None:
+            return com
+        return (self.mass * com + kg * at) / (self.mass + kg)
+
+    def _felt_update(self):
+        """Low-pass the felt weight (FEEL_TAU), as a load cell's filter would: the grip force swings with the bag."""
+        kg, at = self.felt()
+        k0, a0 = getattr(self, "_felt_f", (0.0, None))
+        b = self.model.opt.timestep / (FEEL_TAU + self.model.opt.timestep)
+        k1 = k0 + b * (kg - k0)
+        a1 = at if a0 is None else (a0 if at is None else a0 + b * (at - a0))
+        self._felt_f = (k1, a1)
+
+    def feet_origin(self):
+        """The ankles' midpoint (x, y) less its value at reset: where the robot now stands, for placing things."""
+        a = 0.5 * (self.data.xpos[self.feet[0]][:2] + self.data.xpos[self.feet[1]][:2])
+        return a - getattr(self, "_feet0", a)
+
+    def place_stool(self, k, xy, top=None):
+        """Put stool k's top at height `top` at world (x, y), or park it (xy None). A mocap body: set, not driven."""
+        m, d = self.model, self.data
+        mid = m.body_mocapid[mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_BODY, "stool.%d" % k)]
+        if xy is None:
+            d.mocap_pos[mid] = (k + 1.0, 5.0, -1.0)
+        else:
+            d.mocap_pos[mid] = (xy[0], xy[1], top - STOOL_HALF[2])
+
+    def item_qadr(self, name):
+        m = self.model
+        j = mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_JOINT, "item." + name)
+        return m.jnt_qposadr[j], m.jnt_dofadr[j]
+
+    def place_item(self, name, grip_pos):
+        """Put an item upright with its handle's grip point at grip_pos, at rest."""
+        q, v = self.item_qadr(name)
+        self.data.qpos[q:q + 3] = grip_pos
+        self.data.qpos[q + 3:q + 7] = (1.0, 0.0, 0.0, 0.0)
+        self.data.qvel[v:v + 6] = 0.0
+        mujoco.mj_forward(self.model, self.data)
+
+    def grip_site(self, hand):
+        m = self.model
+        return self.data.site_xpos[mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_SITE, "grip." + hand)].copy()
+
+    def item_grip(self, name):
+        m = self.model
+        return self.data.site_xpos[mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_SITE, "item.%s.grip" % name)].copy()
+
+    def grip(self, hand, name, on=True):
+        """Close (on) or open the hand on an item's handle: the connect equality between their grip sites."""
+        m = self.model
+        self.data.eq_active[mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_EQUALITY, "grip.%s.%s" % (hand, name))] = int(on)
+
+    def held_load(self, hand, name):
+        """The vertical force the hand carries from the item (N, + down on the hand): the grip constraint's force."""
+        m, d = self.model, self.data
+        e = mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_EQUALITY, "grip.%s.%s" % (hand, name))
+        if not d.eq_active[e]:
+            return 0.0
+        for i in range(d.nefc):
+            if d.efc_type[i] == mujoco.mjtConstraint.mjCNSTR_EQUALITY and d.efc_id[i] == e:
+                return float(abs(d.efc_force[i + 2]))      # connect: three rows (x, y, z) in the world frame
+        return 0.0
 
     def set_wind(self, spec):
         """Wind from now on (a WIND dict, or None for still air); a scene may call it after reset()."""
@@ -370,7 +479,7 @@ class Rig:
         """CoM against the feet: (offset of the CoM from the reference point as (x, y), heel margin, toe margin),
         metres. The reference point is the sole centres weighted by the planner's desired weight share, over the
         feet on the ground. Forward is -Y, left is +X; a positive margin means the CoM is inside the sole."""
-        com = self.data.subtree_com[self.pelvis]
+        com = self.com_est()
         s = self.soles()
         wts = [self.weight[i] if s[i][1] else 0.0 for i in range(2)]
         if sum(wts) <= 0:
@@ -390,11 +499,13 @@ class Rig:
             c = d.contact[i]
             if self.floor not in (c.geom1, c.geom2):
                 continue
+            other = c.geom2 if c.geom1 == self.floor else c.geom1
+            if m.geom_contype[other] & 2:                  # an item on the floor (docs/38), not the robot
+                continue
             mujoco.mj_contactForce(m, d, i, f6)
             fn = f6[0]
             num += fn * c.pos[:2]
             den += fn
-            other = c.geom2 if c.geom1 == self.floor else c.geom1
             for k, b in enumerate(self.feet):
                 if m.geom_bodyid[other] == b:
                     loads[k] += fn
@@ -409,7 +520,7 @@ class Rig:
         dt = m.opt.timestep
         e, heel, toe = self.support()
         self.com_margin = (heel, toe)
-        com = d.subtree_com[self.pelvis]
+        com = self.com_est()
         if self._com_f is None:
             self._com_f, self._e_prev = e.copy(), com[:2].copy()
         a = dt / (BAL_TAU + dt)
@@ -431,7 +542,9 @@ class Rig:
             self._ank_w[i] = 0.0 if self.swing == "LR"[i] else min(1.0, self._ank_w[i] + dt / ANKLE_BLEND)
         if not grounded:
             return
-        mass = self.mass
+        if FEEL_LOAD and self.items:
+            self._felt_update()
+        mass = self.mass + getattr(self, "_felt_f", (0.0, None))[0]
         ref = com[:2] - e
         h = max(0.3, com[2] - 0.08)
         omega = math.sqrt(9.81 / h)
@@ -583,6 +696,8 @@ class Rig:
             if back:
                 hb = CHAIR_GEOMS["chair_back"]
                 place["chair_back"] = (0.0, y0 + 2 * hs[1] + hb[1], seat + hb[2])
+        o = getattr(self, "origin", np.zeros(2))
+        place = {k: (v[0] + o[0], v[1] + o[1], v[2]) for k, v in place.items()}
         self._chair_ids = set()
         for name in CHAIR_GEOMS:
             g = mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_GEOM, name)
@@ -932,7 +1047,7 @@ def _pose_com(r, dd, targets):
     fb = r.feet[0]
     sole = dd.xpos[fb] + dd.xmat[fb].reshape(3, 3) @ np.array(SOLE_CENTRE)
     floor = sole[2] - 0.02                      # the sole's underside (export_urdf.FOOT_BOX half height)
-    return dd.subtree_com[0][1] - sole[1], dd.xpos[m.body("thigh.L").id][2] - floor
+    return dd.subtree_com[m.body("pelvis").id][1] - sole[1], dd.xpos[m.body("thigh.L").id][2] - floor   # the robot's, not the items'
 
 
 def sit_path(r, seat, n=20):

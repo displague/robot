@@ -716,3 +716,14 @@ level or better, and the 0.45 m chair.
 Update (P-062): the hip drives on the thighs cost held feet, and the battery move does not. With 2, 4 or 6 hip
 drives on the thighs, no build passes both, so the battery-up move stays and the hip bank waits on a forward
 transfer retuned for held feet.
+
+## D-062 (2026-11-09) Skills are also judged chained, with a hand-back between them; the felt weight stays off
+
+Why: P-063, docs/38. Starting each skill from a fresh stand hid a hand-off bug. The walk leaves the planner's
+swing flags, a 7-degree hip shift and the arms out, and a chair after it cannot stand. `tools/chain.py` runs random
+orders of pick, walk, sit and place with six free bags (`export_mjcf.ITEMS`). `Rig.to_stand()` hands back a quiet
+stand between skills: 10 of 24 chains done with it, 6 without. Walking with a bag in the hand fails in 9 of 10
+chains, and feeding the felt grip weight into the balance loop's CoM did not help (6 raw, 8 low-passed), so
+`FEEL_LOAD` is off by default. Changes to the balance, the step or the chair are also run on the chain grid.
+Alternative: keep judging skills only from a fresh stand.
+Reverses if: the chain grid turns out to add no failures beyond the single scenes' once the bag walk is fixed.
