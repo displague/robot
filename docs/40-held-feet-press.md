@@ -174,6 +174,19 @@ The transfer runs the brushless drives over their continuous line rating (184 N 
 Nothing slips, so it is not a hard limit. But it points at the brushless W-max's 1:25 being light for the held-feet
 transfer, where the 775's 1:40 carries the same scene under its rating.
 
+A heavier ratio does not help. `ROBOT_WMAX_RATIO` (bldc only; the 5010's torque up and its speed down by the ratio)
+on the brushless layout, held feet, out of 14:
+
+| Ratio | Held step | Held walk |
+| --- | --- | --- |
+| 1:25 (as built) | 10 | 4 |
+| 1:35 | 0 | 0 |
+| 1:40 | 0 | 0 |
+
+At 1:35 and 1:40 the first foot lands 23 to 42 mm short: the slower drive cannot swing the leg in the planner's time.
+The gearbox trades the transfer's margin for the swing's. The mass file was not changed, so a heavier printed
+gearbox would make it worse still.
+
 ## Not yet
 
 - The held walk on the layouts: the trailing foot slides outward through the weight ramp, and the CoM leaves at
@@ -182,8 +195,8 @@ transfer, where the 775's 1:40 carries the same scene under its rating.
 
 ## Next
 
-For the brushless layout, try a 1:30 to 1:40 W-max on the leg drives (`tendon_calc.py`'s 5010 entry) on the held
-walk grid. Its transfer runs the ankle and hip lines at 1.2 to 1.4 times their continuous rating. For both, make the walk's release a staged hand-off. Release the trailing foot only once the CoM is
+For the brushless layout, a heavier ratio is ruled out (1:35 and 1:40 swing too slowly). Trace the lurch at its first
+release: the trailing foot dragged while still loaded, and the stance foot rolling on an edge. For both, make the walk's release a staged hand-off. Release the trailing foot only once the CoM is
 over the new stance sole's centre, not just once the foot is light. Hold the shift's integral through the release,
 and ramp the trailing leg's lift. The 26 kg 775 layout's held walk at 0.095 m is the test case (w3). Tried and not
 enough on their own:

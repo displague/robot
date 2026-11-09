@@ -57,12 +57,14 @@ CLASSES = {
 # Back-drivable: hold 0, so its drums never lock and a standing joint holds on current. rotor_J: the outrunner's
 # bell (~50 g at ~25 mm). bldc: the energy is copper loss plus shaft power, not the brushed duty x V x I.
 WMAX_VARIANT = os.environ.get("ROBOT_WMAX", "")
+WMAX_RATIO = float(os.environ.get("ROBOT_WMAX_RATIO", 25))   # bldc: the printed gearbox's ratio (25 in docs/34; docs/40)
 if WMAX_VARIANT == "bldc":
+    _r = WMAX_RATIO
     CLASSES["W-max"] = dict(motor="5010_PLAN25_24V", eta=0.60, r_drum=0.015, line="braid_200lb", rotor_J=3.0e-5,
-                            ratio=25, hold=0.0, bldc=True)
+                            ratio=_r, hold=0.0, bldc=True)
     # its servo tuned to the 775's drum stiffness (torque per rad of gear error): the gains scale with stall torque
     CLASSES["W-max"]["kg_scale"] = float(os.environ.get("ROBOT_WMAX_KG", MOTORS_MODEL["775_PLAN40"].stall_torque_nm
-                                                        / MOTORS_MODEL["5010_PLAN25_24V"].stall_torque_nm))
+                                                        / (MOTORS_MODEL["5010_PLAN25_24V"].stall_torque_nm * _r / 25)))
 elif WMAX_VARIANT:
     raise SystemExit("ROBOT_WMAX: bldc or unset, not %r" % WMAX_VARIANT)
 # line stretch: 2 % at a quarter of break (docs/08) -> EA = break / 0.08
@@ -112,6 +114,10 @@ ETA_MODEL = {k: c["eta"] for k, c in CLASSES.items()}
 def motor_case(spec):
     """(MOTORS, LINES, {class: eta}) for a ROBOT_MOTORS value; tendon_calc's own figures for an empty one."""
     motors, lines, eta = dict(MOTORS_MODEL), dict(LINES_MODEL), dict(ETA_MODEL)
+    if WMAX_RATIO != 25:     # the 5010 on another printed ratio: torque up and speed down by it (docs/40)
+        m5 = motors["5010_PLAN25_24V"]
+        motors["5010_PLAN25_24V"] = dataclasses.replace(m5, stall_torque_nm=m5.stall_torque_nm * WMAX_RATIO / 25,
+                                                        noload_rpm=m5.noload_rpm * 25 / WMAX_RATIO, ratio=WMAX_RATIO)
     if not spec:
         return motors, lines, eta
     path, case = spec, "nom"

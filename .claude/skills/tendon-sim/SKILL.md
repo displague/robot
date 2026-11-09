@@ -23,6 +23,7 @@ ROBOT_MOTORS=high | nom | <file.json>[:case]         # the optimistic end, the s
 ROBOT_WMAX=bldc [ROBOT_WMAX_KG=2.09]                 # variant: W-max on the 5010 on 1:25, 24 V: no lock, FOC energy, gains x kg (docs/34)
 ROBOT_SHOULDERS_LOW=1                                # variant: the shoulder sheaths 0.85 m (drives in the pelvis; rejected, docs/36)
 ROBOT_ITEMS=items.json                               # free items a hand can grip, and two stools (docs/38; tools/chain.py sets them itself)
+ROBOT_WMAX=bldc ROBOT_WMAX_RATIO=35                  # the 5010 on another printed ratio (docs/40: 35 and 40 swing too slowly)
 ```
 
 `ROBOT_MASSES`, `ROBOT_TORSO_WORM`, `ROBOT_MOTORS`, `ROBOT_WMAX` and `ROBOT_SHOULDERS_LOW` are read by `export_mjcf`, so they also apply to `step_sweep.py`
