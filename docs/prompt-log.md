@@ -874,3 +874,14 @@ light arms, not the trunk, lose the chair. The shoulder drives into the pelvis a
 thighs and the battery into the torso: the brushless and 26 kg builds stand again from 0.45 m. `mass_rollup.py` gains
 `--spread`, `--hips-on-thighs`, `--battery-up` and `--shoulders-low`; `export_mjcf` gains `ROBOT_SHOULDERS_LOW`;
 `sim/masses/rollup_bldc_layout.json` and `rollup_775_layout.json`.
+
+## P-061 (2026-11-09) The layout on the full grids
+
+> continue
+
+Continued docs/36's Next on hub task `wmax-mass-down`: the full step and walk grids (7 lengths, soft, held feet,
+`ROBOT_MOTORS=low`) on both layouts, in docs/37. The layout holds on soft contact and the pessimistic motors but
+loses held feet (775: 0 of 14 steps and walks), so D-061 keeps the model on the 20 kg masses and puts D-060 on
+hold. The run that separates the two moves was stopped by the host for low memory and is not rerun. The thigh bank
+is packaged on paper: drives front and back of the femur, inside the model's thigh width. `mass_rollup.py` names
+the brushless gearbox 1:25 and its battery 6S.

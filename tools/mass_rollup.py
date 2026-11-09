@@ -83,7 +83,7 @@ PVC_KG_M = {"1": 0.446, "1-1/4": 0.605, "1-1/2": 0.722, "2": 0.970}   # Schedule
 
 
 TORSO_WORM = False   # --torso-worm: spine and shoulders on a bought worm gearmotor (export_mjcf ROBOT_TORSO_WORM)
-WMAX = "775"         # --wmax 775 | bldc: the W-max motor (docs/21; bldc = 5010 360 KV + B-G431B-ESC1 + 1:16 planetary)
+WMAX = "775"         # --wmax 775 | bldc: the W-max motor (docs/21; bldc = 5010 360 KV + B-G431B-ESC1 + 1:25 planetary at 24 V)
 WMAX_DRIVER = "bts7960"   # --wmax-driver bts7960 | small: the 775's H-bridge (small = VNH5019 class, docs/21)
 SPREAD = False       # --spread: wiring, fasteners, line and joint sensors over the segments by their mass, not all in the trunk
 SPREAD_ITEMS = ("wiring", "M3 inserts", "line, PTFE", "AS5600")
@@ -166,7 +166,7 @@ def bought():
     add("ICM-42688 IMU (torso, feet)", "foot", 2, 5, "est")
     add("ICM-42688 IMU (torso, feet)", "spine", 1, 5, "est")
     add("FSR 402, 4 per foot", "foot", 8, 1, "est")
-    add("battery 3S LiPo 10 Ah", "spine" if BATTERY_UP else "pelvis", 1, 543, "listing")
+    add("battery 3S LiPo 10 Ah" if WMAX != "bldc" else "battery 6S LiPo 5 Ah (24 V; the same 111 Wh as 3S 10 Ah)", "spine" if BATTERY_UP else "pelvis", 1, 543, "listing")
     add("E-stop, 200 A relay, fuse", "spine" if BATTERY_UP else "pelvis", 1, 196, "listing")
     add("wiring (12 and 18 AWG runs, signal), est", "spine", 1, 400, "est")
     add("M3 inserts and screws, est", "spine", 1, 300, "est")
@@ -217,7 +217,7 @@ def main():
     ap.add_argument("--md", help="also write the tables as Markdown to this file")
     ap.add_argument("--torso-worm", action="store_true", help="spine and shoulders on the 10 rpm worm gearmotor")
     ap.add_argument("--wmax", choices=("775", "bldc"), default="775",
-                    help="W-max motor: 775 + printed 1:40, or 5010 BLDC + B-G431B-ESC1 + printed 1:16 (docs/21)")
+                    help="W-max motor: 775 + printed 1:40, or 5010 BLDC + B-G431B-ESC1 + printed 1:25 at 24 V (docs/21, docs/34)")
     ap.add_argument("--wmax-driver", choices=("bts7960", "small"), default="bts7960",
                     help="the 775's H-bridge: BTS7960 with heatsink (65 g) or a VNH5019-class module (10 g)")
     ap.add_argument("--frame", action="store_true",
@@ -300,7 +300,7 @@ def main():
             g *= sum(wm.values())
             name = name.replace("x21", "x%d" % sum(wm.values()))
             if WMAX == "bldc":
-                name = name.replace("1:40", "1:16")
+                name = name.replace("1:40", "1:25")
             s = "with the W-max"
             if TORSO_WORM:
                 tot_ungen += 9 * 60

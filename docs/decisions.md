@@ -700,3 +700,16 @@ reach +1.4 cm. Wiring, fasteners, line and joint sensors are booked over the seg
 Alternative: the old layout (hip bank and battery in the pelvis); the shoulder drives in the pelvis.
 Reverses if: the thigh bank cannot be packaged (its lines must cross the hip to the pelvis), the heavier swing leg
 fails the full step grid, or the printed arms come out as heavy as the model's guesses.
+On hold (D-061, docs/37): the layout fails the full grid on held feet.
+
+## D-061 (2026-11-09) The model stays on the 20 kg masses: the layout loses held feet; D-060 is on hold
+
+Why: P-061, docs/37. On the full grids (7 lengths) the D-060 layout holds on soft contact and on `ROBOT_MOTORS=low`,
+but on held feet (`NOSLIP=5`, the contact D-043 chose) the 775 layout stands 0 of 14 steps and 0 of 14 walks
+(old roll-up 8 and 3, 20 kg model 14 and 14), and the brushless layout 6 and 2. It falls moving its weight onto
+the front foot. That meets D-060's reversal condition "the heavier swing leg fails the full step grid". The
+brushless layout's 19.8 kg meets D-036's mass trigger, but `cad/skeleton.json` keeps the 20 kg model's masses, and
+D-060 is on hold until the run that separates the two moves is done.
+Alternative: move the model to the layout's roll-up now and retune the transfer on held feet.
+Reverses if: a layout (one move, both, or part of the hip bank on the thighs) passes held feet at the old roll-up's
+level or better, and the 0.45 m chair.

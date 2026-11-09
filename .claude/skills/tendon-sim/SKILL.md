@@ -268,5 +268,5 @@ parallel at `CHAIR_JOBS=2` or 3. The 0.50 m case flips with small changes, so re
 build stands only from 0.50 m (D-057), and from 0.45 m on the D-060 layout (`sim/masses/rollup_775_layout.json`).
 The rise is decided by the static reach (`sit_path`'s second return, the CoM behind the sole centre at seat-off;
 the model passes at 7.8 cm at 0.45 m). To see what a mass change does, compute the reach per mass set first (one
-process each, seconds): docs/36 has the reach per kilogram of each segment. In a shell, `S=... && (...) &` runs the assignment in the background subshell:
+process each, seconds): docs/36 has the reach per kilogram of each segment. Judge any mass layout on the full grid's held feet too (`"held: NOSLIP=5"`, 7 lengths): docs/37's layout passed soft contact and failed there. `step_sweep.py` starts every run of a call at once (42 runs for three mass sets); split big grids into calls of 14 to 28, or the host may kill them for memory. In a shell, `S=... && (...) &` runs the assignment in the background subshell:
 set and export the variable on its own line first.

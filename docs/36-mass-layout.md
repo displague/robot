@@ -6,6 +6,9 @@ the CoM is behind the feet at seat-off, and the pelvis and the light arms push i
 drives ride on the thighs, and the battery and E-stop go into the torso. With them the 19.9 kg brushless build and the
 26 kg 775 build both stand again from 0.45 m. The total mass does not change.
 
+**Corrected by docs/37 (D-061):** on the full grid's held feet (`NOSLIP=5`) the layout fails the step and the walk
+(775: 0 of 14), so D-060 is on hold.
+
 Short answers:
 - **The static reach is the CoM's distance behind the sole centre at seat-off** (`sit_path`, with the hips at their
   110-degree stop). It decides the rise. The 20 kg model stands from 0.45 m at 7.8 cm. The brushless roll-up was at
