@@ -132,8 +132,9 @@ The heavy bags are past what one hand walks with (docs/28 and the single walks a
   - 3.9 and 4.5 kg: fall, with or without the slower ramp `TP_B=6 ROLL_KD=0.5` (it only delays the fall);
   - on held feet: falls from 3.0 kg up.
 
-  So one hand walks about 3 kg on soft contact. The chain's tall bag (3.0 kg) still fails its walks there: they come
-  right after the pick.
+  So one hand walks about 3 kg on soft contact, for the grocery bag's shape. The chain's tall bag (3.0 kg, hanging
+  lower on a shorter handle) still fails its walks. Waiting up to 3 s for it to hang still after the pick does not
+  change that (tried and reverted), so the shape matters as well as the weight.
 - **Sitting with a bag.** Tried: the felt weight at the gripping hand in the sit's planned poses, and `com_est` in
   the stand-up gate. It made things worse. The arms are forward at seat-off, so the bag moved the planned reach
   from 7.7 cm to between -2.6 and +1.9 cm. The planner then leaned too little, and the jug no longer sat. The real
@@ -146,5 +147,6 @@ The heavy bags are past what one hand walks with (docs/28 and the single walks a
 
 ## Next
 
-Run the chain grid with a settle after the pick, and with the planner keeping a held bag off the floor while
-seated (forearm up). Then take the bag-carry case into the held-feet step retune (docs/37 Next).
+Find why the tall bag fails where the grocery bag of the same weight walks. Run the single walk with the chain's
+six shapes at 3.0 kg, and compare their swing and the hand's load. Then decide on a planner rule for bags one hand
+should not walk with (over about 3 kg, or long and heavy).
