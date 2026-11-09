@@ -191,6 +191,29 @@ It is now the default:
 - **The chain grid:** 17 of 24, unchanged.
 - At 0.40 m the limit changes nothing: the layouts fail there either way.
 
+## The 0.40 m chair on the layouts
+
+Both layouts sit and fail to rise at 0.40 m, with or without the hip pace. It is the static reach: the CoM's distance
+behind the sole centre at seat-off. The 20 kg model stands from 9.1 cm; the brushless layout has 9.6 and the 775
+layout 11.5. That is docs/36's mass-layout limit (the pelvis and the arms), not the control's.
+
+## Regression with all of P-064's defaults
+
+The press (D-064), the neck's two strands (D-066) and the hip pace (D-067) together. 20 kg model, 7 lengths x 2
+models, out of 14:
+
+| Grid | Before P-064 (docs/37) | Now |
+| --- | --- | --- |
+| held step | 14 | 14 |
+| soft step | 14 | 14 |
+| `ROBOT_MOTORS=low` step | 7 | **13** |
+| held walk | 14 | 14 |
+| soft walk | 14 | 14 |
+| `ROBOT_MOTORS=low` walk | 3 | **12** |
+
+Nothing is lost, and the pessimistic motors gain the most. The gauntlet stands 14 of 14. The chain grid is 17 of 24;
+its failures are the one-handed 3 and 4.5 kg walks.
+
 ## Not yet
 
 - The neck's roll and yaw stay on one strand. Neither was flagged.
@@ -202,5 +225,5 @@ It is now the default:
 ## Next
 
 docs/37's item on the brushless 0.50 m chair is closed. The spine is the next limit in the chair. The rise is fixed by
-pacing the hips (D-067). Next are the layouts at 0.40 m (both fail with or without the limit), and the deeper D-060
+pacing the hips (D-067). Next is the deeper D-060
 thigh in the collision model, which changes when the trunk leaves the thighs.
