@@ -98,6 +98,10 @@ each ablated.
 
 ## Next
 
+Done in docs/39 (P-064): the swing was not the cause. A damped grip and the felt weight (D-063) take the chain grid to
+13 of 24. What follows is below.
+
+
 Find why the carried bag's grip force swings to 10 to 15 times its weight in the walk. Compare a damped connect,
 and a ball joint switched in at the grip, against docs/28's bag. Then rerun the chain grid, and judge the felt
 weight again once the swing is tamed.

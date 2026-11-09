@@ -292,4 +292,10 @@ memory. `--one <seed>` prints one run's full log.
 - **Code that sums the whole world must skip the items.** Use `subtree_com[pelvis]` rather than
   `subtree_com[0]`. Skip floor contacts with contype bit 2 in `cop()`. `Rig.mass` leaves out the items.
   With no items the model and every scene are unchanged.
+- **Held items (docs/39, D-063):** `FEEL_LOAD` (on) adds the felt grip weight to the balance loop's CoM.
+  `GRIP_DAMP` (0.5 N m s/rad) damps an item's rotation against the hand. A freely pivoting bag with no felt weight
+  fails nearly every walk. `GRIP_DAMP` is an explicit torque: 1.0 spikes a light bag and 2.0 blows up, because the
+  hand's inertia is small. Both act only when the model has items.
+- **To diagnose a carried item,** give the balance loop the item's true CoM (`Rig.com_est` overridden) as an upper
+  bound. That separates "the loop does not know it" from "the walk cannot carry it".
 

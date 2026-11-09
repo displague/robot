@@ -33,7 +33,11 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from export_mjcf import CHAIR_GEOMS, STOOL_HALF, build   # noqa: E402
 
 FEEL_TAU = 0.5       # s, the felt weight's low-pass
-FEEL_LOAD = False    # docs/38: the balance loop adds the weight the hands feel (Rig.felt) to its CoM; False: it does not
+FEEL_LOAD = True     # docs/38, docs/39: the balance loop adds the weight the hands feel (Rig.felt) to its CoM; False: it
+                     # does not. With no items in the model it does nothing
+GRIP_DAMP = 0.5      # N m s/rad (docs/39): a closed grip resists the item turning against the hand (the fingers' and
+                     # palm's friction on the handles), so a carried bag swings less; 0: it pivots freely.
+                     # An explicit torque: the hand's 0.24 g m2 limits it to about 0.5 at the 1 ms step (1.0 spikes)
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 KG, KDG = 3.0, 0.02             # inner gear loop: volts-fraction per rad of gear error, per rad/s
@@ -426,6 +430,22 @@ class Rig:
         """Close (on) or open the hand on an item's handle: the connect equality between their grip sites."""
         m = self.model
         self.data.eq_active[mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_EQUALITY, "grip.%s.%s" % (hand, name))] = int(on)
+
+    def _grip_damp(self):
+        """GRIP_DAMP: a torque on each gripped item against its rotation relative to the hand, and its reaction on
+        the hand. Set every step (the torque slots of xfrc_applied; the wind pushes only the torso's force)."""
+        m, d = self.model, self.data
+        if not hasattr(self, "_grips"):
+            self._grips = [(mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_EQUALITY, "grip.%s.%s" % (h, n)),
+                            m.body(h).id, m.body("item." + n).id) for h in ("hand.L", "hand.R") for n in self.items]
+        for e, hb, ib in self._grips:
+            d.xfrc_applied[hb, 3:] = 0.0
+            d.xfrc_applied[ib, 3:] = 0.0
+        for e, hb, ib in self._grips:
+            if d.eq_active[e]:
+                tq = -GRIP_DAMP * (d.cvel[ib][:3] - d.cvel[hb][:3])
+                d.xfrc_applied[ib, 3:] += tq
+                d.xfrc_applied[hb, 3:] -= tq
 
     def held_load(self, hand, name):
         """The vertical force the hand carries from the item (N, + down on the hand): the grip constraint's force."""
@@ -854,6 +874,8 @@ class Rig:
         self.control()
         if self.wind:
             self.blow()
+        if GRIP_DAMP and self.items:
+            self._grip_damp()
         mujoco.mj_step(m, d)
         self.steps += 1
         dt = m.opt.timestep

@@ -927,3 +927,11 @@ Filed hub tasks:
 - `hands-pillow-and-pour`;
 - `perception-channels`;
 - `tendon-physics-on-gpu`.
+
+## P-064 (2026-11-09) Keep working: walking with a bag in hand (docs/38 Next)
+
+> keep working through 5p
+
+Worked the docs/38 Next until 5 pm. The bag's swing was not the cause; the balance loop not knowing the bag was.
+Grip friction (`GRIP_DAMP`) plus the felt weight (`FEEL_LOAD`), now the defaults with items, take the chain grid from
+10 to 13 of 24 and walks with a bag in hand from 1 to 6 of 10 (docs/39, D-063).

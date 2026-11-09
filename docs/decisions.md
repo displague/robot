@@ -727,3 +727,19 @@ chains, and feeding the felt grip weight into the balance loop's CoM did not hel
 `FEEL_LOAD` is off by default. Changes to the balance, the step or the chair are also run on the chain grid.
 Alternative: keep judging skills only from a fresh stand.
 Reverses if: the chain grid turns out to add no failures beyond the single scenes' once the bag walk is fixed.
+Update (P-064, D-063): `FEEL_LOAD` is now on, with the grip damped (`GRIP_DAMP`); the hand-back stands.
+
+## D-063 (2026-11-09) A held item's grip is damped and its felt weight goes to the balance loop
+
+Why: P-064, docs/39. Walking with a gripped bag failed because the balance loop did not know about the bag, not
+because of the swing (under 8 degrees until the fall). Given the bag's true moving CoM, 5 of 7 weights walk; its mass
+at the hand, 1 of 6; nothing, 0 of 7. No estimate of the swing from the wrist force worked. Damping the bag against
+the hand (`GRIP_DAMP` 0.5 N m s/rad, the fingers' or a palm hook's friction) and feeding the felt weight
+(`FEEL_LOAD`) walks 0.8 to 2.3 kg. On the chain grid it does 13 of 24 chains against 10, and 6 of 10 walks with a bag
+against 1. Both are now on by default. They act only on items, and the gauntlet is identical. This reverses D-062's
+"`FEEL_LOAD` off".
+For the hardware: a palm hook with a rubber pad or a strap (D-049), not a free pivot, and a vertical load cell at
+the wrist or palm.
+Alternative: a swing observer from a 3-axis wrist force (tried: it does not track the swing).
+Reverses if: an implicit grip model (a soft weld) shows the damping is a step-size artefact, or the hardware's grip
+pivots freely.
