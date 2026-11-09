@@ -79,16 +79,53 @@ foot's outward slide under a falling load is the mechanism to work on.
 - **The walk on held feet still is:** 4 of 14 on both layouts, against 13 for the 20 kg model.
 - So the model stays on the 20 kg masses (D-061) until the held walk passes. D-060's battery-up move stays.
 
+## The partial hip banks, and the walk's lateral loop
+
+docs/37's partial banks (`mass_rollup.py --spread --battery-up --hips-on-thighs N`), held feet, press on:
+
+| Build | Held step | Held walk |
+| --- | --- | --- |
+| 775, 2 hip drives on the thighs | 14 / 14 (docs/37: 8) | 5 / 14 |
+| 775, 4 | 14 / 14 (docs/37: 3) | 4 / 14 |
+| 775, 6 (the layout) | 14 / 14 (docs/37: 0) | 4 / 14 |
+| brushless, 4 | 9 / 14 (docs/37: 4) | 5 / 14 |
+| brushless, 6 (the layout) | 10 / 14 (docs/37: 6) | 4 / 14 |
+
+- **Every bank now steps on held feet, and none walks on them.** The held walk fails even with 2 hip drives
+  moved. It is a problem of the heavier rolled-up builds (25 to 26 kg against 20), not of where the hip drives sit.
+- **The 0.45 m chair wanted all six on the 775 (docs/37).** Now the held step no longer costs anything for them.
+
+At the layout's failing release, the trailing leg's roll follows its command; the -10 degrees is the commanded weight
+shift itself. With 95% of the load on the new stance foot, the CoM is still 47 mm inside that sole's centre and
+the shift keeps growing. Windup variants on the 775 layout's held walk (base 4 of 14):
+
+| Variant | Walks |
+| --- | --- |
+| `ROLL_KI=0.25` (half) | 5 |
+| `ROLL_KD=0.5` | 6 |
+| `LAT_FF=True` (the geometric feed-forward, docs/19) | 6 |
+| `ROLL_MAX` 8 degrees | 0 |
+
+None clears the scatter, and a tighter clamp breaks the walk. So the shift is needed, and the failure is what
+happens at the release, when the trailing foot stops resisting.
+
+The release gate is not what fires early. It waits for the trailing load under a tenth and the lateral CoM error
+under 10 mm. In the failing transfer the trailing foot unloads by itself while the CoM is still 30 mm short of the
+new stance sole's centre. The shift has given the body lateral momentum: the load transfers before the CoM arrives,
+the foot lifts, and the CoM carries on past the sole's edge. The heavier build's slower lateral swing makes this
+worse.
+
 ## Not yet
 
 - The held walk on the layouts: the trailing foot slides outward through the weight ramp, and the CoM leaves at
   its release.
-- Rerunning docs/37's partial hip banks (2 and 4 drives on the thighs) with the press fix.
 - The brushless layout's 0.50 m neck slip (docs/37).
 
 ## Next
 
-Trace the layout's held walk at release (w3, 0.095 m). Measure why the trailing foot slides 31 mm out on held feet
-while it unloads; it is probably its hip roll pushing against a light foot. Then try holding the trailing leg's
-roll at its measured angle until release, with the lateral CoM target moved toward the new stance foot before the
-release.
+Make the walk's release a staged hand-off for the heavier builds. Release the trailing foot only once the CoM is
+over the new stance sole's centre, not just once the foot is light. Hold the shift's integral through the release,
+and ramp the trailing leg's lift. The 26 kg 775 layout's held walk at 0.095 m is the test case (w3). Tried and not
+enough on their own:
+- seeding the released leg's roll from its measured angle (3 and 6 of 14, with and without a slower filter);
+- the gain sweeps above.
