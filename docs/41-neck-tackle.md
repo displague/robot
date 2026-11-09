@@ -58,6 +58,20 @@ The third strand takes off only 5 to 13% and slows the trunk's swing, so half th
 its continuous rating on every build, for the second or two of the swing. That is a question for the line and its
 rating (docs/12's table), not the tackle.
 
+### Why: the spine is at its clutch
+
+Neither a slower swing (`SIT_LEAN_T` doubled) nor less spine overshoot (`SIT_SPINE_OVER` 15 to 5 degrees) moves the peak.
+It stays at 315 to 339 N on all three builds. The clutch slips when the line reaches a third of its break
+(`CLUTCH_LINE_FRACTION`): 297 N on the 890 N braid. So the spine drive is pushing against its clutch:
+- The spine is position-servoed toward a seat-off pose that it cannot reach under the trunk's load, so it
+  saturates.
+- More strands or a slower swing only change how it gets there.
+- The 775 layout's spine slips (87 to 199 degrees) because its heavier trunk holds it there longer.
+
+The gauntlet's line flag (a safety factor under 4) sits below the clutch's own setting (3). So any drive that works
+at its clutch is flagged. The flag is right that the spine runs at its limit. It does not mean the line is at risk:
+the clutch caps the line at 297 N, with brief dynamic peaks of up to 1.2 times that.
+
 ## Not yet
 
 - The neck's roll and yaw stay on one strand. Neither was flagged.
@@ -68,6 +82,7 @@ rating (docs/12's table), not the tackle.
 
 ## Next
 
-docs/37's item on the brushless 0.50 m chair is closed. The spine pitch line comes next. Check its peak (300 to 354 N
-for a second or two of the swing) against the line's break strength and its creep rating, not its continuous drive
-rating. Then decide whether the spine needs a heavier line, or whether the swing should be slower.
+docs/37's item on the brushless 0.50 m chair is closed. The spine's seat-off pose asks more than its drive holds.
+Plan the sit's spine target from what the drive can hold: the trunk's static moment at seat-off against the clutch
+torque. Let the hips take more of the lean, as `SIT_HIP_K` already does when the CoM lags, and rerun the chair
+seats.
