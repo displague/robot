@@ -1,0 +1,39 @@
+site_name: Robot - a home-printable tendon humanoid
+site_url: https://displague.github.io/robot/
+repo_url: https://github.com/displague/robot
+repo_name: displague/robot
+edit_uri: edit/main/docs/
+docs_dir: docs
+site_dir: site
+
+# docs/index.md is generated from each numbered doc's front matter (title, summary, section): tools/docs_index.py
+hooks:
+  - tools/mkdocs_hooks.py
+
+theme:
+  name: material
+  features:
+    - navigation.instant
+    - navigation.top
+    - search.highlight
+    - content.code.copy
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle: {icon: material/brightness-7, name: Dark mode}
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle: {icon: material/brightness-4, name: Light mode}
+
+markdown_extensions:
+  - tables
+  - toc: {permalink: true}
+  - admonition
+  - pymdownx.superfences
+  - pymdownx.arithmatex: {generic: true}
+
+# the docs link into tools/, cad/ and sim/, outside docs_dir: those stay links to GitHub's copy, not build errors
+validation:
+  links:
+    not_found: info
+    unrecognized_links: info

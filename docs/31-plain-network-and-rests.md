@@ -1,3 +1,9 @@
+---
+title: "31 - Five seeds: a plain network beats the sibling's core; rests and locks; held loads (P-052, D-052)"
+summary: "Five seeds: a plain network beats the sibling's core on this robot; the drums lock under a policy; training with a held load makes policies rest (best 10.6 W idle against 5.4 W) (D-052)"
+section: "Learned control"
+---
+
 # 31 - Five seeds: a plain network beats the sibling's core; rests and locks; held loads (P-052, D-052)
 
 `30` set the order: first settle whether the sibling's model core helps this robot at all (sibling #51, with a

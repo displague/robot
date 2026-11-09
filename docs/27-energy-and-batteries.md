@@ -1,3 +1,9 @@
+---
+title: "27 - Energy and batteries: how far it walks on a charge, and where the power goes (P-041, D-045)"
+summary: "Energy: what is counted, how far a charge walks (about 18 m on the 26 kg build, wind barely matters), peaks, power banks in the bones (logic supply only), the trade-offs, cutting the walk's energy, more tackle (a 6:1 block does not pay)"
+section: "Drives, mass and energy"
+---
+
 # 27 - Energy and batteries: how far it walks on a charge, and where the power goes (P-041, D-045)
 
 The owner asked whether the motors' energy is counted, how long the robot can walk against the wind on its

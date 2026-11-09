@@ -1,3 +1,9 @@
+---
+title: "16 - The first static step on the tendon model (P-014)"
+summary: "The first static step completes (Phase 6a in simulation): per-phase line readout, the exit test verdict, what it took, the observer bug (D-029, D-030)"
+section: "Simulation, balance and walking"
+---
+
 # 16 - The first static step on the tendon model (P-014)
 
 The first step of `06` Phase 6a, on the MuJoCo tendon model of `13` with the controllers of `14`

@@ -1,3 +1,9 @@
+---
+title: "04 - Electronics and compute"
+summary: "Boards, bus, drivers, encoders, power"
+section: "Design and hardware"
+---
+
 # 04 - Electronics and compute
 
 ## Topology

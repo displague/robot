@@ -796,3 +796,12 @@ Alternative: gate the knees on the spine's error (`SIT_SPINE_GATE`, kept as an o
 brushless layout's 0.50 m rise and cost energy.
 Reverses if: a faster rise is needed (the limit adds about a second).
 
+
+## D-068 (2026-11-09) The docs are indexed from their own front matter, not the README
+
+Why: P-065. The README's repository map had grown to 41 doc rows. Each numbered doc now starts with YAML front
+matter (`title`, `summary`, `section`), and `tools/docs_index.py` generates `docs/index.md` from it, grouped by
+section. The mkdocs build regenerates the index (`tools/mkdocs_hooks.py`), and the committed copy serves readers on
+GitHub. CI checks that it is current. The README keeps the tools and paths, and points at the index.
+Alternative: keep the README table, or generate the index only inside the build (GitHub readers would lose it).
+Reverses if: the site is dropped, or the index stops being read.

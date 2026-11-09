@@ -1,3 +1,9 @@
+---
+title: "28 - Carrying a grocery bag: what it holds standing, what it walks with (P-047, P-049, D-049)"
+summary: "Carrying a grocery bag: standing to 11.3 kg in one hand, walking to 3.9 kg (20 kg build), the fingers hook about 2.4 kg, so a palm hook (D-049)"
+section: "Skills: wind, bags, chairs, chains"
+---
+
 # 28 - Carrying a grocery bag: what it holds standing, what it walks with (P-047, P-049, D-049)
 
 The owner asked whether the robot can carry a grocery bag of 5 to 25 lb (2.3 to 11.3 kg), such as bread and eggs or a

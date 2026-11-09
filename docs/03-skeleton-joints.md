@@ -1,3 +1,9 @@
+---
+title: "03 - Skeleton and joints"
+summary: "Joint types per body region, ROM targets vs human, materials, print segmentation"
+section: "Design and hardware"
+---
+
 # 03 - Skeleton and joints
 
 ## Materials and hardware (all cheap, all common)

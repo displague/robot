@@ -1,3 +1,9 @@
+---
+title: "05 - Parts, cost and mass (pre-test)"
+summary: "Parts list with recommended parts, checked prices, totals and mass"
+section: "Design and hardware"
+---
+
 # 05 - Parts, cost and mass (pre-test)
 
 Every drive in this list is the one the tendon model (`tools/export_mjcf.py`, `tools/tendon_calc.py`) is built

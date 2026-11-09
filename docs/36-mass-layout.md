@@ -1,3 +1,9 @@
+---
+title: "36 - Where the mass sits: hip drives on the thighs, the battery up (P-060, D-060, hub task wmax-mass-down)"
+summary: "Where the mass sits: the CoM's reach behind the feet at seat-off per kilogram of each segment. The hip drives ride on the thighs and the battery moves into the torso, so the brushless and the 26 kg builds stand again from 0.45 m (D-060)"
+section: "Drives, mass and energy"
+---
+
 # 36 - Where the mass sits: hip drives on the thighs, the battery up (P-060, D-060, hub task wmax-mass-down)
 
 docs/34 and docs/35 said that the brushless build loses the 0.45 m chair because its trunk is heavy (5.9 kg

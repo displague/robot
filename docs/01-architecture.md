@@ -1,3 +1,9 @@
+---
+title: "01 - Architecture"
+summary: "System overview, DOF budget, actuator classes, compute topology, honest limits"
+section: "Design and hardware"
+---
+
 # 01 - Architecture
 
 ## System in one picture

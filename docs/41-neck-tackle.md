@@ -1,3 +1,9 @@
+---
+title: "41 - The neck's pitch on two strands: the chair no longer slips it (P-064, D-066)"
+summary: "The chair's trunk swing overloaded the neck's W-mini. Its pitch now runs on two strands (D-066). The spine's overload traced to the rise's fast hip extension; pacing it at 22.5 deg/s (D-067) stands every chair case with no slip and less energy"
+section: "Skills: wind, bags, chairs, chains"
+---
+
 # 41 - The neck's pitch on two strands: the chair no longer slips it (P-064, D-066)
 
 docs/33 found that the chair scene overloads the neck. While the trunk swings forward to seat-off, the neck holds

@@ -1,3 +1,9 @@
+---
+title: "23 - A static walk: four steps and back to level (P-037)"
+summary: "The static walk: four 100 mm steps and the closing step, 42 of 42 grid variants over three mass sets, landings within 6 mm, 93 s and 1113 J; each transfer starts from the stance leg's crouch (D-039); `walk.gif`"
+section: "Simulation, balance and walking"
+---
+
 # 23 - A static walk: four steps and back to level (P-037)
 
 The single step of `19` (with the landing press of D-037 and the locks of D-038) generalised to a gait cycle

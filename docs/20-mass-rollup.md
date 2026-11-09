@@ -1,3 +1,9 @@
+---
+title: "20 - Mass roll-up: the robot as specified is about 26 kg, not 20 (P-031)"
+summary: "Mass roll-up of every printed and bought part: about 26 kg against the 20 kg budget; the model on those masses (the ankle at its rating, the step 11 of 14); where mass can come off (D-036)"
+section: "Drives, mass and energy"
+---
+
 # 20 - Mass roll-up: the robot as specified is about 26 kg, not 20 (P-031)
 
 The 20 kg budget in `05` and the masses in `cad/skeleton.json` were estimates written before most parts

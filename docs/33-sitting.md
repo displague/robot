@@ -1,3 +1,9 @@
+---
+title: "33 - Sitting on a chair and standing again (P-056, D-056)"
+summary: "Sitting on a chair and standing again: from 0.40, 0.45 and 0.50 m seats with or without armrests, not from 0.35 m; the forward reach (hip, ankle and the spine's drive) is the limit, the rise needs a trunk swing, and the hands cannot use the armrests (D-056); the 26 kg build stands again only from 0.50 m (D-057)"
+section: "Skills: wind, bags, chairs, chains"
+---
+
 # 33 - Sitting on a chair and standing again (P-056, D-056)
 
 The owner's side quest (P-047, hub task `sit-and-stand-chair`), given priority on 2026-11-05: sit on a chair and stand

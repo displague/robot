@@ -1,3 +1,9 @@
+---
+title: "40 - The layout on held feet: the landing press was the step's failure (P-064, D-064)"
+summary: "The layout's held-feet step failure traced to the landing press: starting it from the landed leg's measured length (now the default, D-064) takes the 775 layout from 0 to 14 of 14 steps. The held walk is still 4 of 14"
+section: "Drives, mass and energy"
+---
+
 # 40 - The layout on held feet: the landing press was the step's failure (P-064, D-064)
 
 docs/37 found that the D-060 layout (the hip drives on the thighs, the battery in the torso) loses held feet.

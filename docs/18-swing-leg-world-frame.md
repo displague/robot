@@ -1,3 +1,9 @@
+---
+title: "18 - The swing leg in the world frame, and what the step really lacks (P-026)"
+summary: "The swing leg by world-frame IK (accurate landings, steady single support with the free foot held in the world), and the finding that the step has no margin: most variants fall in the weight transfer, whatever the swing leg does (in progress)"
+section: "Simulation, balance and walking"
+---
+
 # 18 - The swing leg in the world frame, and what the step really lacks (P-026)
 
 `16` ended with the step completing but its feet landing 18 to 29 mm long, and five attempts at correcting

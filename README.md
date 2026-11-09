@@ -26,50 +26,13 @@ Goal ordering, in case they conflict: **cheap > simple to build > human range of
 
 ## Repository map
 
+The docs (design notes and experiments, one per topic) are indexed with a summary each in
+[`docs/index.md`](docs/index.md), generated from their front matter; `mkdocs serve` browses them as a site.
+
 | Path | What |
 | --- | --- |
-| `docs/01-architecture.md` | System overview, DOF budget, actuator classes, compute topology, honest limits |
-| `docs/02-tendon-actuator.md` | The winch: physics, lock options, drum rules, line choice, creep, calculator results, needle liners and ceramic ring guides (where each goes) |
-| `docs/03-skeleton-joints.md` | Joint types per body region, ROM targets vs human, materials, print segmentation |
-| `docs/04-electronics.md` | Boards, bus, drivers, encoders, power |
-| `docs/05-bom-estimate.md` | Parts list with recommended parts, checked prices, totals and mass |
-| `docs/06-roadmap.md` | Phases with exit criteria, starting with one finger on one winch, ending in dynamic walking |
-| `docs/07-locomotion.md` | Walking and balancing: joint loads from gait, W-max sizing, sensors, controller stages, feet |
-| `docs/08-passive-balance-springs-compliance.md` | What balance comes for free (and why not a bladder), where springs are used, how compliant the robot is |
-| `docs/09-knuckle-chain.md` | The finger's principle generalised: one generator, 11 presets, 26 joint instances, what the generalisation taught |
+| `docs/index.md`, `mkdocs.yml` | The docs' index by section, generated from each doc's front matter (`tools/docs_index.py`); the docs site |
 | `cad/blender/chain.py` | The knuckle-chain generator behind those presets |
-| `docs/10-rotational-geometry.md` | Rotational geometry and physics idea bank: each discussion point and what it could mean for the robot, with cheapest tests |
-| `docs/11-ring-joint.md` | The second primitive: axial rotation on a printed ball race, six presets; pipe bones |
-| `docs/12-render-simulation.md` | Gallery render, URDF pipeline, centre-of-mass checks, MuJoCo stand and push results |
-| `docs/13-tendon-simulation.md` | The drive train per DOF in MuJoCo: motor curve, self-lock, clutch, two elastic lines; tension, slack and slip readouts; standing, push, hold and squat results; three design changes it forced |
-| `docs/14-balance-gauntlet.md` | Is it connected (contact census, printed-envelope shapes); the balance controller that holds 30 N pushes and a sustained 15 N; what the hip can and cannot do; weight shift and the one-foot attempt; the recorded gauntlet; the sibling-project harness |
-| `docs/15-one-foot-hold.md` | The one-foot hold passes (Phase 5 exit test in simulation): the seven things it took, what the stance hip actually does, the 60 mm hip-roll pulley (D-027, D-028) |
-| `docs/16-first-step.md` | The first static step completes (Phase 6a in simulation): per-phase line readout, the exit test verdict, what it took, the observer bug (D-029, D-030) |
-| `docs/17-learned-control.md` | Learned control: the fast stand-in, the sibling's model core as a PPO actor, the hand-written controller as teacher, the first ladder (cloning: 90 % standing under pushes), the failing gate on the tendon model, why get-up needs a kneeling curriculum (D-031) |
-| `docs/18-swing-leg-world-frame.md` | The swing leg by world-frame IK (accurate landings, steady single support with the free foot held in the world), and the finding that the step has no margin: most variants fall in the weight transfer, whatever the swing leg does (in progress) |
-| `docs/19-transfer-for-margin.md` | The step with margin: no drum locks while stepping, staged transfers from planned geometry, the shift fed forward; stands in 14 of 14 grid variants, landings within 4 mm, 444 J (D-034) |
-| `docs/20-mass-rollup.md` | Mass roll-up of every printed and bought part: about 26 kg against the 20 kg budget; the model on those masses (the ankle at its rating, the step 11 of 14); where mass can come off (D-036) |
-| `docs/25-wind.md` | Wind: drag on every body, mean plus gusts from any side; the robot leans into a sustained force (D-042); where standing, the one-foot hold, the step and the walk fail by speed, gusts and direction; `gust.gif` |
-| `docs/26-model-fidelity.md` | How close the model is: drag shape, wind speed, weight, the silicone foot pad, the sensors (a 1 kHz, 5 ms balance loop, D-044), postures against wind (bowing works), and how results are checked |
-| `docs/27-energy-and-batteries.md` | Energy: what is counted, how far a charge walks (about 18 m on the 26 kg build, wind barely matters), peaks, power banks in the bones (logic supply only), the trade-offs, cutting the walk's energy, more tackle (a 6:1 block does not pay) |
-| `docs/28-carrying-a-bag.md` | Carrying a grocery bag: standing to 11.3 kg in one hand, walking to 3.9 kg (20 kg build), the fingers hook about 2.4 kg, so a palm hook (D-049) |
-| `docs/29-learned-stand-gate.md` | The learned stand policy on the tendon model: the stand-in's drive refitted, retrained on three seeds; it stands 10 s and takes most pushes, not yet the 30 N push, the 8 m/s wind or the power budget (D-050) |
-| `docs/30-learned-control-plan.md` | Learned control: how the sibling's model does in MuJoCo, training it to rest and lock the drums, other MuJoCo bodies, the order for its open issues (D-051) |
-| `docs/31-plain-network-and-rests.md` | Five seeds: a plain network beats the sibling's core on this robot; the drums lock under a policy; training with a held load makes policies rest (best 10.6 W idle against 5.4 W) (D-052) |
-| `docs/33-sitting.md` | Sitting on a chair and standing again: from 0.40, 0.45 and 0.50 m seats with or without armrests, not from 0.35 m; the forward reach (hip, ankle and the spine's drive) is the limit, the rise needs a trunk swing, and the hands cannot use the armrests (D-056); the 26 kg build stands again only from 0.50 m (D-057) |
-| `docs/34-brushless-wmax.md` | The 5010 brushless W-max in the model (`ROBOT_WMAX=bldc`): passes the gauntlet on the 20 kg masses with its servo at the 775's stiffness, holds a foot on 36 % less energy; the 19.9 kg brushless build loses the chair because its trunk is 5.8 kg (D-058) |
-| `docs/36-mass-layout.md` | Where the mass sits: the CoM's reach behind the feet at seat-off per kilogram of each segment. The hip drives ride on the thighs and the battery moves into the torso, so the brushless and the 26 kg builds stand again from 0.45 m (D-060) |
-| `docs/37-layout-full-grid.md` | The D-060 layout on the full step and walk grids: it holds on soft contact and the pessimistic motors but loses held feet (775: 0 of 14), so the model stays on the 20 kg masses and D-060 is on hold (D-061). The hip drives on the thighs cost held feet and the battery move does not; no layout gets both the chair and the held step |
-| `docs/38-chained-skills.md` | Skills back to back in random orders (`tools/chain.py`): bags of six shapes and weights picked up and put down, a walk and a chair, with a hand-back between skills (D-062). Walking with a bag in hand is the open failure |
-| `docs/39-walking-with-a-bag.md` | Why walking with a gripped bag failed: the balance loop did not know the bag, not the swing. A damped grip plus the felt weight walks 0.8 to 2.3 kg; the chain grid goes from 10 to 13 of 24 (D-063) |
-| `docs/40-held-feet-press.md` | The layout's held-feet step failure traced to the landing press: starting it from the landed leg's measured length (now the default, D-064) takes the 775 layout from 0 to 14 of 14 steps. The held walk is still 4 of 14 |
-| `docs/41-neck-tackle.md` | The chair's trunk swing overloaded the neck's W-mini. Its pitch now runs on two strands (D-066). The spine's overload traced to the rise's fast hip extension; pacing it at 22.5 deg/s (D-067) stands every chair case with no slip and less energy |
-| `docs/35-keyed-shells.md` | The torso and pelvis as keyed thin shells (`cad/blender/shell.py`), like a lifecast mother mold: ribbed 1.2 mm panels that print flat, lap strips with keys and screws; 970 g for both, the structure and the cover in one (D-059) |
-| `docs/32-wind-and-getup.md` | The 8 m/s wind (not the drag, the action range or the ankle drive mode: the policies lack the balance loop's ankle strategy) and getting up: no slow rise below a pelvis height of 0.90 m; a learned lunge rises from a half-kneel 61 % of the time (D-053) |
-| `docs/24-motor-sources.md` | Sourced low / nominal / high figures for every drive and line (`sim/motor_ranges.json`, `ROBOT_MOTORS`): the 775's Kt settled at 0.0095 N m/A; what stands at the pessimistic end and which part limits it (D-040, D-041) |
-| `docs/23-static-walk.md` | The static walk: four 100 mm steps and the closing step, 42 of 42 grid variants over three mass sets, landings within 6 mm, 93 s and 1113 J; each transfer starts from the stance leg's crouch (D-039); `walk.gif` |
-| `docs/22-locks-and-balance.md` | Drum locks only once the robot is still, released by any push: 199 of 200 random pushes stand (184), energy down in 9 of 11 scenes, the one-foot hold 562 J (811); teacher data re-recorded (D-038) |
-| `docs/21-wmax-options.md` | W-max options weighed: a VNH5019-class driver for the 775 (25.0 kg), a 5010 brushless W-max (19.9 kg), lead-screw winches (heavier); the 775's current constant questioned |
 | `tools/sensor_sweep.py` | Any scene on modelled sensors (IMU/encoder CoM with delay, bias and noise; 4 load sensors per sole with gain, hysteresis, drift, saturation) instead of the simulator's truth (docs/26) |
 | `tools/posture_wind.py` | Drag and CoM offset needed per posture, and whether a posture (bow, squat, arms in, twist) stands in a wind (docs/26) |
 | `tools/energy_report.py` | A scene's motor energy per winch class, mean / p99 / peak power (docs/27) |
@@ -103,7 +66,7 @@ Goal ordering, in case they conflict: **cheap > simple to build > human range of
 
 ## Quick start
 
-```powershell
+```sh
 # sizing numbers for every reference joint
 python tools/tendon_calc.py
 
@@ -116,8 +79,12 @@ python tools/sim_video.py --only step --gif --out step               # docs/img/
 python tools/export_standin.py             # sim/robot_standin.xml and .json (training stand-in, docs/17)
 python tools/record_teacher.py --pushes 200   # sim/out/teacher/teacher.npz (demonstrations)
 
-# generate the W-mini winch housing, drum and lid as STL (Blender 4.2+ / 5.x)
-& "C:\Program Files\Blender Foundation\Blender 5.1\blender.exe" -b -P cad/blender/winch_mini.py -- --out cad/out
+# generate the W-mini winch housing, drum and lid as STL (Blender 4.2+ / 5.x on PATH)
+blender -b -P cad/blender/winch_mini.py -- --out cad/out
+
+# the docs as a site (docs/index.md is regenerated from the docs' front matter)
+pip install -r requirements-docs.txt
+mkdocs serve
 ```
 
 ## Status

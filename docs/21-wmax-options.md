@@ -1,3 +1,9 @@
+---
+title: "21 - W-max options: a small driver now, a brushless W-max for 20 kg"
+summary: "W-max options weighed: a VNH5019-class driver for the 775 (25.0 kg), a 5010 brushless W-max (19.9 kg), lead-screw winches (heavier); the 775's current constant questioned"
+section: "Drives, mass and energy"
+---
+
 # 21 - W-max options: a small driver now, a brushless W-max for 20 kg
 
 The mass roll-up (`20`) put the robot at 26.1 kg against 20, and the 21 W-max drives are 12.4 kg of it: each one a

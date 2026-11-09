@@ -12,7 +12,10 @@ description: How work is recorded in the robot repo (prompt log, one commit per 
 3. **Decisions** are numbered `D-nnn` in `docs/decisions.md`: date, title, Why, the alternative,
    Reverses if. Reference them from code comments and docs.
 4. **Docs** are numbered by topic (`docs/NN-*.md`); each experiment doc ends with "Not yet" and "Next"
-   sections, which are the backlog. Add each new doc to the README's repository map.
+   sections, which are the backlog. Each starts with YAML front matter (`title`: its H1, `summary`: one or two
+   sentences of what it found and its decisions, `section`: one of `tools/docs_index.SECTIONS`). Then run
+   `python tools/docs_index.py` and commit the regenerated `docs/index.md` (CI runs `--check`; `mkdocs serve`
+   browses the site, `pip install -r requirements-docs.txt`). Docs are not listed in the README; new tools are.
 5. **Branches**: small work on `main`. Work that breaks a gauntlet scene until a follow-up fixes it goes
    on a `feat/*` branch, pushed, and merged when the gauntlet passes again.
 6. **Durable know-how goes in `.claude/skills/`**, not only in chat or memory: when a tool, generator or

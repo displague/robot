@@ -965,3 +965,22 @@ Continued:
 - Hub task `tendon-policies-after-p064-defaults` (filed and finished): no retrain for the standing policies.
   Regenerate the step, walk and chair teacher demos before training on them.
 - A heavier brushless ratio (1:35, 1:40; `ROBOT_WMAX_RATIO`) swings too slowly: 0 of 14 (docs/40).
+
+## P-065 (2026-11-09) The docs index as a mkdocs site; Hi-WBC; release readiness
+
+> In the root readme is a local c: path. The root docs table is getting a little crazy in length. Can we mkdocs it from frontmatter summaries of the individual docs in the build, as a docs/index.md
+>
+> Seen https://ah.meyu.us/@displague/read/records/grok-bot-paper-20261109-beijing-humanoid-hi-wbc%401 ?
+>
+> Have we had any successes to lead a release soon?
+
+- The README's Blender command no longer names a local `C:\Program Files` path; Blender is expected on PATH.
+- Every numbered doc has front matter (`title`, `summary`, `section`), seeded from its old README row.
+- `tools/docs_index.py` writes `docs/index.md` by section. `mkdocs.yml` (Material) regenerates it in the build
+  (`tools/mkdocs_hooks.py`).
+- `.github/workflows/docs.yml` checks the index and builds the site. Its Pages deploy waits for Pages to be set to
+  GitHub Actions and the repo variable `PAGES_ENABLED`.
+- The README drops its 41 doc rows for a pointer to the index (D-068).
+- Hi-WBC (the hub's daily paper) was read. Its payload sensing from joint current alone is the same move as D-063's
+  felt weight, and its tutor-to-generalist distillation is the sibling's teacher plan. Release readiness was answered
+  in chat: a v0.6.0 on P-058 to P-064 is warranted.

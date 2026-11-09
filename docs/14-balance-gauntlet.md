@@ -1,3 +1,9 @@
+---
+title: "14 - Is it connected, the balance controller, and the first gauntlet (P-011)"
+summary: "Is it connected (contact census, printed-envelope shapes); the balance controller that holds 30 N pushes and a sustained 15 N; what the hip can and cannot do; weight shift and the one-foot attempt; the recorded gauntlet; the sibling-project harness"
+section: "Simulation, balance and walking"
+---
+
 # 14 - Is it connected, the balance controller, and the first gauntlet (P-011)
 
 P-011 asked three things: whether the simulated segments are really connected or could pass

@@ -8,3 +8,4 @@ cad/out/*
 sim/out/
 MUJOCO_LOG.TXT
 .claude/worktrees/
+site/

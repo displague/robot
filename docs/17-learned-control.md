@@ -1,3 +1,9 @@
+---
+title: "17 - Learned control: the fast stand-in, the sibling's model core, and the algorithmic controller as teacher (P-021)"
+summary: "Learned control: the fast stand-in, the sibling's model core as a PPO actor, the hand-written controller as teacher, the first ladder (cloning: 90 % standing under pushes), the failing gate on the tendon model, why get-up needs a kneeling curriculum (D-031)"
+section: "Learned control"
+---
+
 # 17 - Learned control: the fast stand-in, the sibling's model core, and the algorithmic controller as teacher (P-021)
 
 Everything up to `16` is hand-written control. This doc records the first learned controller: a recurrent

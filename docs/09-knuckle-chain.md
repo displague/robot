@@ -1,3 +1,9 @@
+---
+title: "09 - The knuckle chain: one primitive for 26 joints (P-007)"
+summary: "The finger's principle generalised: one generator, 11 presets, 26 joint instances, what the generalisation taught"
+section: "Design and hardware"
+---
+
 # 09 - The knuckle chain: one primitive for 26 joints (P-007)
 
 The finger is not a special case. Strip it to its principle and it is a **knuckle chain**: rigid

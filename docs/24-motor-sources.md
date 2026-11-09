@@ -1,3 +1,9 @@
+---
+title: "24 - Motor and line figures from sources, and the model at the pessimistic end (D-040, D-041)"
+summary: "Sourced low / nominal / high figures for every drive and line (`sim/motor_ranges.json`, `ROBOT_MOTORS`): the 775's Kt settled at 0.0095 N m/A; what stands at the pessimistic end and which part limits it (D-040, D-041)"
+section: "Drives, mass and energy"
+---
+
 # 24 - Motor and line figures from sources, and the model at the pessimistic end (D-040, D-041)
 
 The owner will not buy motors before the outcome is reasonably certain and cannot run bench tests (P-038,

@@ -1,3 +1,9 @@
+---
+title: "25 - Wind: drag on every body, gusts from any side, and a robot that leans into it (P-038, D-042)"
+summary: "Wind: drag on every body, mean plus gusts from any side; the robot leans into a sustained force (D-042); where standing, the one-foot hold, the step and the walk fail by speed, gusts and direction; `gust.gif`"
+section: "Skills: wind, bags, chairs, chains"
+---
+
 # 25 - Wind: drag on every body, gusts from any side, and a robot that leans into it (P-038, D-042)
 
 Wind was one of the intended obstacles of the sibling project (its world has wind as a smoothed random control),

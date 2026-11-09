@@ -1,3 +1,9 @@
+---
+title: "06 - Roadmap"
+summary: "Phases with exit criteria, starting with one finger on one winch, ending in dynamic walking"
+section: "Design and hardware"
+---
+
 # 06 - Roadmap
 
 Each phase ends with a physical test that can fail. A failed test rewrites the decision log, not

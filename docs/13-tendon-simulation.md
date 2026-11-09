@@ -1,3 +1,9 @@
+---
+title: "13 - Tendon-level simulation (P-010)"
+summary: "The drive train per DOF in MuJoCo: motor curve, self-lock, clutch, two elastic lines; tension, slack and slip readouts; standing, push, hold and squat results; three design changes it forced"
+section: "Simulation, balance and walking"
+---
+
 # 13 - Tendon-level simulation (P-010)
 
 Answer to "will the tensions on the lines and other mechanisms be expressed while it exerts and

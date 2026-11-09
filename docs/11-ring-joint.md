@@ -1,3 +1,9 @@
+---
+title: "11 - The ring joint: the second primitive (P-009)"
+summary: "The second primitive: axial rotation on a printed ball race, six presets; pipe bones"
+section: "Design and hardware"
+---
+
 # 11 - The ring joint: the second primitive (P-009)
 
 The knuckle chain (`09-knuckle-chain.md`) cannot rotate a segment about its own axis. Eight DOF

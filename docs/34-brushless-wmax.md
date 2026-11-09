@@ -1,3 +1,9 @@
+---
+title: "34 - The brushless W-max in the model (P-058, D-058, hub task wmax-mass-down)"
+summary: "The 5010 brushless W-max in the model (`ROBOT_WMAX=bldc`): passes the gauntlet on the 20 kg masses with its servo at the 775's stiffness, holds a foot on 36 % less energy; the 19.9 kg brushless build loses the chair because its trunk is 5.8 kg (D-058)"
+section: "Drives, mass and energy"
+---
+
 # 34 - The brushless W-max in the model (P-058, D-058, hub task wmax-mass-down)
 
 docs/21 chose, on paper, a 5010 360 KV outrunner on a printed 1:25 at 24 V for the W-max: the only drive that brings

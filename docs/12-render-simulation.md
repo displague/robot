@@ -1,3 +1,9 @@
+---
+title: "12 - Render and simulation (P-009)"
+summary: "Gallery render, URDF pipeline, centre-of-mass checks, MuJoCo stand and push results"
+section: "Simulation, balance and walking"
+---
+
 # 12 - Render and simulation (P-009)
 
 Where the project stands on seeing the robot and simulating it, after the generators of 09 and 11.

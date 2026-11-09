@@ -1,3 +1,9 @@
+---
+title: "07 - Walking and balancing"
+summary: "Walking and balancing: joint loads from gait, W-max sizing, sensors, controller stages, feet"
+section: "Design and hardware"
+---
+
 # 07 - Walking and balancing
 
 Walking and balancing are goals, not stretch goals (P-002). This changes three things: the

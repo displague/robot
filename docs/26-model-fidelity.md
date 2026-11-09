@@ -1,3 +1,9 @@
+---
+title: "26 - How close is the model: shape, weight, feet, wind, sensors, and what the body can do about wind (P-040, D-044)"
+summary: "How close the model is: drag shape, wind speed, weight, the silicone foot pad, the sensors (a 1 kHz, 5 ms balance loop, D-044), postures against wind (bowing works), and how results are checked"
+section: "Simulation, balance and walking"
+---
+
 # 26 - How close is the model: shape, weight, feet, wind, sensors, and what the body can do about wind (P-040, D-044)
 
 The owner asked whether the shape, friction, weight and wind dynamics are accurate, whether the robot's own sensors

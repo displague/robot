@@ -1,3 +1,9 @@
+---
+title: "08 - Passive balance, springs, and compliance (P-005)"
+summary: "What balance comes for free (and why not a bladder), where springs are used, how compliant the robot is"
+section: "Design and hardware"
+---
+
 # 08 - Passive balance, springs, and compliance (P-005)
 
 Three questions from P-005: can balance be had passively (ballast, a bladder); are spools or

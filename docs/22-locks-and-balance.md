@@ -1,3 +1,9 @@
+---
+title: "22 - Drum locks only when the robot is still (P-036, D-038)"
+summary: "Drum locks only once the robot is still, released by any push: 199 of 200 random pushes stand (184), energy down in 9 of 11 scenes, the one-foot hold 562 J (811); teacher data re-recorded (D-038)"
+section: "Simulation, balance and walking"
+---
+
 # 22 - Drum locks only when the robot is still (P-036, D-038)
 
 The drums self-lock so that a still robot holds its pose at zero power (D-015). `19` found that inside the

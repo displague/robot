@@ -1,3 +1,9 @@
+---
+title: "30 - Learned control: where the sibling stands in MuJoCo, rests and locks, other bodies, its issues (P-051, D-051)"
+summary: "Learned control: how the sibling's model does in MuJoCo, training it to rest and lock the drums, other MuJoCo bodies, the order for its open issues (D-051)"
+section: "Learned control"
+---
+
 # 30 - Learned control: where the sibling stands in MuJoCo, rests and locks, other bodies, its issues (P-051, D-051)
 
 P-051 asked four things: train the sibling (ai-embedded-dynamic-diversity) to rest and lock the drums, since that

@@ -1,3 +1,9 @@
+---
+title: "37 - The layout on the full grid: it loses held feet (P-061, D-061, hub task wmax-mass-down)"
+summary: "The D-060 layout on the full step and walk grids: it holds on soft contact and the pessimistic motors but loses held feet (775: 0 of 14), so the model stays on the 20 kg masses and D-060 is on hold (D-061). The hip drives on the thighs cost held feet and the battery move does not; no layout gets both the chair and the held step"
+section: "Drives, mass and energy"
+---
+
 # 37 - The layout on the full grid: it loses held feet (P-061, D-061, hub task wmax-mass-down)
 
 docs/36 moved the hip drives onto the thighs and the battery into the torso (D-060). Then the 19.9 kg brushless

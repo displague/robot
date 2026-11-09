@@ -1,3 +1,9 @@
+---
+title: "Rotational geometry and physics: a design idea bank"
+summary: "Rotational geometry and physics idea bank: each discussion point and what it could mean for the robot, with cheapest tests"
+section: "Design and hardware"
+---
+
 # Rotational geometry and physics: a design idea bank
 
 Source: a three-prompt exploratory discussion (P-008), "facts about rotational geometry and

@@ -1,3 +1,9 @@
+---
+title: "29 - The learned stand policy against the tendon model: the drive refit, retraining, three seeds (P-050, D-050)"
+summary: "The learned stand policy on the tendon model: the stand-in's drive refitted, retrained on three seeds; it stands 10 s and takes most pushes, not yet the 30 N push, the 8 m/s wind or the power budget (D-050)"
+section: "Learned control"
+---
+
 # 29 - The learned stand policy against the tendon model: the drive refit, retraining, three seeds (P-050, D-050)
 
 `17` ended with a gap: the cloned and PPO-trained stand policy (sibling release v0.3.0) stood 90 % of the time on

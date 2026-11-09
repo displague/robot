@@ -1,3 +1,9 @@
+---
+title: "19 - A step with margin: staged transfers, no drum locks while stepping (P-027)"
+summary: "The step with margin: no drum locks while stepping, staged transfers from planned geometry, the shift fed forward; stands in 14 of 14 grid variants, landings within 4 mm, 444 J (D-034)"
+section: "Simulation, balance and walking"
+---
+
 # 19 - A step with margin: staged transfers, no drum locks while stepping (P-027)
 
 `18` left the swing leg landing within 10 mm but the step standing in at most 2 of 6 variants, with the falls

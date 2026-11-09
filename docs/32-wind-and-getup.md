@@ -1,3 +1,9 @@
+---
+title: "32 - The 8 m/s wind and getting up from a half-kneel (P-052, D-053)"
+summary: "The 8 m/s wind (not the drag, the action range or the ankle drive mode: the policies lack the balance loop's ankle strategy) and getting up: no slow rise below a pelvis height of 0.90 m; a learned lunge rises from a half-kneel 61 % of the time (D-053)"
+section: "Learned control"
+---
+
 # 32 - The 8 m/s wind and getting up from a half-kneel (P-052, D-053)
 
 The afternoon of P-052, after `31`. Two open items for learned control: no learned stand policy holds the gate's

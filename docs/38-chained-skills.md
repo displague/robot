@@ -1,3 +1,9 @@
+---
+title: "38 - Skills back to back: a bag picked up and put down, a walk and a chair in random orders (P-063, D-062)"
+summary: "Skills back to back in random orders (`tools/chain.py`): bags of six shapes and weights picked up and put down, a walk and a chair, with a hand-back between skills (D-062). Walking with a bag in hand is the open failure"
+section: "Skills: wind, bags, chairs, chains"
+---
+
 # 38 - Skills back to back: a bag picked up and put down, a walk and a chair in random orders (P-063, D-062)
 
 The gauntlet starts every scene from a fresh stand. A day is not like that: the robot sits down after a walk,

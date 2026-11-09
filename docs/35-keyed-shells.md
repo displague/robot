@@ -1,3 +1,9 @@
+---
+title: "35 - The torso and pelvis as keyed thin shells (P-059, D-059)"
+summary: "The torso and pelvis as keyed thin shells (`cad/blender/shell.py`), like a lifecast mother mold: ribbed 1.2 mm panels that print flat, lap strips with keys and screws; 970 g for both, the structure and the cover in one (D-059)"
+section: "Design and hardware"
+---
+
 # 35 - The torso and pelvis as keyed thin shells (P-059, D-059)
 
 The idea (P-059) came from lifecasting: a mother mold is a thin rigid shell in sections that part cleanly along

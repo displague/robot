@@ -1,3 +1,9 @@
+---
+title: "02 - The tendon actuator (winch)"
+summary: "The winch: physics, lock options, drum rules, line choice, creep, calculator results, needle liners and ceramic ring guides (where each goes)"
+section: "Design and hardware"
+---
+
 # 02 - The tendon actuator (winch)
 
 One design, three sizes. A motor turns a small drum; braided fishing line winds on the drum and

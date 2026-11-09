@@ -1,3 +1,9 @@
+---
+title: "15 - The one-foot hold: single-support balance on the tendon model (P-013)"
+summary: "The one-foot hold passes (Phase 5 exit test in simulation): the seven things it took, what the stance hip actually does, the 60 mm hip-roll pulley (D-027, D-028)"
+section: "Simulation, balance and walking"
+---
+
 # 15 - The one-foot hold: single-support balance on the tendon model (P-013)
 
 The Phase 5 exit test of `06` (stand on one foot with the other lifted) failed at P-011 within a
