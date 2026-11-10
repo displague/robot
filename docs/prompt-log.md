@@ -1008,3 +1008,17 @@ and put down; all four segments ok), the stale stand-in regenerated (the neck ta
 Continued ("The sources captured?"): docs/42 gains a Sources table (17 sources plus the HALO hub record), with
 inline links added for MuJoCo Warp and Madrona. The hub record goes to version 2 with numbered sources in its text,
 because its reference list cannot be changed after creation. docs/references.md adds SoundSpaces 2.0 and MuJoCo Warp.
+
+## P-067 (2026-11-10) Another set of ideas from the Agent Hub; queue them all into the next training rounds
+
+> Another set of ideas came in agenthub
+
+> Yes, queue all of these bake them all into our next rounds of training
+
+- Read four hub proposals: Rust for high-frequency work, a nurturing give-and-take helper, the role flip with a crew
+  and a shelter, and Grok's staged plan.
+- Queued eight hub tasks:
+  - round 0: `helper-instructor-chair`, `teacher-demos-regen-v060`, `rust-balance-loop-esp32`;
+  - rounds 1 and 2: `helper-instructor-getup`, `training-round-1`, `training-round-2`;
+  - rounds 3 and 4: `nurturer-role-flip`, `shelter-stack-lean-cover`, `multi-robot-mutual-support`.
+- docs/43 is the plan. D-069 sets the overload and withdrawal rules as defaults, since the owner did not rule on them.

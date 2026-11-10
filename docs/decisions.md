@@ -805,3 +805,20 @@ section. The mkdocs build regenerates the index (`tools/mkdocs_hooks.py`), and t
 GitHub. CI checks that it is current. The README keeps the tools and paths, and points at the index.
 Alternative: keep the README table, or generate the index only inside the build (GitHub readers would lose it).
 Reverses if: the site is dropped, or the index stops being read.
+
+## D-069 (2026-11-10) The next training rounds bring in a fading helper; overload through it fails, and withdrawal needs both conditions
+
+Why: P-067, docs/43. The owner queued the hub's senses, loose-control, nurturing-helper, role-flip, shelter and Rust
+proposals into the next training rounds. The helper is scripted first: a give-and-take admittance law on two mocap
+hands the robot grips. It is tried first on the 0.35 m chair rise with the hand-written controller, and faded in four
+phases. Two rules hold throughout:
+1. A line driven past its rating through contact with the helper fails the episode.
+2. The helper counts as withdrawn only when both hold:
+   - its impulse is under 10% of the Phase A baseline;
+   - the unassisted gates pass at their pre-helper rate or better.
+
+Rust goes to the ESP32 balance loop as a parallel spike; the simulation stays in Python.
+Alternative: a learned helper or a second tendon body first (Grok's plan and this one both put it after withdrawal),
+or withdrawal judged on impulse alone. A policy could then lean on the helper and still pass.
+Reverses if: the owner rules otherwise on either rule (they were defaults, not the owner's answers), or Phase A's logs
+show the 10% threshold is the wrong scale.
