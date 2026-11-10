@@ -822,3 +822,27 @@ Alternative: a learned helper or a second tendon body first (Grok's plan and thi
 or withdrawal judged on impulse alone. A policy could then lean on the helper and still pass.
 Reverses if: the owner rules otherwise on either rule (they were defaults, not the owner's answers), or Phase A's logs
 show the 10% threshold is the wrong scale.
+
+## D-070 (2026-11-10) The helper holds the wrists, pulls along the arms by the balance's need, and is judged against the unassisted arms
+
+Why: P-068, docs/44. The first helper, leading the hands along the rise's planned path and holding them at the grip
+point, pulled across the arms. The elbow lines reached 2.7x their rating and the wrist clutches slipped, and the
+robot fell forward once up. The helper v0 therefore:
+- holds the wrists;
+- pulls in tension along the arm, by how far the CoM is behind the feet;
+- follows the body with a damping that sets its give;
+- takes hold only once the arm is out straight;
+- lets go at 90 degrees of knee, while the robot holds its arms forward until then (`SIT_ARMS_HOLD`).
+
+With it the 0.35 m rise stands, on the hand-written controller.
+
+D-069's two laws, as applied:
+1. **Overload:** the arm lines while held are judged against their unassisted peak over the same rise window, plus
+   10%, as well as their rating. The unassisted rise already runs the elbows at 1.42x their rating.
+2. **The withdrawal baseline:** the firmest setting that passes the overload law (give 0.25, 107 N s), since the firm
+   Phase A fails it (elbows 2.35x).
+
+Alternative: the literal "past its rating", which every run fails, helped or not; or Phase A's impulse as the
+baseline, which would let a helper that overloads the arms set the scale.
+Reverses if: the elbows' unassisted load is fixed (then the rating alone is the test), or the owner rules on D-069's
+first law.

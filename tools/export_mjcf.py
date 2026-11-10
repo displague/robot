@@ -168,6 +168,10 @@ ITEMS = []
 STOOLS = 2            # mocap stools for the items, placed by Rig.place_stool
 STOOL_HALF = (0.20, 0.20, 0.40)   # a counter-sized top, 0.4 m square
 GRIP_HANDS = ("hand.L", "hand.R")
+# the nurturing helper (docs/44, D-070): two mocap "hands" the robot's hands grip by connect equalities (off until
+# tools/helper.py attaches them). They do not collide and weigh nothing in the robot's mass; the helper's admittance
+# law moves them (tools/helper.py). False: the model is unchanged.
+HELPER = bool(os.environ.get("ROBOT_HELPER"))
 
 
 def winch_params(joint_name, axis, cls_name):
@@ -331,9 +335,11 @@ def mjcf(links, data):
                 out.append(winch_body_xml(pad, name, p, pos))
         for c in children.get(l["name"], []):
             out.extend(body(c, indent + 1))
-        if ITEMS and l["name"] in GRIP_HANDS:
+        if (ITEMS or HELPER) and l["name"] in GRIP_HANDS:
             g = sub(l["tail"], l["head"])
             out.append('%s  <site name="grip.%s" pos="%.4f %.4f %.4f" size="0.008"/>\n' % ((pad, l["name"]) + tuple(g)))
+            if HELPER:      # the helper holds the wrist (the hand's joint), so the small wrist drive carries none of it
+                out.append('%s  <site name="wrist.%s" pos="0 0 0" size="0.008"/>\n' % (pad, l["name"]))
         if l["name"] in BAGS:
             # the bag swings from the grip at the link's tail; it does not collide (the legs pass through it)
             g = sub(l["tail"], l["head"])
@@ -387,6 +393,17 @@ def mjcf(links, data):
                    '      <geom name="%s" type="box" size="%.3f %.3f %.3f" mass="0.001" contype="0" conaffinity="0" '
                    'rgba="0.55 0.4 0.25 0"/>\n    </body>\n' % ((name, name) + half))
     out.extend(items_xml(equalities))
+    if HELPER:
+        for hand in GRIP_HANDS:
+            side = hand[-1]
+            out.append('    <body name="helper.%s" mocap="true" pos="%d 5 -1">\n'
+                       '      <site name="helper.%s.grip" size="0.008"/>\n'
+                       '      <geom type="sphere" size="0.035" contype="0" conaffinity="0" mass="0.001" '
+                       'rgba="0.95 0.55 0.2 0.9"/>\n'
+                       '      <geom type="capsule" size="0.025" fromto="0 0 0 0 -0.25 -0.05" contype="0" conaffinity="0" '
+                       'mass="0.001" rgba="0.95 0.55 0.2 0.6"/>\n    </body>\n' % (side, 3 if side == "L" else 4, side))
+            equalities.append('    <connect name="helper.%s" site1="wrist.%s" site2="helper.%s.grip" active="false" '
+                              'solref="0.02 1"/>\n' % (side, hand, side))
     out.append('  </worldbody>\n  <tendon>\n')
     out.extend(tendons)
     out.append('  </tendon>\n  <equality>\n')

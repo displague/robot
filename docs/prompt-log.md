@@ -1022,3 +1022,22 @@ because its reference list cannot be changed after creation. docs/references.md 
   - rounds 1 and 2: `helper-instructor-getup`, `training-round-1`, `training-round-2`;
   - rounds 3 and 4: `nurturer-role-flip`, `shelter-stack-lean-cover`, `multi-robot-mutual-support`.
 - docs/43 is the plan. D-069 sets the overload and withdrawal rules as defaults, since the owner did not rule on them.
+
+## P-068 (2026-11-10) Start the first two training-round tasks: the helper on the chair, and the teacher demos
+
+> yes, start both
+
+- Hub tasks `helper-instructor-chair` and `teacher-demos-regen-v060` claimed and done.
+- The helper v0 (docs/44, D-070): `tools/helper.py`, two mocap hands in the model (`export_mjcf.HELPER`), and
+  `sim_tendon.SIT_ARMS_HOLD`.
+  - It holds the wrists and pulls along the arms by how far the CoM is behind the feet.
+  - The 0.35 m chair rise stands with it for the first time, on the hand-written controller.
+  - Firm, it overloads the elbows (2.35x, against 1.42x unassisted) and fails D-069's first law; yielding, it passes.
+  - One hand, a lopsided helper, or give 0.75 fail; withdrawn, the rise fails as before.
+  - Recording: docs/img/helper35.gif.
+- The teacher demos on the v0.6.0 defaults (docs/43): `tools/record_teacher.py --set chair|chain`, and a `felt`
+  channel (the carried weight, truth and the balance loop's estimate) in every file.
+  - `teacher.npz`: 235 of 237 episodes; 198 of 200 random pushes stand (199 before).
+  - `teacher_chair.npz`: 6 of 8 (the 0.35 m seats fall).
+  - `teacher_chain.npz`: 17 of 24 chains.
+  - The sibling's loader reads all three.

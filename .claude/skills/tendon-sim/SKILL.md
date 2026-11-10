@@ -197,7 +197,7 @@ that feeds the failing phase on its own, measure the ripple of a load or CoM err
 off one at a time (drum locks, joint damping, ankle modes, loop gains); the drum locks were it.
 Since D-038 the locks are gated on whole-body stillness (`LOCK_STILL`, 0.5 s under 20 mm/s; released above
 80 mm/s) and off in the shift and one-foot hold (`BALANCE_LOCKS`). A change to the balance loop is also
-judged on the 200 random pushes of `record_teacher.py` (199 stand).
+judged on the 200 random pushes of `record_teacher.py` (198 stand at v0.6.0; 199 before D-064).
 
 ## Recordings
 
@@ -225,6 +225,13 @@ PYTHONPATH=src ROBOT_REPO=../robot .venv/Scripts/python.exe ../robot/tools/recor
 `python tools/record_teacher.py [--pushes 24] [--winds 0] [--jobs 8]` writes `sim/out/teacher/teacher.npz`
 (gitignored): the hand-written controller's targets on the stand-in's observations, for behaviour cloning
 in the sibling project (ai-embedded-dynamic-diversity, `rl/`). Re-record after a controller or model change.
+`--set chair` writes `teacher_chair.npz` (the sit scenes; 6 of 8 stand), `--set chain --chains N` writes
+`teacher_chain.npz` (chain.py seeds, each in a fresh worker since each bag is its own model; 17 of 24). They are
+separate files because their offsets need about 0.70 rad action spans against 0.27 standing. Every file has `felt`
+(steps x 2: the carried weight over the robot's, as `held_load` truth and as the D-063 estimate) beside the 72-channel
+`obs`. Smoke check: the sibling's `rl.bc.load_teacher(path, teacher_action_half(path))` on each. Do not edit
+`sim_tendon.py` or `export_mjcf.py` while one runs: every task's worker imports them afresh. The release set (docs/43):
+`--pushes 200 --winds 24 --jobs 10`, then `--set chair --jobs 8`, then `--set chain --chains 24 --jobs 10`.
 
 The stand-in's drive (`tools/export_standin.py`) is fitted to the tendon model (docs/29, D-050): `KV_SCALE`,
 `TIMECONST` and `outer_loop` in the JSON (the firmware's KQ, KI, trim limit, per-joint gain), which the sibling's
@@ -321,3 +328,15 @@ is about 20 MB for a 140 s chain: remake it from the MP4 at 4x speed, 480 px, 10
 - **To diagnose a carried item,** give the balance loop the item's true CoM (`Rig.com_est` overridden) as an upper
   bound. That separates "the loop does not know it" from "the walk cannot carry it".
 
+
+## The nurturing helper (docs/44, D-070)
+
+`python tools/helper.py --phases` (the per-phase table on the 0.35 m chair), `--fade`, `--one <phase> [--trace]
+[give= cap= hands= on_reach= arms_hold= G_FIRM= ...] [--video name]`. `export_mjcf.HELPER` (or `ROBOT_HELPER=1`)
+adds two mocap hands, a `wrist.hand.*` site per hand and the `helper.L/R` connect equalities (off); without it the
+model is unchanged. `helper.Helper(rig, give, hands, on_reach, cap, drunk, arms_hold)` with `rig.hook = h.chain()`
+runs it every step; `h.log` holds the impulse, work, peak, time held and the arm lines' peaks (held and over the rise
+window). The robot's side is `sim_tendon.SIT_ARMS_HOLD` (rad: the arms forward till the knees pass it; off by default).
+Lessons: hold the wrist, not the grip point (the wrist clutch slips); pull along the arm, never across it (the elbow
+overloads); take hold only once the arm is straight; never step a target when the hold ends. Judge the overload law
+against the unassisted rise window (the elbows run 1.42x their rating there) and keep the table's D row.

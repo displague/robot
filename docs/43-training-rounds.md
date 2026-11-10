@@ -126,14 +126,35 @@ These come only after Phase D:
 - **The crew:** three and four robots, one knocked down and the others helping it up. This needs GPU physics, since
   each body is 32 winches.
 
+## Round 0 so far (P-068)
+
+- **The helper on the chair** (`helper-instructor-chair`, done): docs/44.
+  - With the helper the 0.35 m rise stands, on the hand-written controller.
+  - Firm, it overloads the elbows; yielding (give 0.25 to 0.5), it passes the overload law.
+  - The withdrawal baseline is 107 N s (D-070), so withdrawn means under about 11 N s.
+- **The teacher demos** (`teacher-demos-regen-v060`, done), re-recorded on the v0.6.0 defaults into
+  `sim/out/teacher/` (gitignored). Every file adds `felt`: the carried weight over the robot's weight, as the grip's
+  force (truth) and as the balance loop's estimate (D-063). `obs` keeps the stand-in's 72 channels.
+
+| File | Command | Episodes kept | Steps (50 Hz) |
+| --- | --- | --- | --- |
+| `teacher.npz` | `record_teacher.py --pushes 200 --winds 24` | 235 of 237 (2 random pushes fall) | 85 068 |
+| `teacher_chair.npz` | `record_teacher.py --set chair` | 6 of 8 (the 0.35 m seats fall) | 6 781 |
+| `teacher_chain.npz` | `record_teacher.py --set chain --chains 24` | 17 of 24 chains | 153 898 |
+
+The chair and chain offsets need action spans of 0.70 rad on average, against 0.27 for the standing set (the sibling's
+`teacher_action_half`), so they are separate files. The sibling's `load_teacher` reads all three. The relaxed-control
+channel waits for `relaxed-control-variability`.
+
 ## Not yet
 
-- None of this is built. The tasks are queued; none has started.
-- The 10% withdrawal threshold is a default, not a measured choice.
-- The helper's admittance gains are unknown until Phase A's logs exist.
+- Nothing is trained. The helper is scripted and works with the hand-written controller only.
+- The helper is not in the sibling's stand-in.
 - The rounds pick one mass model, the 20 kg masses, until the W-max choice lands (D-061).
+- The head IMU, relaxed control and the Rust spike (round 0's other tasks) have not started.
 
 ## Next
 
-`helper-instructor-chair`: the scripted helper on the 0.35 m chair rise, with Phase A's logs as the baseline.
-`teacher-demos-regen-v060` can run alongside it.
+- `helper-instructor-getup`: the helper on getting up from the floor.
+- The helper in the sibling's stand-in, so `training-round-1` can learn the 0.35 m rise and fade it.
+- `head-imu-vestibular-channel` and `relaxed-control-variability`, before round 1 trains.

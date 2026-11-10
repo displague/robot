@@ -222,6 +222,8 @@ SIT_HOLD = 2.0                   # s: seated
 SIT_LEAN_T = (1.0, 1.5, 0.065)   # s: the trunk's swing to the seat-off pose: the first where the static reach is
                                  # over the third (m behind the sole centre: less margin, more momentum), else the second
 SIT_SPINE_GATE = 0.0             # rad: the rise's knees stop when the spine is folded this far past its path (docs/41); 0: off
+SIT_ARMS_HOLD = 0.0              # rad, docs/44: the rise keeps the arms forward at SIT_ARM while the knees are bent more
+                                 # than this (a helper holds the hands), then lowers them in step with the knees; 0: off
 SIT_HIP_RATE = math.radians(22.5)  # rad/s: the rise's hip extension rate limit (D-067, docs/41): the trunk keeps up
 SIT_LEAD = math.radians(12)      # the knee target's lead on the measured knee in the rise
 SIT_KNEE_RATE = math.radians(25)  # rad/s: the knee target's fastest
@@ -1175,6 +1177,9 @@ def sit_stand(r, seat, arms=False):
     for _ in range(int(12.0 / dt)):
         km = 0.5 * (r.data.qpos[r.by_name["shank.L_pitch"]["q"]] + r.data.qpos[r.by_name["shank.R_pitch"]["q"]])
         t, off = at(km)
+        if SIT_ARMS_HOLD:      # forward until the knees pass SIT_ARMS_HOLD, then lowered with the knees, no jump
+            for s in "LR":
+                t["upperarm.%s_pitch" % s] = SIT_ARM * min(1.0, km / SIT_ARMS_HOLD)
         so = r.soles()
         e = r.data.subtree_com[r.pelvis][1] - 0.5 * (so[0][0][1] + so[1][0][1]) - off   # +: further back than planned
         gate = float(np.clip(1.0 - e / SIT_GATE, 0.0, 1.0))

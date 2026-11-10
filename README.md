@@ -56,7 +56,8 @@ The docs (design notes and experiments, one per topic) are indexed with a summar
 | `tools/chain.py`, `tools/chain_video.py`, `docs/img/chain.gif` | Skills chained in random orders with a bag picked up and put down (docs/38, docs/39); one chain recorded: the grocery bag picked, walked, set down for a sit, taken up and put down |
 | `tools/sit_static.py`, `tools/chair_sweep.py`, `docs/img/sit40.gif` | Leaving a chair: the static seat-off check (poses with the CoM over the soles against the knee, hip, ankle and spine drives; `hands`: how hard the hands can push on the armrests), the chair grid (sit, stand again, line peaks, slip, seated power, energy per seat height and armrests) and the 0.40 m recording (docs/33) |
 | `tools/rise_static.py` | Whether the robot can rise slowly on one leg: the lowest pelvis height with the CoM over a flat foot, by geometry and within the knee, hip and ankle drives, per ankle dorsiflexion (docs/32) |
-| `tools/record_teacher.py` | Demonstrations from the hand-written controller on the tendon model, in the stand-in's observation layout |
+| `tools/record_teacher.py` | Demonstrations from the hand-written controller on the tendon model, in the stand-in's observation layout: the gauntlet and pushes, `--set chair`, `--set chain`, each with the carried weight (docs/43) |
+| `tools/helper.py`, `docs/img/helper35.gif` | The nurturing helper v0: two hands that hold the robot's wrists and give in proportion to the pull, on the 0.35 m chair rise, per phase and faded (docs/44) |
 | `docs/decisions.md` | Decision log (what we chose and why; revisit when a test disagrees) |
 | `docs/prompt-log.md` | Every prompt that produced a set of work, verbatim, with what it produced |
 | `tools/tendon_calc.py` | Force / speed / power / line-safety calculator for any motor + drum + tackle combination; `--ranges`: each winch class at the sourced low / nom / high |
