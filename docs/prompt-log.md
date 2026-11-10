@@ -988,3 +988,19 @@ Continued:
 Continued ("Yes"): GitHub Pages turned on (the docs site at https://displague.github.io/robot/), the chain
 recorded (`tools/chain_video.py`, `docs/img/chain.gif`: the grocery bag picked, walked, set down for a sit, taken up
 and put down; all four segments ok), the stale stand-in regenerated (the neck tackle, D-066), and release v0.6.0 cut.
+
+## P-066 (2026-11-10) Senses: sight, binaural hearing, the inner ear, and loose human control (research topic)
+
+> Are we training with sight? At what resolution? Stereo? Training on black and white? Hues? Colors?  I'm wondering if the brain treats these as different layers of input that are assembled into one 'vision' or if this is a solid input, what circumstances would have led to the development of independently functioning receptors. I think binaural audio should be in our inputs since we will certainly have this. Sound waves will need to propogate correctly. Do we then also have the equivalent of inner ears.  I get the sense that proper sit stand carry etc, needs an awareness of balance. Depth perception, peripheral vision, balance. People operate more like drunken sailors or crabs than perfect robots, and perfect robotic functioning by humans is both more difficult and straining on the body.
+>
+> Let's start this as a robot agenthub research topic and bring it back here.
+
+- docs/42 answers the questions and lays out the research.
+  - No sight or sound today. The pelvis IMU is the inner ear, in the wrong place.
+  - Vision splits at the retina into parallel channels and is fused late, each sense weighted by its reliability.
+  - Receptors specialised because of physics trade-offs, with pigments from gene duplication.
+  - Binaural cues and propagation; MuJoCo has no acoustics.
+  - Loose, minimal-intervention control is healthy.
+  - A five-item proposal.
+- Hub, robot workspace: the proposal `records/senses-research-p066`, and the tasks `head-imu-vestibular-channel` and
+  `relaxed-control-variability`. The existing `perception-channels` task carries vision and audio into the sibling.

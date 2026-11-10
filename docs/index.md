@@ -69,6 +69,7 @@ A home-printable, fishing-line tendon humanoid, so far entirely in simulation. T
 | [30 - Learned control: where the sibling stands in MuJoCo, rests and locks, other bodies, its issues (P-051, D-051)](30-learned-control-plan.md) | Learned control: how the sibling's model does in MuJoCo, training it to rest and lock the drums, other MuJoCo bodies, the order for its open issues (D-051) |
 | [31 - Five seeds: a plain network beats the sibling's core; rests and locks; held loads (P-052, D-052)](31-plain-network-and-rests.md) | Five seeds: a plain network beats the sibling's core on this robot; the drums lock under a policy; training with a held load makes policies rest (best 10.6 W idle against 5.4 W) (D-052) |
 | [32 - The 8 m/s wind and getting up from a half-kneel (P-052, D-053)](32-wind-and-getup.md) | The 8 m/s wind (not the drag, the action range or the ankle drive mode: the policies lack the balance loop's ankle strategy) and getting up: no slow rise below a pelvis height of 0.90 m; a learned lunge rises from a half-kneel 61 % of the time (D-053) |
+| [42 - Senses: sight, hearing, balance, and why people sway (P-066, research)](42-senses.md) | Research topic: the robot senses only its body (joints, lines, a pelvis IMU, foot loads), with no sight or sound. How eyes, ears and the inner ear split and fuse their inputs, why separate receptors evolved, and why people control loosely. A proposal for head stereo depth, binaural hearing, a head IMU, and a relaxed-control test |
 
 ## Reference
 
