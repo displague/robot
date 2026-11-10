@@ -197,7 +197,7 @@ that feeds the failing phase on its own, measure the ripple of a load or CoM err
 off one at a time (drum locks, joint damping, ankle modes, loop gains); the drum locks were it.
 Since D-038 the locks are gated on whole-body stillness (`LOCK_STILL`, 0.5 s under 20 mm/s; released above
 80 mm/s) and off in the shift and one-foot hold (`BALANCE_LOCKS`). A change to the balance loop is also
-judged on the 200 random pushes of `record_teacher.py` (198 stand at v0.6.0; 199 when last recorded, before P-064).
+judged on the 200 random pushes of `record_teacher.py` (198 stand at v0.6.0; 199 when last recorded).
 
 ## Recordings
 
