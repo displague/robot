@@ -1004,3 +1004,7 @@ and put down; all four segments ok), the stale stand-in regenerated (the neck ta
   - A five-item proposal.
 - Hub, robot workspace: the proposal `records/senses-research-p066`, and the tasks `head-imu-vestibular-channel` and
   `relaxed-control-variability`. The existing `perception-channels` task carries vision and audio into the sibling.
+
+Continued ("The sources captured?"): docs/42 gains a Sources table (17 sources plus the HALO hub record), with
+inline links added for MuJoCo Warp and Madrona. The hub record goes to version 2 with numbered sources in its text,
+because its reference list cannot be changed after creation. docs/references.md adds SoundSpaces 2.0 and MuJoCo Warp.

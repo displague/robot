@@ -149,11 +149,13 @@ These are the experiments for the hub topic. All are simulation only; nothing is
      - depth has the smallest gap between simulation and reality;
      - learned legged locomotion already works from one low-resolution depth camera, by training on a cheap stand-in
        then distilling ([Agarwal et al. 2022](https://arxiv.org/abs/2211.07638));
-     - Apple's HALO uses 48 x 84 log depth.
+     - Apple's HALO uses 48 x 84 log depth (hub `records/halo-apple-tracker-assessment-20261109`).
    - **After depth:** luminance (black and white) for texture and edges.
    - **Colour** only for telling objects apart (which bag), at the planner level and not in the balance loop.
-   - **First measurement:** MuJoCo's render cost per step on this CPU. Batched GPU rendering (MuJoCo Warp, which
-     replaced Madrona-MJX) is the route if it is too slow; hub task `tendon-physics-on-gpu`.
+   - **First measurement:** MuJoCo's render cost per step on this CPU. Batched GPU rendering
+     ([MuJoCo Warp](https://github.com/google-deepmind/mujoco_warp), which replaced
+     [Madrona-MJX](https://madrona-engine.github.io/renderer-blog.html)) is the route if it is too slow; hub task
+     `tendon-physics-on-gpu`.
 3. **Binaural hearing of the robot's own contacts.**
    - **Sound sources:** contact events (footfalls, a set-down, the chair).
    - **Propagation:** to two ear points, with a spherical-head ITD and ILD per frequency band.
@@ -173,6 +175,32 @@ These are the experiments for the hub topic. All are simulation only; nothing is
      - stride-to-stride variability;
      - falls.
    - **Expected:** less energy and no more falls. If falls go up, the loose directions were not really free.
+
+## Sources
+
+Gathered on 2026-11-10 from web search results (abstracts and excerpts). Most were not read in full; check the
+original before relying on a number.
+
+| Source | Used for |
+| --- | --- |
+| [Callaway 2005, J Physiol](https://pubmed.ncbi.nlm.nih.gov/15905213/) | The magno, parvo and konio pathways, segregated to V1 |
+| [Edwards, Goodhew and Badcock 2021](https://link.springer.com/article/10.3758/s13423-020-01874-w) | The pathway split is real but debated |
+| [Ernst and Banks 2002, Nature 415:429](https://ideas.repec.org/a/nat/nature/v415y2002i6870d10.1038_415429a.html) | Senses fused by reliability (maximum likelihood) |
+| [Arduino, Schubert and Anson 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC11568912) | Vestibular anatomy; sensory reweighting; the canals' contested role in standing |
+| [Osorio and Vorobyev, primate colour vision review](https://pubmed.ncbi.nlm.nih.gov/15312027/) | Opsins, gene duplication, trichromacy |
+| [Melin et al. 2017](https://pmc.ncbi.nlm.nih.gov/articles/PMC5625910) | Trichromat capuchins forage fruit faster |
+| [Horiuchi et al. 2017](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5633140/) | Peripheral optic flow steadies quiet standing |
+| [Optic flow, central against peripheral (Appl. Sci. 2019)](https://mdpi.com/2076-3417/9/5/934) | Central flow works too; the flow's structure matters |
+| [Técnico Lisboa, IROS 2006](https://vislab.isr.tecnico.ulisboa.pt/publications/06-iros-ears.pdf) | ITD, ILD, HRTF; two microphones confuse front and back |
+| [SoundSpaces 2.0 (Chen et al. 2022)](https://www.arxiv.org/pdf/2206.08312) | Path-traced binaural room responses on meshes |
+| [Hausdorff 2007](https://pmc.ncbi.nlm.nih.gov/articles/PMC2267927) | Fractal stride variability; its loss predicts falls |
+| [Todorov and Jordan 2002](https://papers.neurips.cc/paper_files/paper/2002/hash/8c5f6ecd29a0eb234459190ca51c16dd-Abstract.html) | The minimal intervention principle |
+| [Valero-Cuevas, Venkadesan and Todorov 2009](https://pmc.ncbi.nlm.nih.gov/articles/PMC2712269) | Task-relevant control in muscle recordings |
+| [arXiv 2309.02976](https://arxiv.org/pdf/2309.02976v2.pdf) | Learned muscle models co-contract unless effort is paid for |
+| [Kormushev et al. 2011](https://calinon.ch/papers/Kormushev-IROS2011.pdf) | COMAN's passive compliance cut walking energy 18% |
+| [Agarwal et al. 2022](https://arxiv.org/abs/2211.07638) | Legged locomotion from one egocentric depth camera, distilled |
+| [Madrona batch renderer](https://madrona-engine.github.io/renderer-blog.html), [MuJoCo Warp](https://github.com/google-deepmind/mujoco_warp) | GPU batch rendering for vision training |
+| Hub `records/halo-apple-tracker-assessment-20261109` | HALO's 48 x 84 log-depth input |
 
 ## Not yet
 
