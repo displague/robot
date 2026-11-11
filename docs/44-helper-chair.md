@@ -126,6 +126,8 @@ The sibling's stand-in has no helper yet: round 1 needs it there, or trains on t
 
 ## Next
 
+- Done since: the drunken sailor and the rise trained with this helper as curriculum (docs/45).
+
 - `helper-instructor-getup`: the same helper on getting up from the floor.
 - Training round 1 (`training-round-1`): the stand-in learns the 0.35 m rise with the helper at give 0.25 to 0.5,
   faded toward the 11 N s withdrawal, with the demos of docs/43's round 0.

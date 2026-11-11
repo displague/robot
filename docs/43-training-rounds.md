@@ -146,9 +146,19 @@ The chair and chain offsets need action spans of 0.70 rad on average, against 0.
 `teacher_action_half`), so they are separate files. The sibling's `load_teacher` reads all three. The relaxed-control
 channel waits for `relaxed-control-variability`.
 
+## Round 1 so far (P-069)
+
+- **The drunken sailor** (docs/45): a 4 N wander is survivable with a yielding helper; 8 N fails the rise through wrist
+  slip.
+- **The rise trained on the full model** (docs/45, D-071): a parameter search, with the helper as curriculum, and a
+  control without it.
+  - The 0.35 m seat stands with no helper.
+  - The control found it sooner than the curriculum did.
+  - The trained sets are marginal and are not the defaults.
+
 ## Not yet
 
-- Nothing is trained. The helper is scripted and works with the hand-written controller only.
+- No network is trained: round 1's first slice trained the hand-written rise's parameters (docs/45). The helper is scripted and works with the hand-written controller only.
 - The helper is not in the sibling's stand-in.
 - The rounds pick one mass model, the 20 kg masses, until the W-max choice lands (D-061).
 - The head IMU, relaxed control and the Rust spike (round 0's other tasks) have not started.

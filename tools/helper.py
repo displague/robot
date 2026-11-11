@@ -27,6 +27,7 @@ Phases (docs/43, docs/44, D-069, D-070):
 
     python tools/helper.py --phases [--seat 0.35] [--jobs 7] [K=V ...]   # the per-phase table
     python tools/helper.py --fade [--seat 0.35]                          # the firm helper weakened step by step
+    python tools/helper.py --drunk [--seat 0.35]                         # the drunken sailor: wander, lopsided, one hand
     python tools/helper.py --one B [--seat 0.35] [--trace] [give=0.5 cap=60 ...] [--video name [--gif]]
 
 K=V: give=, cap=, hands=, drunk=, on_reach=, arms_hold= override the phase; upper-case names set this module's
@@ -271,7 +272,7 @@ def _parse(argv):
     for a in argv:
         if "=" in a and not a.startswith("--"):
             k, v = a.split("=", 1)
-            if k in ("give", "cap", "hands", "drunk", "on_reach", "arms_hold"):
+            if k in ("give", "cap", "hands", "drunk", "on_reach", "arms_hold", "seed"):
                 over[k] = v if k == "hands" else eval(v)
             elif k.isupper() and k in globals():
                 globals()[k] = eval(v)
@@ -354,6 +355,17 @@ def main():
         argv.remove("--fade")
         runs = [("A give %.2f cap %3.0f" % (g, c), ["A", "give=%r" % g, "cap=%r" % c])
                 for g, c in ((0.0, 200), (0.25, 150), (0.5, 100), (0.5, 60), (0.75, 40), (0.75, 25), (0.9, 15))]
+        return _table(runs + [("D withdrawn", ["D"])], seat, argv)
+    if "--drunk" in argv:
+        argv.remove("--drunk")
+        runs = [("B25 drunk 0", ["B", "give=0.25", "cap=150"])]
+        runs += [("B25 drunk %g s%d" % (dr, sd), ["B", "give=0.25", "cap=150", "drunk=%r" % dr, "seed=%d" % sd])
+                 for dr in (4.0, 8.0, 16.0) for sd in (0, 1)]
+        runs += [("B50 drunk %g" % dr, ["B", "drunk=%r" % dr]) for dr in (4.0, 8.0)]
+        runs += [("lopsided 0.1/0.5", ["B", "give=(0.1, 0.5)", "cap=150"]),
+                 ("lopsided 0.1/0.5 drunk 8", ["B", "give=(0.1, 0.5)", "cap=150", "drunk=8.0"]),
+                 ("one hand give 0.25", ["C1", "give=0.25", "cap=150"]),
+                 ("one hand give 0", ["C1", "give=0.0", "cap=200"])]
         return _table(runs + [("D withdrawn", ["D"])], seat, argv)
     print(__doc__)
 

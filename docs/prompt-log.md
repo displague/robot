@@ -1041,3 +1041,21 @@ because its reference list cannot be changed after creation. docs/references.md 
   - `teacher_chair.npz`: 6 of 8 (the 0.35 m seats fall).
   - `teacher_chain.npz`: 17 of 24 chains.
   - The sibling's loader reads all three.
+
+## P-069 (2026-11-11) The defaults stand; the drunken sailor and training on the simulation
+
+> Defaults sound good. Stay flexible.  Let me know after drunken sailor and training/sim are done. When we see results perhaps we work towards that independence/weening (drunken sailor may help this)  and then move into double sided, joint and group objectives.
+
+- D-069 and D-070's defaults are accepted.
+- The drunken sailor (docs/45): `tools/helper.py --drunk`.
+  - A 4 N wander overloads the elbows with the firmer helper (give 0.25) but not the softer one (give 0.5).
+  - At 8 N the wrist clutches slip and the rise fails.
+  - One hand, or a lopsided helper, stands the robot up only by overloading the held arm.
+- Training (docs/45, D-071): `tools/rise_train.py`, a cross-entropy search over the hand-written rise's 11
+  parameters on the full model, with the helper faded from give 0.25 to a 1 N pull and then withdrawn. Each candidate
+  also runs with a 4 N drunken helper and from the 0.40 m seat with no helper.
+  - The faded rise stands with a 1 N pull, impulse 15 N s (the arms' weight on the hold).
+  - The 0.35 m seat stands with no helper for the first time. Recording: docs/img/rise35.gif.
+  - A control with no helper found it sooner (generation 7) and keeps 0.35 to 0.45 m, but loses 0.50 m. So the
+    curriculum did not help this search.
+  - Both are marginal under 2% jitter (5 of 12), so the sets are in `sim/rise_params.json`, not the defaults.

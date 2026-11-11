@@ -1,0 +1,54 @@
+{
+ "note": "docs/45, D-071: the chair rise's parameters trained by tools/rise_train.py (angles in degrees; LEAN_T scales SIT_LEAN_T). Not the defaults.",
+ "control_withdrawn": {
+  "source": "sim/out/rise_control, no helper, gen 37",
+  "grid": "0.35-0.45 stand (with and without armrests), 0.50 fails",
+  "params": {
+   "SIT_LEAD": 10.136800927209016,
+   "SIT_KNEE_RATE": 35.45548891869549,
+   "SIT_GATE": 0.038352494052288515,
+   "SIT_HIP_K": 1.8389903540268335,
+   "SIT_HIP_RATE": 25.924540533543727,
+   "SIT_SPINE_OVER": 14.607959165682173,
+   "SIT_SPINE": 10.191227999490119,
+   "SIT_ARM": -111.37682685508818,
+   "LEAN_T": 0.8802061401156045,
+   "SIT_BAL_ON": 27.112898340748362,
+   "ARMS_HOLD": 107.63737968819025
+  }
+ },
+ "curriculum_cap1": {
+  "source": "sim/out/rise_gate level 6 (helper give 0.9 cap 1 N), gen 27",
+  "grid": "0.40-0.50 stand without a helper; 0.35 needs the helper",
+  "params": {
+   "SIT_LEAD": 4.0,
+   "SIT_KNEE_RATE": 35.01395789753913,
+   "SIT_GATE": 0.03652645622977971,
+   "SIT_HIP_K": 0.9541705704582006,
+   "SIT_HIP_RATE": 27.590324259177812,
+   "SIT_SPINE_OVER": 25.151030237430586,
+   "SIT_SPINE": 17.99480088671722,
+   "SIT_ARM": -107.20918565114216,
+   "LEAN_T": 1.02896680336109,
+   "SIT_BAL_ON": 38.02913318003058,
+   "ARMS_HOLD": 110.0
+  }
+ },
+ "curriculum_withdrawn": {
+  "source": "sim/out/rise_gate level 7, gen 39",
+  "grid": "0.35 stands; 0.40-0.50 fail",
+  "params": {
+   "SIT_LEAD": 4.2920733486251805,
+   "SIT_KNEE_RATE": 38.553304428709545,
+   "SIT_GATE": 0.038091889987705685,
+   "SIT_HIP_K": 1.1091123673272005,
+   "SIT_HIP_RATE": 27.193758610187626,
+   "SIT_SPINE_OVER": 17.138262253664944,
+   "SIT_SPINE": 14.879459549565876,
+   "SIT_ARM": -115.41211876049974,
+   "LEAN_T": 0.949090273045124,
+   "SIT_BAL_ON": 40.604882691991165,
+   "ARMS_HOLD": 109.43602609277536
+  }
+ }
+}

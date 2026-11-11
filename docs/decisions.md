@@ -846,3 +846,24 @@ Alternative: the literal "past its rating", which every run fails, helped or not
 baseline, which would let a helper that overloads the arms set the scale.
 Reverses if: the elbows' unassisted load is fixed (then the rating alone is the test), or the owner rules on D-069's
 first law.
+
+## D-071 (2026-11-11) The rise is trained by search on the full model; the trained sets stay out of the defaults until robust
+
+Why: P-069, docs/45. Training round 1's first question, whether the robot's own rise can be weaned off the helper,
+can be asked of the hand-written rise's 11 parameters directly. That runs on the full tendon model, where the helper
+lives, with no stand-in port and no network. The answer:
+- the 0.35 m seat stands with no helper;
+- a control with no helper found it sooner than the helper's curriculum did, and kept more of the chair grid;
+- both withdrawn sets stand in only 5 of 12 runs with every parameter jittered by 2%;
+- no single set covers the whole grid: the control's loses the 0.50 m seats.
+
+So:
+- the sets are kept in `sim/rise_params.json`, not in `sim_tendon`'s defaults;
+- the drunken wander for training is 4 N, since 8 N already fails the scripted rise through wrist-clutch slip;
+- every generation scores the 0.40 m seat with no helper (D-069's second law), after the first run traded it away.
+
+Alternative: adopt the control's set, or a seat-scheduled pair (the trained set to 0.45 m, the defaults above), as
+the default now. That would gain the 0.35 m chair, but on a 5-in-12 margin. Or go straight to a learned policy with the
+helper on the stand-in, which needs the helper ported there first.
+Reverses if: a set (or a seat-scheduled pair) stands across the grid and holds under jitter. Then it becomes the
+default after a gauntlet run.

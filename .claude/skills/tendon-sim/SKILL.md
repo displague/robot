@@ -340,3 +340,17 @@ window). The robot's side is `sim_tendon.SIT_ARMS_HOLD` (rad: the arms forward t
 Lessons: hold the wrist, not the grip point (the wrist clutch slips); pull along the arm, never across it (the elbow
 overloads); take hold only once the arm is straight; never step a target when the hold ends. Judge the overload law
 against the unassisted rise window (the elbows run 1.42x their rating there) and keep the table's D row.
+
+## Training the rise (docs/45, D-071)
+
+- `python tools/helper.py --drunk` is the drunken-sailor table: the wander, the lopsided helper and one hand.
+- `python tools/rise_train.py` trains the chair rise's 11 parameters (`PARAMS`) by CEM on the full model, one process
+  per run, 13 at a time. A generation of 13 candidates takes about 80 s.
+  - The helper's levels (`LEVELS`) are the curriculum. `--start-level 7` is the no-helper control.
+  - `--grid`, `--probe` and `--show` read a run's `best.json`.
+  - Runs go to `sim/out/rise*` (gitignored); keepers go to `sim/rise_params.json`.
+- Lessons:
+  - score an unassisted old seat in every generation, or the search trades it away;
+  - run a no-curriculum control: here it beat the curriculum;
+  - jitter-test a winner before adopting it (2% jitter, 13 runs).
+  - Don't use `cat > file` without a heredoc in a backgrounded Bash call: it waits on stdin forever.
