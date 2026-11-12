@@ -352,5 +352,8 @@ against the unassisted rise window (the elbows run 1.42x their rating there) and
 - Lessons:
   - score an unassisted old seat in every generation, or the search trades it away;
   - run a no-curriculum control: here it beat the curriculum;
-  - jitter-test a winner before adopting it (2% jitter, 13 runs).
+  - jitter-test a winner before adopting it: `--jitter-test file:key --n 24` (2% jitter, per seat).
+- `--robust file:key` retrains with no helper, every run jittered and all four seats scored. Its set is the
+  default for seats under 0.42 m: `sim_tendon.SIT_LOW` and `SIT_LOW_BELOW` (D-072). A trainer that sets the `SIT_*`
+  globals itself must set `st.SIT_LOW = None`, or the schedule overrides its parameters on the low seats.
   - Don't use `cat > file` without a heredoc in a backgrounded Bash call: it waits on stdin forever.

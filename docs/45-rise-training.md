@@ -1,16 +1,16 @@
 ---
-title: "45 - The drunken sailor, and training the chair rise with the helper as curriculum (P-069, D-071)"
-summary: "A wandering helper strains the elbows: 4 N of wander breaks the overload law with the firmer helper, and 8 N fails the rise through wrist-clutch slip. A cross-entropy search over the hand-written rise's 11 parameters, on the full model, faded the helper to a 1 N pull and then found a 0.35 m rise with no helper. A control with no helper at any point found a better one sooner: 0.35 to 0.45 m stand unassisted, 0.50 m is lost. So in this search the 0.35 m failure was tuning, and the helper's curriculum did not help. Both rises are marginal under 2% parameter jitter (5 of 12), so the defaults stay"
+title: "45 - The drunken sailor, and training the chair rise with the helper as curriculum (P-069, P-070, D-071, D-072)"
+summary: "A wandering helper strains the elbows: 4 N of wander breaks the overload law with the firmer helper, and 8 N fails the rise through wrist-clutch slip. A cross-entropy search over the hand-written rise's 11 parameters, on the full model, faded the helper to a 1 N pull and then found a 0.35 m rise with no helper. A control with no helper at any point found a better one sooner: 0.35 to 0.45 m stand unassisted, 0.50 m is lost. So in this search the 0.35 m failure was tuning, and the helper's curriculum did not help. Those first rises were marginal under 2% parameter jitter. Retrained with the jitter and every seat in the score, the low-seat set stands on 0.35 m 23 of 24 times. It is now the default below 0.42 m (D-072), so the whole chair grid stands, and the gauntlet is unchanged"
 section: "Learned control"
 ---
 
-# 45 - The drunken sailor, and training the chair rise with the helper as curriculum (P-069, D-071)
+# 45 - The drunken sailor, and training the chair rise with the helper as curriculum (P-069, P-070, D-071, D-072)
 
 The owner accepted D-069 and D-070's defaults and asked for two things before weaning and the crew work (P-069):
 - the drunken sailor: docs/43's Phase C, a lopsided and wandering helper;
 - training on the simulation: training round 1's first slice (hub task `training-round-1`, docs/43).
 
-| The 0.35 m chair, no helper, with the trained rise parameters (`sim/rise_params.json`, control), 2x speed |
+| The 0.35 m chair, no helper, with the default low-seat rise (D-072), 2x speed |
 | --- |
 | ![rise35](img/rise35.gif) |
 
@@ -138,10 +138,58 @@ What it shows:
   - The old gates are not all met by one set: the control's set loses the 0.50 m seats.
   - A rise that picks its set by seat height (the planner knows the seat) would pass all 8. That is not built.
 
+## Robust, and the default for low seats (P-070, D-072)
+
+```bash
+python tools/rise_train.py --robust sim/rise_params.json:control_withdrawn --gens 25
+python tools/rise_train.py --jitter-test sim/rise_params.json:low_seat --n 24
+```
+
+No helper. Each candidate runs six times, every run with its parameters jittered by 2% (a fresh draw each time): three
+times on 0.35 m, once each on 0.40, 0.45 and 0.50 m. The score is the mean over those runs. The search starts from the
+control's set, 13 candidates a generation, 25 generations (about 55 minutes).
+
+Under 2% jitter, separate draws:
+
+| Set | 0.35 m | 0.40 m | 0.45 m | 0.50 m |
+| --- | --- | --- | --- | --- |
+| Defaults | 0 of 12 | 11 of 12 | 12 of 12 | 11 of 12 |
+| The control's set (above) | 9 of 12 | 12 of 12 | 12 of 12 | 1 of 12 |
+| Robust, best candidate (gen 18) | **23 of 24** | **24 of 24** | 20 of 24 | 11 of 24 |
+| Robust, the search's final mean | 23 of 24 | 24 of 24 | 20 of 24 | 12 of 24 |
+
+- **The low seats are now robust.**
+- **One set does not suit both ends of the grid:**
+  - the low seats want the arms further forward and a quicker lean;
+  - the 0.50 m seat stands better on the defaults.
+- **So the rise is scheduled by seat height, which the planner knows** (D-072):
+  - `sim_tendon.SIT_LOW` holds the robust set;
+  - seats under `SIT_LOW_BELOW` (0.42 m) use it, and higher seats keep the old defaults.
+  - Under jitter that gives 23, 24, 12 and 11 of 24, 24, 12 and 12, from 0.35 to 0.50 m.
+  - `helper.py` and `rise_train.py` turn it off so their own tables are unchanged.
+
+**The gate:**
+- every chair scene stands: sit35, sit35a, sit40, sit40a, sit45, sit45a, sit50, sit50a;
+- the full default gauntlet stands, 14 of 14. Its only chair is 0.45 m, which the schedule does not touch.
+
+The set's differences from the defaults:
+
+| | knee lead | knee rate | CoM gate | hip K | hip rate | spine over | spine | arms | lean | balance on |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Defaults | 12 | 25 /s | 2.0 cm | 3.0 | 22.5 /s | 15 | 20 | -90 | 1.0 s | 30 |
+| Low seats | 10.7 | 33.5 /s | 4.0 cm | 1.8 | 27.0 /s | 15 | 12 | -111 | 0.81 s | 25 |
+
+In words, for the low seats:
+- the arms reach 21 degrees further forward, and the spine bends less;
+- the trunk swings to the seat-off pose 20% faster;
+- the knees drive harder, with a looser CoM gate and less extra hip flexion.
+
+That is a momentum rise rather than a static one, where docs/33 had found the CoM 10 cm behind the feet at seat-off.
+
 ## Not yet
 
-- **The trained sets are not the defaults** (D-071). They are marginal under jitter, and none covers the whole grid
-  alone.
+- **The low-seat set stands on 0.35 m 23 of 24 times under 2% jitter.** Larger errors, the 775 layout and
+  `ROBOT_MOTORS=low` are not tried.
 - **The search is over the hand-written rise's parameters, not a network.**
   - The stand-in has no helper.
   - The felt-weight and head-IMU channels, and the stiff-against-relaxed comparison, wait for a learned policy.
@@ -150,10 +198,7 @@ What it shows:
 
 ## Next
 
-- **Robustness:**
-  - train with parameter jitter and the 0.45 and 0.50 m seats in the score;
-  - or a seat-scheduled rise (the control's set to 0.45 m, the defaults above).
-  - Then make it the default if the gauntlet holds.
+- Done since: the chair demos re-recorded with the low-seat set, 8 of 8 episodes (`teacher_chair.npz`, 7 985 steps).
 - **Weaning where the curriculum should matter:**
   - a learned policy on the rise (many dimensions, where search from scratch fails);
   - the get-up from a fall.

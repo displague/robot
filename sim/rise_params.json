@@ -50,5 +50,22 @@
    "SIT_BAL_ON": 40.604882691991165,
    "ARMS_HOLD": 109.43602609277536
   }
+ },
+ "low_seat": {
+  "source": "sim/out/rise_robust gen 18: tools/rise_train.py --robust, no helper, 2% jitter, seats 0.35-0.50; the default below 0.42 m as sim_tendon.SIT_LOW (D-072)",
+  "grid": "jittered 2%: 0.35 23/24, 0.40 24/24, 0.45 20/24, 0.50 11/24",
+  "params": {
+   "SIT_LEAD": 10.690354055558327,
+   "SIT_KNEE_RATE": 33.535314698031364,
+   "SIT_GATE": 0.03981352153394614,
+   "SIT_HIP_K": 1.8440690741788643,
+   "SIT_HIP_RATE": 26.960100213815313,
+   "SIT_SPINE_OVER": 14.962378948391567,
+   "SIT_SPINE": 12.059126409182705,
+   "SIT_ARM": -111.2044871093624,
+   "LEAN_T": 0.8072155002823529,
+   "SIT_BAL_ON": 24.997261560050188,
+   "ARMS_HOLD": 107.32386119903768
+  }
  }
 }

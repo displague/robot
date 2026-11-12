@@ -234,6 +234,7 @@ def run_one(cfg, seat, video=None, gif=False, title=""):
     cfg = dict(cfg) if cfg else dict(hands="", arms_hold=False)   # Phase D: the same logging, nobody there
     cfg.setdefault("arms_hold", ARMS_HOLD)
     st.SIT_ARMS_HOLD = math.radians(cfg["arms_hold"]) if cfg["arms_hold"] else 0.0
+    st.SIT_LOW = None          # docs/44's tables: the helper on the default rise, not the trained low-seat set (D-072)
     h = Helper(r, **cfg)
     rec = None
     if video:

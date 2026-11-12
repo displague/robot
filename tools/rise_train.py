@@ -31,6 +31,9 @@ the trained parameters against the defaults; the rest of the gauntlet does not u
                                [--start-level 7]   # the control: no curriculum, straight at withdrawn
     python tools/rise_train.py --grid sim/out/rise/best.json      # the chair grid with the trained parameters
     python tools/rise_train.py --show sim/out/rise_gate/best.json --level 7 [--video rise35]   # record it, no helper
+    python tools/rise_train.py --robust sim/rise_params.json:control_withdrawn [--gens 25]   # no helper, 2% jitter,
+                               # every seat 0.35-0.50 in the score (docs/45 Next)
+    python tools/rise_train.py --jitter-test sim/rise_params.json:control_withdrawn [--n 24]  # per seat, jittered
     python tools/rise_train.py --probe sim/out/rise/best.json [--level 3]   # that level's best against weaker helpers
 """
 import contextlib
@@ -77,6 +80,7 @@ def defaults():
 
 def _apply(p):
     import sim_tendon as st
+    st.SIT_LOW = None          # the trained parameters, not the seat-scheduled low-seat set (D-072)
     for k, v in p.items():
         if k == "LEAN_T":
             st.SIT_LEAN_T = (1.0 * v, 1.5 * v, 0.065)
@@ -205,6 +209,75 @@ def train(gens, pop, jobs, seed, out, gate=True, start=0):
     return best
 
 
+ROBUST_SEATS = (0.35, 0.35, 0.35, 0.40, 0.45, 0.50)   # three draws on the hard seat, one on each other seat
+JITTER = 0.02
+
+
+def _jitter(p, rng, j):
+    return {k: v * (1.0 + j * rng.standard_normal()) for k, v in p.items()}
+
+
+def robust(init, gens, pop, jobs, seed, out):
+    """No helper: every candidate runs each of ROBUST_SEATS once with its parameters jittered by JITTER (a fresh draw
+    per run), so the score is how often it stands across the grid's seats under small errors (docs/45 Next)."""
+    os.makedirs(out, exist_ok=True)
+    rng = np.random.default_rng(seed)
+    logf = open(os.path.join(out, "log.jsonl"), "a")
+    path, key = init.rsplit(":", 1)
+    d = json.load(open(path))
+    p0 = d[key]["params"] if key in d else d["best"][key]["params"]
+    mean, std = _to_unit(p0), np.full(len(PARAMS), 0.05)
+    n_elite, best = max(2, pop // 4), None
+    m = len(ROBUST_SEATS)
+    with mp.get_context("spawn").Pool(jobs, maxtasksperchild=4) as pool:
+        for g in range(gens):
+            us = [mean] + [mean + std * rng.standard_normal(len(PARAMS)) for _ in range(pop - 1)]
+            ps = [_from_unit(u) for u in us]
+            jobs_ = [(_jitter(p, rng, JITTER), None, 0.0, 0, s, False, False) for p in ps for s in ROBUST_SEATS]
+            t0 = time.time()
+            rs = pool.map(run, jobs_, chunksize=1)
+            sc, stood = [], []
+            for i in range(pop):
+                rr = rs[m * i:m * i + m]
+                stood.append([r["stood"] for r in rr])
+                sc.append(float(np.mean([10.0 if r["stood"] else 5.0 * r["progress"] for r in rr])
+                                - 0.002 * np.mean([r["rise_e"] for r in rr])))
+            order = np.argsort(sc)[::-1]
+            elite = order[:n_elite]
+            i0 = int(order[0])
+            if best is None or sc[i0] > best["score"]:
+                best = dict(score=sc[i0], params=ps[i0], stood=stood[i0], gen=g)
+            rec = dict(gen=g, best=sc[i0], mean_score=float(np.mean(sc)), best_stood=stood[i0],
+                       stood=int(sum(map(sum, stood))), runs=len(rs), params=ps[i0], std=float(std.mean()),
+                       wall=time.time() - t0)
+            logf.write(json.dumps(rec) + "\n")
+            logf.flush()
+            print("gen %2d  best %5.2f (%s)  mean %5.2f  stood %2d/%d  std %.3f  %.0f s"
+                  % (g, sc[i0], "".join("+" if s else "." for s in stood[i0]), rec["mean_score"], rec["stood"],
+                     len(rs), rec["std"], rec["wall"]), flush=True)
+            mean = 0.3 * mean + 0.7 * np.mean([us[i] for i in elite], axis=0)
+            std = np.clip(0.5 * std + 0.5 * np.std([us[i] for i in elite], axis=0), 0.015, 0.15)
+            json.dump(dict(best={"robust": best}, mean=_from_unit(mean)), open(os.path.join(out, "best.json"), "w"),
+                      indent=1)
+    return best
+
+
+def jitter_test(path, key, jobs, n=24, seats=(0.35, 0.40, 0.45, 0.50)):
+    """Each seat n times with the parameters jittered by JITTER: how many stand."""
+    if key == "defaults":
+        p = defaults()
+    else:
+        d = json.load(open(path))
+        p = d[key]["params"] if key in d else d["best"][key]["params"]
+    rng = np.random.default_rng(12345)
+    jobs_ = [(_jitter(p, rng, JITTER), None, 0.0, 0, s, False, False) for s in seats for _ in range(n)]
+    with mp.get_context("spawn").Pool(jobs, maxtasksperchild=4) as pool:
+        rs = pool.map(run, jobs_, chunksize=1)
+    for k, s in enumerate(seats):
+        print("seat %.2f m, %d%% jitter: %2d of %d stand" % (s, round(100 * JITTER), sum(r["stood"] for r in
+                                                                 rs[k * n:(k + 1) * n]), n), flush=True)
+
+
 def grid(path, jobs):
     """The chair grid with no helper, the trained parameters (each level's best) against the defaults."""
     data = json.load(open(path))
@@ -276,7 +349,15 @@ if __name__ == "__main__":
     g = _opt(argv, "--grid", None)
     pr = _opt(argv, "--probe", None)
     sh = _opt(argv, "--show", None)
-    if sh:
+    rb = _opt(argv, "--robust", None)
+    jt = _opt(argv, "--jitter-test", None)
+    if rb:
+        robust(rb, int(_opt(argv, "--gens", 25)), int(_opt(argv, "--pop", 13)), jobs, int(_opt(argv, "--seed", 0)),
+               _opt(argv, "--out", "sim/out/rise_robust"))
+    elif jt:
+        path, key = jt.rsplit(":", 1)
+        jitter_test(path, key, jobs, int(_opt(argv, "--n", 24)))
+    elif sh:
         show(sh, int(_opt(argv, "--level", 7)), float(_opt(argv, "--seat", SEAT)), _opt(argv, "--video", "rise35"))
     elif pr:
         probe(pr, int(_opt(argv, "--level", 3)), jobs)

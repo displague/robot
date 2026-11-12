@@ -1059,3 +1059,16 @@ because its reference list cannot be changed after creation. docs/references.md 
   - A control with no helper found it sooner (generation 7) and keeps 0.35 to 0.45 m, but loses 0.50 m. So the
     curriculum did not help this search.
   - Both are marginal under 2% jitter (5 of 12), so the sets are in `sim/rise_params.json`, not the defaults.
+
+## P-070 (2026-11-12) Continue: the low-seat rise made robust and the default
+
+> continue
+
+- docs/45's first Next item: `tools/rise_train.py --robust` retrains the rise with no helper. Every run is jittered
+  by 2%, and all four seats are scored.
+  - Under jitter the trained set stands on 0.35 m 23 of 24 times and on 0.40 m 24 of 24, against 0 of 12 for the
+    defaults on 0.35 m. It is weaker on 0.45 and 0.50 m.
+- D-072: seats under 0.42 m rise with the trained set (`sim_tendon.SIT_LOW`); higher seats keep the defaults.
+  - All 8 chair scenes stand, and the default gauntlet is unchanged at 14 of 14.
+  - Recording: docs/img/rise35.gif.
+- The chair teacher demos were re-recorded: 8 of 8 episodes. The sibling's loader reads them.

@@ -867,3 +867,21 @@ the default now. That would gain the 0.35 m chair, but on a 5-in-12 margin. Or g
 helper on the stand-in, which needs the helper ported there first.
 Reverses if: a set (or a seat-scheduled pair) stands across the grid and holds under jitter. Then it becomes the
 default after a gauntlet run.
+
+## D-072 (2026-11-12) Seats under 0.42 m rise with the trained low-seat set
+
+Why: P-070, docs/45. Trained with 2% parameter jitter and all four seats in the score (`rise_train.py --robust`),
+one set stands on 0.35 m 23 of 24 times and on 0.40 m 24 of 24. The defaults stand on 0.35 m 0 of 12 times.
+The same set is weaker high up: 0.45 m 20 of 24, 0.50 m 11 of 24, against the defaults' 12 of 12 and 11 of 12. So:
+- the set is `sim_tendon.SIT_LOW`, used for seats under `SIT_LOW_BELOW` = 0.42 m;
+- higher seats keep the old defaults.
+
+The planner knows the seat height, so this needs no sensing it does not already have. The result:
+- all 8 chair scenes stand;
+- the default gauntlet stands 14 of 14, unchanged, since its chair is 0.45 m.
+
+This meets D-071's condition for adopting a trained set.
+
+Alternative: one set for every seat, which the search did not find (the low seats want a momentum rise, the 0.50 m
+seat the old one). Or keep the defaults and leave the 0.35 m seat to the helper.
+Reverses if: a single set holds the whole grid under jitter, or a learned policy replaces the scripted rise.

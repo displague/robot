@@ -230,6 +230,11 @@ SIT_KNEE_RATE = math.radians(25)  # rad/s: the knee target's fastest
 SIT_GATE = 0.02                  # m: the knee stops when the CoM is this much further back than planned
 SIT_HIP_K = 3.0                  # rad per m: extra hip flexion per metre the CoM is behind the plan
 SIT_BAL_ON = math.radians(30)    # the balance loop (ankles in torque mode) takes over below this knee angle
+SIT_LOW_BELOW = 0.42             # m: seats lower than this rise with SIT_LOW (docs/45, D-072); None or {}: off
+SIT_LOW = dict(                  # trained by tools/rise_train.py --robust (no helper, 2% jitter, seats 0.35-0.50)
+    SIT_LEAD=math.radians(10.69), SIT_KNEE_RATE=math.radians(33.54), SIT_GATE=0.0398, SIT_HIP_K=1.844,
+    SIT_HIP_RATE=math.radians(26.96), SIT_SPINE_OVER=math.radians(14.96), SIT_SPINE=math.radians(12.06),
+    SIT_ARM=math.radians(-111.20), SIT_LEAN_T=(0.807, 1.211, 0.065), SIT_BAL_ON=math.radians(25.00))
 GEAR_FRICTION = 0.02           # of stall: running friction of the gear train when powered
 CURRENT_LIMIT = 0.9              # of the clutch slip torque: the driver's current limit
 
@@ -1112,6 +1117,18 @@ def sit_path(r, seat, n=20):
 
 
 def sit_stand(r, seat, arms=False):
+    """The chair scene; seats under SIT_LOW_BELOW run with the trained low-seat set SIT_LOW (docs/45, D-072)."""
+    low = SIT_LOW if SIT_LOW and SIT_LOW_BELOW and seat < SIT_LOW_BELOW else {}
+    g = globals()
+    saved = {k: g[k] for k in low}
+    g.update(low)
+    try:
+        return _sit_stand(r, seat, arms)
+    finally:
+        g.update(saved)
+
+
+def _sit_stand(r, seat, arms=False):
     """Sit on a chair and stand again (docs/33, hub task sit-and-stand-chair). Stand-to-sit: down sit_path with the
     balance loop on, its CoM target following the path's offset; then the balance loop off, the hips sat back onto
     the seat, the trunk upright and the hands in the lap. Sit-to-stand: the trunk swings forward to the seat-off pose

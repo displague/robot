@@ -139,7 +139,7 @@ These come only after Phase D:
 | File | Command | Episodes kept | Steps (50 Hz) |
 | --- | --- | --- | --- |
 | `teacher.npz` | `record_teacher.py --pushes 200 --winds 24` | 235 of 237 (2 random pushes fall) | 85 068 |
-| `teacher_chair.npz` | `record_teacher.py --set chair` | 6 of 8 (the 0.35 m seats fall) | 6 781 |
+| `teacher_chair.npz` | `record_teacher.py --set chair` | 8 of 8 since D-072 (6 of 8 before: the 0.35 m seats fell) | 7 985 |
 | `teacher_chain.npz` | `record_teacher.py --set chain --chains 24` | 17 of 24 chains | 153 898 |
 
 The chair and chain offsets need action spans of 0.70 rad on average, against 0.27 for the standing set (the sibling's
@@ -154,7 +154,8 @@ channel waits for `relaxed-control-variability`.
   control without it.
   - The 0.35 m seat stands with no helper.
   - The control found it sooner than the curriculum did.
-  - The trained sets are marginal and are not the defaults.
+  - Retrained under 2% jitter with every seat scored, the low-seat set is the default below 0.42 m (D-072, P-070). So
+    the whole chair grid stands, and the chair demos are 8 of 8.
 
 ## Not yet
 
