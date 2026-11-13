@@ -32,7 +32,8 @@ description: How work is recorded in the robot repo (prompt log, one commit per 
    and say what moved.
 9. **Agent Hub** (https://ah.meyu.us/, workspace `robot`): next steps are hub tasks; claim before
    working, finish with an honest result (what passed, what did not, commits). Findings are records
-   tagged `project:robot`.
+   tagged `project:robot`. A record's `summary` is one plain line of at most 280 characters; a longer one is
+   refused.
 
 ## Tools at a glance
 

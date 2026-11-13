@@ -1164,9 +1164,10 @@ because its reference list cannot be changed after creation. docs/references.md 
 >
 > Release across both projects when ready, to their standards, presenting the detailed analysis.
 
-- **The hub** still refuses this session ("Connector access could not be verified ... Sign out and sign in again"),
-  so the two P-074 records (`coach-voice-hands-p074`, `directions-after-first-run-p074`) are not filed. Their
-  content is docs/49.
+- **The hub** refused this session at first (it asked for a new sign-in), then answered again after the releases.
+  Both P-074 records are filed: `coach-voice-hands-p074` (the finding, with the three-seed table and both release
+  links) and `directions-after-first-run-p074` (the proposal). The earlier failures were partly mine: the hub
+  limits a record's summary to 280 characters.
 - **Ready meant more seeds.** The no-support and early-fade arms ran on seeds 1 and 2. They corrected P-074's
   reading: the early-fade helper is withdrawn in training on every seed, and leaves 46% unaided rise against 52%
   with no support (seed 0 alone had said 47% against 48%, with a third as many overloaded lines). docs/49 and the
