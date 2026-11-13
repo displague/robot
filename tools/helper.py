@@ -129,10 +129,8 @@ class Helper:
         """The robot's pull on helper hand s (N, world): minus the connect constraint's force on its second site."""
         d = self.r.data
         e = self.eq[s]
-        for i in range(d.nefc):
-            if d.efc_type[i] == mujoco.mjtConstraint.mjCNSTR_EQUALITY and d.efc_id[i] == e:
-                return -np.array(d.efc_force[i:i + 3])
-        return np.zeros(3)
+        i = np.flatnonzero((d.efc_id == e) & (d.efc_type == mujoco.mjtConstraint.mjCNSTR_EQUALITY))
+        return -np.array(d.efc_force[i[0]:i[0] + 3]) if len(i) else np.zeros(3)
 
     def attached(self, s):
         return bool(self.r.data.eq_active[self.eq[s]])

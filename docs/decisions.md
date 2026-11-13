@@ -925,3 +925,38 @@ feet. So:
 Alternative: stronger wrist and elbow drives (W-mid at the wrist, W-max at the elbow), at mass and cost in the arm; or
 a helper that only steadies, which leaves the get-up without its lift (docs/46).
 Reverses if: the arm's drives are upsized, or a learned get-up needs only steadying.
+
+## D-075 (2026-11-13) Two robots share one model: a rig each on the same data, the cradle a soft connect
+
+Why: P-073, docs/48. The role flip needs two bodies that touch. The second robot is a copy of `sim/robot.xml`
+attached under a name prefix (MuJoCo's spec attach), so both run the same drives, clutches and balance loop:
+- `sim_tendon.Rig` takes a model, data, prefix and standing place. Only the first rig resets and steps the data. It
+  runs its partners' controllers before each step and their readouts after it.
+- A rig reads world positions in its own heading frame (`Rig.loc`) and counts only its own contacts.
+- The cradle is a soft connect between the two robots' elbow sites, and their arms do not collide with each other.
+  Every other contact between them is real.
+
+With one robot nothing changes (the gauntlet scenes compared print the same tables).
+
+Alternative: two simulations coupled by a force each step. It needs no change to `Rig`, but an explicit coupling
+between two light arms is unstable at 1 ms, and the robots could not touch.
+Reverses if: the cradle becomes a contact (a forearm under an upper arm), or a third robot shows the partner scheme
+does not scale.
+
+## D-076 (2026-11-13) A robot helper stands close, carries beside its body, and never pulls down; the helped robot stands up where it is
+
+Why: P-073, docs/48. Each rule came from a run that failed:
+- **Close, feet apart.** The W-max clutch slips at 1.03 of the line's continuous rating. A helper that bows 35
+  degrees with its arms forward folds at the spine with nothing in them, and one that takes 46 N at 0.2 m of reach
+  folds within a second. So the helper stands about 0.6 m from the kneeling robot's pelvis, its feet 0.44 m apart
+  astride the other's front foot, and plans its posture with each joint's static torque under 0.7 of its rating.
+- **The perch.** Once it holds, the helper does not chase the scripted anchor. The anchor moves to the helper's
+  strong spot: its elbows just ahead of its soles' centre at about 1.1 m, upper arms near vertical. The helped robot
+  comes to it.
+- **Never down.** The cradle carries and holds fore and aft, but its vertical force is never downward.
+- **Stand up in place.** The get-up plants its stepping foot under the body and stands up in a stride
+  (`getup.STRIDE`). docs/46's get-up ends 0.4 m further forward, where the helper stands.
+
+Alternative: a helper that steps back as the other rises (it cannot step while loaded yet); a stronger spine drive
+or a 2:1 tackle on it, at mass in the trunk.
+Reverses if: the helper can step under load, or the spine's drive is upsized.

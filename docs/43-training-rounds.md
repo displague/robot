@@ -164,6 +164,9 @@ channel waits for `relaxed-control-variability`.
 
 - **The role flip, statics** (docs/47, D-074, P-072): a second robot can carry most of the get-up's helper forces if
   it cradles near its elbows; not with its hands.
+- **The role flip, two bodies** (docs/48, D-075, D-076, P-073): two robots in one model. Robot B takes A's arms from
+  the scripted helper at the stand-up and lets go once A is up: both stand 19 of 24 under jitter. Earlier takeovers
+  fail more often, and the scripted hands still make the catch and carry the rise. B's spine is the limit.
 
 ## Not yet
 

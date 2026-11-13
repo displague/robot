@@ -384,3 +384,29 @@ against the unassisted rise window (the elbows run 1.42x their rating there) and
   - It runs in about 5 minutes per scale and needs no scipy.
 - `--pose t` prints one sample's pose.
 - Lesson: the arm's wrist and elbow drives (0.66 and 3.8 N m) cannot carry a lift; contact near the elbow can.
+
+## Two robots in one model (docs/48, D-075, D-076)
+
+- `duo.Duo()` builds the pair: robot A as before (no prefix, so `getup.py` and `helper.py` run on it unchanged) and
+  robot B under the prefix `b.`, facing A, on the same `MjData`.
+  - `sim_tendon.Rig(model, data, prefix, base, winches)` is one robot of several. Only the first rig resets and steps
+    the data; its `step()` calls each partner's `pre_step()` (its `script`, then `control()`) and `readout()`.
+  - Code in `Rig` that reads a world position must go through `Rig.loc()` (the rig's heading frame), and code that
+    sums contacts must skip the other robot's (`Rig.shared`, `Rig.root`).
+  - After any `Rig` change, check one robot is unchanged: `sim_tendon.py --only stand,push30,squat` and
+    `getup.py --settle` must print the same as before.
+- `python tools/duo.py --one --params sim/duo_params.json:<key> [--trace] [--video duo --gif]` runs one get-up with B
+  as the helper; `take=N` sets the first phase (`duo.ORDER`) in which B may take A's arms. `--probe` prints where A's
+  parts go.
+- `python tools/duo.py --train --levels [--from 6] --init <best.json>:levels.6 --out sim/out/duo_x` searches A's
+  script (`getup.GPARAMS`) with B's place and reach (`duo.DPARAMS`), about 70 s a generation at 13 processes.
+  `--jitter-test <best.json>:levels.6 --n 24` checks a set.
+- Lessons:
+  - a W-max clutch slips at 1.03 of the line's continuous rating, so a posture planned near 1.0 folds: plan under 0.7;
+  - a helper robot stands close, feet apart, and carries beside its body; it does not reach or bow under load;
+  - the helped robot must stand up where it is (`getup.STRIDE`), not travel into the helper;
+  - a cradle never pulls down (`Lifter.no_pull_down`);
+  - a search that may leave the hard part to the scripted helper will: give no credit unless the robot held, and
+    move the takeover earlier level by level;
+  - do not edit `duo.py`, `getup.py`, `helper.py` or `sim_tendon.py` while a search runs (its workers re-import them);
+  - a long patch script full of quotes fails as a Bash heredoc here: write it with the Write tool and run the file.

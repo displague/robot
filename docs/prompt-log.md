@@ -1105,3 +1105,23 @@ because its reference list cannot be changed after creation. docs/references.md 
 - Cradling near its elbows (D-074), 74 of 94 samples fit every rating. The exceptions are the catch at the lean
   (spine 2.5x) and the stand-up (grips 5 cm out of reach).
 - The hub task `nurturer-role-flip` waits on round 2. This pass is recorded in docs/47 and the prompt log.
+
+## P-073 (2026-11-13) ok, new model, smarter brain, same project and challenge. continue, innovate, and make it work
+
+> ok, new model, smarter brain, same project and challenge. continue, innovate, and make it work
+
+- docs/48, D-075, D-076: two robots in one simulation, and the role flip with two bodies.
+  - `sim_tendon.Rig` can be one robot of several in a shared model (a prefix, a standing place and heading, partner
+    rigs stepped by the first). One robot is unchanged: the gauntlet's 14 scenes and docs/46's get-up are identical.
+  - `tools/duo.py`: the pair, robot B's posture solver and balance under load, the handover from the scripted helper,
+    the joint search with a curriculum on the takeover, the jitter test. `tools/duo_video.py` records both.
+  - `tools/getup.py`: `STRIDE` (the stepping foot planted under the body, standing up in a stride), `UP_SHARE`,
+    `ELBOW`, and `Lifter.no_pull_down`.
+- What works: robot B takes A's upper arms from the scripted helper at the stand-up and lets go once A is up. Both
+  stand 19 of 24 under 2% jitter (B 24 of 24); with B standing by, the same get-up stands 7 of 24.
+- What does not: the earlier B takes over, the less often it works (10 of 24 from the foot's landing, 4 from its
+  planting, none before the step). The scripted hands still catch the kneel and carry the rise. The robots end chest
+  to chest, touching.
+- What limits it: B's spine. Its clutch slips at 1.03 of the rating, so B cannot bow or reach under load: it stands
+  close, feet apart, and carries beside its body (D-076).
+- Recording: docs/img/duo.gif. Parameters: `sim/duo_params.json`.

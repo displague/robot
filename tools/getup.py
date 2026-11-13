@@ -62,6 +62,11 @@ SHIFT_LOAD = 0.25
 SHIFT_FWD = 0.20       # m: the helper's anchor draws forward this far over the shift
 SAMPLE_DT = 0.1        # s: the helper's hand positions and forces are sampled this often (Lifter.samples)
 Z_TOP = 0.0            # m: the anchor's ceiling above the standing grip height
+STRIDE = 0.0           # m: the stepping foot is planted this far behind the front foot (0: beside it), so the robot
+                       # stands up where it is, in a stride, and not 0.4 m forward over the front foot (docs/48)
+UP_SHARE = 0.5         # the share of the weight the stand-up plans onto the stepped (back) foot of a stride
+LEG = 0.87             # m: hip to ankle
+ELBOW = 0.0            # rad: the elbows' bend while held (0: straight; duo.py folds them, clear of a robot helper)
 LIFT_SLACK = 10.0      # N per hand: the lift allowed beyond the weight the feet leave uncarried
 HOLD_S = 3.0           # s standing at the end
 TRACE = False
@@ -99,7 +104,9 @@ def kneel(r, kn=None):
     for _ in range(24):                     # the highest root height at which the body touches the floor
         d.qpos[2] = 0.5 * (lo + hi)
         mujoco.mj_forward(m, d)
-        touching = any(m.geom_bodyid[c.geom1] == 0 or m.geom_bodyid[c.geom2] == 0 for c in d.contact[:d.ncon])
+        touching = any((m.geom_bodyid[c.geom1] == 0 and m.body_rootid[m.geom_bodyid[c.geom2]] == r.root)
+                       or (m.geom_bodyid[c.geom2] == 0 and m.body_rootid[m.geom_bodyid[c.geom1]] == r.root)
+                       for c in d.contact[:d.ncon])           # this robot on the floor (not a partner's feet)
         lo, hi = (d.qpos[2], hi) if touching else (lo, d.qpos[2])
     d.qpos[2] = lo + 0.005
     d.qvel[:] = 0.0
@@ -154,16 +161,19 @@ def step(r):
     r.move({"thigh.%s_pitch" % B: hf - D(15), "shank.%s_pitch" % B: SWING[0]}, SWING_T)
     r.set_phase("stand: step plant")
     q = lambda k: float(r.data.qpos[r.by_name[k % F]["q"]])
-    r.move({"thigh.%s_pitch" % B: q("thigh.%s_pitch"), "shank.%s_pitch" % B: q("shank.%s_pitch"),
-            "foot.%s_pitch" % B: q("foot.%s_pitch")}, PLANT_T)
+    back = math.asin(min(0.9, STRIDE / LEG))    # the hip's extra extension that puts the foot STRIDE further back
+    r.move({"thigh.%s_pitch" % B: q("thigh.%s_pitch") + back, "shank.%s_pitch" % B: q("shank.%s_pitch"),
+            "foot.%s_pitch" % B: q("foot.%s_pitch") - back}, PLANT_T)
     r.set_phase("stand: step land")          # lower the foot until it carries LAND_LOAD of the weight
     ib = 0 if B == "L" else 1
-    goal = {"shank.%s_pitch" % B: 0.0, "thigh.%s_pitch" % B: q("thigh.%s_pitch") + LAND_HIP,
-            "foot.%s_pitch" % B: st.STAND_LEAN}
+    goal = {"shank.%s_pitch" % B: 0.0, "thigh.%s_pitch" % B: q("thigh.%s_pitch") + LAND_HIP + back,
+            "foot.%s_pitch" % B: st.STAND_LEAN - back}
     r.ramp(LAND_T, targets=goal, until=lambda _r: _r.cop()[1][ib] > LAND_LOAD * _r.mass * 9.81)
     so = r.soles()
     landed = r.cop()[1][ib] > 0.5 * LAND_LOAD * r.mass * 9.81
-    if r.stage == 2 and abs(so[0][0][1] - so[1][0][1]) < 0.15 and landed:     # the feet side by side, both down
+    ifr = 0 if F == "L" else 1
+    r.stride = float(so[ib][0][1] - so[ifr][0][1])          # how far the stepped foot is behind the front one
+    if r.stage == 2 and abs(r.stride - STRIDE) < 0.15 and landed:     # the feet where planned, both down
         r.stage = 3
 
 
@@ -179,7 +189,7 @@ def getup(r):
     lean["spine_pitch"] = SPINE_LEAN
     for s in "LR":
         lean["upperarm.%s_pitch" % s] = ARM
-        lean["forearm.%s_pitch" % s] = 0.0
+        lean["forearm.%s_pitch" % s] = ELBOW
     r.move(lean, LEAN_T)
     r.set_phase("stand: rise")
     start = dict(r.target)
@@ -210,7 +220,15 @@ def getup(r):
         step(r)
     r.set_phase("stand: up")
     r.balance, r._com_f = True, None
-    r.move(stand, UP_T)
+    up = dict(stand)
+    if STRIDE:                              # standing in the stride it landed in: each leg half of it off vertical
+        a = math.asin(float(np.clip(getattr(r, "stride", STRIDE) / 2 / LEG, -0.5, 0.5)))
+        up.update({"thigh.%s_pitch" % FRONT: -a, "foot.%s_pitch" % FRONT: st.STAND_LEAN + a,
+                   "thigh.%s_pitch" % BACK: a, "foot.%s_pitch" % BACK: st.STAND_LEAN - a})
+    if STRIDE and UP_SHARE != 0.5:          # the weight planned onto the back foot, so it stays down (docs/48)
+        r.ramp(UP_T, targets=up, weight=(1 - UP_SHARE, UP_SHARE) if BACK == "R" else (UP_SHARE, 1 - UP_SHARE))
+    else:
+        r.move(up, UP_T)
     r.set_phase("stand: done")
     if getattr(r, "stage", 0) == 3 and r.standing():
         r.stage = 4
@@ -262,6 +280,7 @@ class Lifter(helper.Helper):
         self.t_up = None
         self.fwd = 0.0
         self.samples, self._sample_t = [], 0.0
+        self.no_pull_down = False
         if GRIP == "elbow":             # under the arms: it holds each upper arm at the elbow, off the elbow's line
             m = rig.model
             self.eq = {s: mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_EQUALITY, "helper.%s.elbow" % s) for s in "LR"}
@@ -330,6 +349,8 @@ class Lifter(helper.Helper):
             own = self.k(s) * (self.anchor(s) - self.x[s]) * fade
             if own[2] > 0.0:                       # it lifts no more than the feet leave uncarried (D-073)
                 own[2] = min(own[2], need / max(1, len(self.hands)) + LIFT_SLACK)
+            elif self.no_pull_down:                # a cradle only carries: it never holds the robot down (docs/48)
+                own[2] = 0.0
             n = np.linalg.norm(own)
             if n > self.cap:
                 own *= self.cap / n
@@ -494,7 +515,7 @@ def table(runs, extra):
 # --- the search over the scripted get-up's parameters (as rise_train.py does for the chair) ---------------------
 # name, default, low, high; angles in degrees (DEG), set on this module (or SHIFT/SWING entries)
 GPARAMS = [
-    ("ARM", -90.0, -160.0, -60.0),
+    ("ARM", -90.0, -160.0, -35.0),
     ("SPINE_LEAN", 10.0, 0.0, 35.0),
     ("RISE_T", 4.0, 2.0, 7.0),
     ("LIFT", 0.45, 0.2, 0.7),
@@ -511,6 +532,8 @@ GPARAMS = [
     ("UP_T", 1.5, 0.8, 4.0),
     ("LIFT_SLACK", 10.0, 0.0, 40.0),
     ("Z_TOP", 0.0, -0.35, 0.0),
+    ("STRIDE", 0.0, 0.0, 0.45),
+    ("UP_SHARE", 0.5, 0.3, 0.8),
 ]
 GDEG = {"ARM", "SPINE_LEAN", "SHIFT.ankle", "SHIFT.knee", "SHIFT.back_hip", "SHIFT.spine", "SWING.0", "SWING.1"}
 

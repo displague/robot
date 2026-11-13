@@ -240,26 +240,37 @@ CURRENT_LIMIT = 0.9              # of the clutch slip torque: the driver's curre
 
 
 class Rig:
-    def __init__(self):
-        xml, winches, links = build()
-        self.model = mujoco.MjModel.from_xml_string(xml)
-        self.data = mujoco.MjData(self.model)
+    def __init__(self, model=None, data=None, prefix="", base=None, winches=None):
+        """A rig on its own model (the default), or one robot of several in a shared model (docs/48): `prefix` is its
+        names' prefix there, `base` its standing place (x, y, yaw), `winches` export_mjcf.build()'s. A rig with a
+        prefix never resets or steps the shared data itself: the first rig's step() runs it (`partners`)."""
+        if model is None:
+            xml, winches, links = build()
+            model = mujoco.MjModel.from_xml_string(xml)
+        self.model = model
+        self.data = mujoco.MjData(self.model) if data is None else data
+        self.prefix, self.base = prefix, base
+        self.partners = []               # other rigs in this model: step() runs their control and their readouts
+        self.on_reset = None             # called at the end of reset() (a shared model: the partners reset after it)
+        self.shared = False              # True: other robots stand on this floor (cop() counts this one's contacts)
         m = self.model
         self.w = []
+        _id = mujoco.mj_name2id
+        mj_name2id = lambda mm, t, n: _id(mm, t, prefix + n)   # noqa: E731
         for name, p, host in winches:
-            jid = mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_JOINT, name)
-            gid = mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_JOINT, name + "_gear")
+            jid = mj_name2id(m, mujoco.mjtObj.mjOBJ_JOINT, name)
+            gid = mj_name2id(m, mujoco.mjtObj.mjOBJ_JOINT, name + "_gear")
             self.w.append(dict(
                 name=name, p=p,
                 q=m.jnt_qposadr[jid], dq=m.jnt_dofadr[jid], gq=m.jnt_qposadr[gid], gdof=m.jnt_dofadr[gid],
-                tA=mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_TENDON, name + "_lineA"),
-                tB=mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_TENDON, name + "_lineB"),
-                tC=mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_TENDON, name + "_clutch"),
-                act=mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_ACTUATOR, name + "_motor"),
-                eq_stick=mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_EQUALITY, name + "_stick"),
-                eq_lock=mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_EQUALITY, name + "_lock"),
-                ddof=m.jnt_dofadr[mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_JOINT, name + "_drum")],
-                dq_=m.jnt_qposadr[mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_JOINT, name + "_drum")],
+                tA=mj_name2id(m, mujoco.mjtObj.mjOBJ_TENDON, name + "_lineA"),
+                tB=mj_name2id(m, mujoco.mjtObj.mjOBJ_TENDON, name + "_lineB"),
+                tC=mj_name2id(m, mujoco.mjtObj.mjOBJ_TENDON, name + "_clutch"),
+                act=mj_name2id(m, mujoco.mjtObj.mjOBJ_ACTUATOR, name + "_motor"),
+                eq_stick=mj_name2id(m, mujoco.mjtObj.mjOBJ_EQUALITY, name + "_stick"),
+                eq_lock=mj_name2id(m, mujoco.mjtObj.mjOBJ_EQUALITY, name + "_lock"),
+                ddof=m.jnt_dofadr[mj_name2id(m, mujoco.mjtObj.mjOBJ_JOINT, name + "_drum")],
+                dq_=m.jnt_qposadr[mj_name2id(m, mujoco.mjtObj.mjOBJ_JOINT, name + "_drum")],
                 lo=m.jnt_range[jid][0], hi=m.jnt_range[jid][1]))
         self.by_name = {w["name"]: w for w in self.w}
         self.lock_enabled = True
@@ -268,22 +279,27 @@ class Rig:
                                          # firmware's would under any other controller (a learned policy, docs/30)
         self.hook = None                 # called after every step (the video recorder)
         self.record_all = False
-        self.pelvis = mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_BODY, "pelvis")
-        self.feet = [mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_BODY, b) for b in ("foot.L", "foot.R")]
-        self.floor = mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_GEOM, "floor")
+        self.pelvis = mj_name2id(m, mujoco.mjtObj.mjOBJ_BODY, "pelvis")
+        self.feet = [mj_name2id(m, mujoco.mjtObj.mjOBJ_BODY, b) for b in ("foot.L", "foot.R")]
+        self.floor = _id(m, mujoco.mjtObj.mjOBJ_GEOM, "floor")
         m.opt.noslip_iterations = NOSLIP
         if FLOOR_MU is not None:
             m.geom_friction[:, 0] = FLOOR_MU
-        self.items = [m.body(b).name[5:] for b in range(m.nbody) if m.body(b).name.startswith("item.")]
+        self.root = int(m.body_rootid[self.pelvis])
+        self.rq = int(m.jnt_qposadr[m.body_jntadr[self.pelvis]])      # the free joint's qpos and dof addresses
+        self.rv = int(m.jnt_dofadr[m.body_jntadr[self.pelvis]])
+        self.items = [] if prefix else [m.body(b).name[5:] for b in range(m.nbody)
+                                        if m.body(b).name.startswith("item.")]
         if self.items:                    # the items (docs/38) rest on the floor too (contact bit 2), not on the robot
             m.geom_conaffinity[self.floor] |= 2
             m.body_conaffinity[m.geom_bodyid[self.floor]] |= 2   # the broad phase filters on the body's bits too
         self.mass = float(sum(m.body_mass[b] for b in range(m.nbody)          # not the chair, the stools or the items
-                              if m.body_mocapid[b] < 0 and not m.body(b).name.startswith("item.")))
+                              if m.body_mocapid[b] < 0 and not m.body(b).name.startswith("item.")
+                              and m.body_rootid[b] in (0, self.root)))
         self.reset()
         mujoco.mj_forward(m, self.data)
         self._feet0 = 0.5 * (self.data.xpos[self.feet[0]][:2] + self.data.xpos[self.feet[1]][:2])
-        j = lambda n: self.data.xanchor[mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_JOINT, n)]
+        j = lambda n: self.data.xanchor[mj_name2id(m, mujoco.mjtObj.mjOBJ_JOINT, n)]
         self.leg = float(np.linalg.norm(j("thigh.L_pitch") - j("foot.L_pitch")))   # hip to ankle, m
         self.thigh_len = float(np.linalg.norm(j("thigh.L_pitch") - j("shank.L_pitch")))
         self.shank_len = float(np.linalg.norm(j("shank.L_pitch") - j("foot.L_pitch")))
@@ -293,11 +309,26 @@ class Rig:
         angle about the ankle axis so the soles are flat and the CoM sits over the sole centre, every gear
         and drum at the angle that pose needs (the robot was homed there)."""
         m, d = self.model, self.data
-        mujoco.mj_resetData(m, d)
         th = -STAND_LEAN
         ankle_z = 0.08
-        d.qpos[0:3] = (0.0, -(0.95 - ankle_z) * math.sin(th), ankle_z + (0.95 - ankle_z) * math.cos(th) + 0.01)
-        d.qpos[3:7] = (math.cos(th / 2), math.sin(th / 2), 0.0, 0.0)
+        if not self.prefix:
+            mujoco.mj_resetData(m, d)
+            d.qpos[0:3] = (0.0, -(0.95 - ankle_z) * math.sin(th), ankle_z + (0.95 - ankle_z) * math.cos(th) + 0.01)
+            d.qpos[3:7] = (math.cos(th / 2), math.sin(th / 2), 0.0, 0.0)
+        else:                            # one of several robots: its own joints only, at its base (x, y, yaw)
+            for j in range(m.njnt):
+                if m.body_rootid[m.jnt_bodyid[j]] == self.root and m.jnt_type[j] != mujoco.mjtJoint.mjJNT_FREE:
+                    d.qpos[m.jnt_qposadr[j]] = m.qpos0[m.jnt_qposadr[j]]
+                    d.qvel[m.jnt_dofadr[j]] = 0.0
+            bx, by, yaw = self.base
+            y0 = -(0.95 - ankle_z) * math.sin(th)
+            d.qpos[self.rq:self.rq + 3] = (bx - y0 * math.sin(yaw), by + y0 * math.cos(yaw),
+                                           ankle_z + (0.95 - ankle_z) * math.cos(th) + 0.01)
+            q = np.zeros(4)
+            mujoco.mju_mulQuat(q, np.array([math.cos(yaw / 2), 0.0, 0.0, math.sin(yaw / 2)]),
+                               np.array([math.cos(th / 2), math.sin(th / 2), 0.0, 0.0]))
+            d.qpos[self.rq + 3:self.rq + 7] = q
+            d.qvel[self.rv:self.rv + 6] = 0.0
         # the ankles start pre-stretched for the standing torque (CoM over the sole centre, 80 mm ahead of the
         # ankle), so the first half second is not a fall onto the lines
         pre = self.torque_to_angle("foot.L_pitch", self.mass * 9.81 * -SOLE_CENTRE[1] / 2)
@@ -351,10 +382,24 @@ class Rig:
             d.eq_active[w["eq_lock"]] = 0
         self._felt_f = (0.0, None)       # the felt weight in the hands, filtered (kg, where)
         self.origin = np.zeros(2)        # planner: where scenes place the chair and stools from (the start: zero)
-        self.set_wind(WIND)
-        self.set_chair(None)
-        for k in range(len([1 for b in range(m.nbody) if m.body(b).name.startswith("stool.")])):
-            self.place_stool(k, None)
+        if not self.prefix:              # the wind, the chair and the stools are the first rig's
+            self.set_wind(WIND)
+            self.set_chair(None)
+            for k in range(len([1 for b in range(m.nbody) if m.body(b).name.startswith("stool.")])):
+                self.place_stool(k, None)
+        else:
+            self.wind = None
+        if self.on_reset:
+            self.on_reset(self)
+
+    def loc(self, p):
+        """A world vector in this rig's heading frame (forward -y, left +x). The first rig's is the world's."""
+        if not self.base or not self.base[2]:
+            return p
+        c, s = math.cos(self.base[2]), math.sin(self.base[2])
+        out = np.array(p, dtype=float)
+        out[0], out[1] = c * p[0] + s * p[1], -s * p[0] + c * p[1]
+        return out
 
     def to_stand(self, t=1.5, hold=1.5):
         """Hand back a quiet two-footed stand between skills (docs/38): the planner's swing and support flags off,
@@ -386,11 +431,11 @@ class Rig:
 
     def com_est(self):
         """The balance loop's CoM: the robot's own, plus the felt weight in the hands at the grips (FEEL_LOAD)."""
-        com = self.data.subtree_com[self.pelvis]
+        com = self.loc(self.data.subtree_com[self.pelvis])
         kg, at = getattr(self, "_felt_f", (0.0, None))
         if kg <= 0.05 or at is None:
             return com
-        return (self.mass * com + kg * at) / (self.mass + kg)
+        return (self.mass * com + kg * self.loc(at)) / (self.mass + kg)
 
     def _felt_update(self):
         """Low-pass the felt weight (FEEL_TAU), as a load cell's filter would: the grip force swings with the bag."""
@@ -496,7 +541,7 @@ class Rig:
         out = []
         dt = self.model.opt.timestep
         for i, (b, load) in enumerate(zip(self.feet, loads)):
-            c = d.xpos[b] + d.xmat[b].reshape(3, 3) @ np.array(SOLE_CENTRE)
+            c = self.loc(d.xpos[b] + d.xmat[b].reshape(3, 3) @ np.array(SOLE_CENTRE))
             if update:
                 thr = (GROUND_LOAD if self._grounded[i] else 3 * GROUND_LOAD) * self.mass * 9.81
                 self._unload_t[i] = self._unload_t[i] + dt if load <= thr else 0.0
@@ -532,6 +577,8 @@ class Rig:
             other = c.geom2 if c.geom1 == self.floor else c.geom1
             if m.geom_contype[other] & 2:                  # an item on the floor (docs/38), not the robot
                 continue
+            if self.shared and m.body_rootid[m.geom_bodyid[other]] != self.root:   # another robot's (docs/48)
+                continue
             mujoco.mj_contactForce(m, d, i, f6)
             fn = f6[0]
             num += fn * c.pos[:2]
@@ -539,7 +586,7 @@ class Rig:
             for k, b in enumerate(self.feet):
                 if m.geom_bodyid[other] == b:
                     loads[k] += fn
-        return (num / den if den > 1.0 else None), loads
+        return (self.loc(num / den) if den > 1.0 else None), loads
 
     def balance_loop(self):
         """Balance from the CoM estimate (IMU + joint sensors on the robot; the simulator here). Sagittal:
@@ -619,7 +666,7 @@ class Rig:
         self.cop_cmd = ref + (p_x, p_y)
         # --- sagittal: ankle pitch torque for that CoP, shared by the grounded ankles, as a line-stretch angle.
         # CoP forward of the ankle (-Y) needs plantarflexion torque; +q is plantarflexion (toes down).
-        ankle_y = np.mean([d.xpos[b][1] for b, (c, on) in zip(self.feet, s) if on])
+        ankle_y = np.mean([self.loc(d.xpos[b])[1] for b, (c, on) in zip(self.feet, s) if on])
         # shared by the feet by where the CoM sits between the soles (statically that is each foot's load). A
         # lightly loaded foot asked for half the torque rocks onto its toe and pushes the body; sharing by the
         # measured load feeds back (the loaded foot pushes itself off, the load slams across at 2 Hz); sharing
@@ -653,7 +700,7 @@ class Rig:
         want_x = ref[0] + p_x
         for side, b, (c, on), load in zip("LR", self.feet, s, loads):
             if single and on and SS_ANKLE_TORQUE:
-                dx = max(-COP_LIMIT_X, min(COP_LIMIT_X, (ref[0] + p[0]) - d.xpos[b][0]))
+                dx = max(-COP_LIMIT_X, min(COP_LIMIT_X, (ref[0] + p[0]) - self.loc(d.xpos[b])[0]))
                 self.ankle_roll[side] = self.torque_to_angle("foot.%s_roll" % side, mass * 9.81 * dx)
             else:
                 self.ankle_roll[side] = None     # position mode: the parallelogram, or the swing foot held level
@@ -886,7 +933,24 @@ class Rig:
             self.blow()
         if GRIP_DAMP and self.items:
             self._grip_damp()
+        for p in self.partners:          # the other robots in this model (docs/48): their controllers, then one step
+            p.pre_step()
         mujoco.mj_step(m, d)
+        self.readout(record)
+        for p in self.partners:
+            p.readout(False)
+        if self.hook:
+            self.hook(self)
+
+    def pre_step(self):
+        """A partner rig's part of a step before the physics: its policy (`script`, if set), then its drives."""
+        if getattr(self, "script", None):
+            self.script(self)
+        self.control()
+
+    def readout(self, record=False):
+        """The per-step readouts of this rig's lines, clutches and motors."""
+        m, d = self.model, self.data
         self.steps += 1
         dt = m.opt.timestep
         row = [d.time]
@@ -923,8 +987,6 @@ class Rig:
                 row += [fA, fB, tq]
         if record or self.record_all:
             self.rows.append(row)
-        if self.hook:
-            self.hook(self)
 
     def run(self, seconds, record=False):
         for _ in range(int(round(seconds / self.model.opt.timestep))):

@@ -1,0 +1,109 @@
+{
+ "note": "docs/48, D-075, D-076: two robots, robot B the helper of robot A's get-up from a half-kneel (tools/duo.py). Each set holds getup.GPARAMS (angles in degrees), B's place BASE_Y and duo's constants (B.*), and cfg.take: the first phase of duo.ORDER in which B may take A's arms. Run with: python tools/duo.py --one --params sim/duo_params.json:standup",
+ "standup": {
+  "source": "sim/out/duo_6, the search's mean after 22 generations (3 jittered runs per candidate, take 7)",
+  "jitter": "both stand, B having held A: 19 of 24 under 2% jitter (B 24 of 24); from the foot's landing (take 6) 18 of 24; with B standing by (take 99) A stands 7 of 24",
+  "cfg": {
+   "take": 7
+  },
+  "params": {
+   "ARM": -69.53961276028579,
+   "SPINE_LEAN": 2.6305669175550466,
+   "RISE_T": 4.036752596306599,
+   "LIFT": 0.5917312173863398,
+   "LIFT_FWD": 0.1586804334696203,
+   "SHIFT.ankle": -18.96333078003745,
+   "SHIFT.knee": 22.480883291399326,
+   "SHIFT.back_hip": 8.757875850706279,
+   "SHIFT.spine": 28.91280371640886,
+   "SHIFT_FWD": 0.06285522954263022,
+   "SWING.0": 74.95458581121085,
+   "SWING.1": -22.389550184242964,
+   "SWING_T": 0.7362516484276547,
+   "PLANT_T": 0.607964172516265,
+   "UP_T": 0.8191293963427377,
+   "LIFT_SLACK": 23.05207504445142,
+   "Z_TOP": -0.11922947708895121,
+   "STRIDE": 0.3918008688946387,
+   "UP_SHARE": 0.4803560713180632,
+   "BASE_Y": -0.6268773763596978,
+   "B.REACH": 0.3069401724583052,
+   "B.F_RES": 25.784499153764745,
+   "B.Z_LOW": 1.0618121475350981,
+   "B.PERCH_FWD": 0.08909792428727555,
+   "B.PERCH_Z": 1.1302568477660448,
+   "B.PERCH_T": 2.8534956508148737,
+   "B.B_FOREARM": -87.3510362927729
+  }
+ },
+ "land": {
+  "source": "sim/out/duo_5, the curriculum's level 6 (take from the foot's landing)",
+  "jitter": "10 of 24 (B 24 of 24); taken at the stand-up 12 of 24; with B standing by A stands 23 of 24",
+  "cfg": {
+   "take": 6
+  },
+  "params": {
+   "ARM": -63.68430308007383,
+   "SPINE_LEAN": 6.16590478596962,
+   "RISE_T": 4.3431810495786864,
+   "LIFT": 0.5149239097744949,
+   "LIFT_FWD": 0.18299835678832432,
+   "SHIFT.ankle": -19.463432610552974,
+   "SHIFT.knee": 19.82857979179014,
+   "SHIFT.back_hip": 9.206740895188087,
+   "SHIFT.spine": 29.816117219020704,
+   "SHIFT_FWD": 0.07742226232734235,
+   "SWING.0": 75.26776636638822,
+   "SWING.1": -19.782774450228406,
+   "SWING_T": 0.7819539017381362,
+   "PLANT_T": 0.6389041010432723,
+   "UP_T": 1.1728847774202877,
+   "LIFT_SLACK": 26.303820755756625,
+   "Z_TOP": -0.14220879257305466,
+   "STRIDE": 0.34864674343652,
+   "BASE_Y": -0.6213565485278056,
+   "B.REACH": 0.3111849597803586,
+   "B.F_RES": 26.259029027053014,
+   "B.Z_LOW": 1.0426620869534629,
+   "B.PERCH_FWD": 0.09681785514726292,
+   "B.PERCH_Z": 1.1129349996730604,
+   "B.PERCH_T": 2.7082770965747227,
+   "B.B_FOREARM": -80.0
+  }
+ },
+ "plant": {
+  "source": "sim/out/duo_5, the curriculum's level 5 (take from the foot's planting), passed at generation 13",
+  "jitter": "4 of 24 (B 20 of 24); B carries 25% of the impulse",
+  "cfg": {
+   "take": 5
+  },
+  "params": {
+   "ARM": -61.0102226137123,
+   "SPINE_LEAN": 7.92059024541535,
+   "RISE_T": 4.264417015359973,
+   "LIFT": 0.5091057816359568,
+   "LIFT_FWD": 0.2000129615231575,
+   "SHIFT.ankle": -19.78265736359289,
+   "SHIFT.knee": 20.490550314201123,
+   "SHIFT.back_hip": 10.847512263472709,
+   "SHIFT.spine": 27.393550585930576,
+   "SHIFT_FWD": 0.11690395241224366,
+   "SWING.0": 71.31443064926846,
+   "SWING.1": -26.394640833173586,
+   "SWING_T": 0.8097191966351791,
+   "PLANT_T": 0.6239338464463529,
+   "UP_T": 0.8975519133049672,
+   "LIFT_SLACK": 26.543327669882046,
+   "Z_TOP": -0.11878732297393368,
+   "STRIDE": 0.3666467069841946,
+   "BASE_Y": -0.6141666650475887,
+   "B.REACH": 0.295564695692631,
+   "B.F_RES": 29.998652394048012,
+   "B.Z_LOW": 1.0314493508176221,
+   "B.PERCH_FWD": 0.10736760499908023,
+   "B.PERCH_Z": 1.15175880509171,
+   "B.PERCH_T": 2.948556330895925,
+   "B.B_FOREARM": -79.95635515220887
+  }
+ }
+}
