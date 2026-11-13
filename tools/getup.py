@@ -661,8 +661,10 @@ def jitter_test(path, key, n, jobs, grip=None):
     import multiprocessing as mp
     d = json.load(open(path))
     p = d[key]["params"] if "params" in d[key] else d[key]
+    # the helper's settings: a search's best.json has them as `cfg`; sim/getup_params.json per set, as `helper`
+    cfg = d[key].get("cfg") or d[key].get("helper") or d["cfg"]
     with mp.get_context("spawn").Pool(jobs, maxtasksperchild=4) as pool:
-        rs = pool.map(grun, [(p, d["cfg"], 1000 + i) for i in range(n)], chunksize=1)
+        rs = pool.map(grun, [(p, cfg, 1000 + i) for i in range(n)], chunksize=1)
     worst = [max(r["arm_on"].values() or [0.0]) for r in rs]
     print("%s %s: %d of %d stand (jitter %.0f%%); impulse %.0f N s mean; worst arm line %.2fx max; stage %s"
           % (path, key, sum(r["stood"] for r in rs), n, 100 * JITTER, np.mean([r["impulse"] for r in rs]), max(worst),

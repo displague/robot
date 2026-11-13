@@ -1125,3 +1125,34 @@ because its reference list cannot be changed after creation. docs/references.md 
 - What limits it: B's spine. Its clutch slips at 1.03 of the rating, so B cannot bow or reach under load: it stands
   close, feet apart, and carries beside its body (D-076).
 - Recording: docs/img/duo.gif. Parameters: `sim/duo_params.json`.
+
+## P-074 (2026-11-13) Continue; capture skills; fix what is fundamental; a spoken coach in the sibling; ideas from the hub; thoughts
+
+> Continue, capturing any skills, fixing any fundamental issues, and let's work with the sibling project, ai-embedded-dynamic-diversity, to get mutual benefits. In the sibling project, perhaps the stages should come with another form of support - binaural audio instruction, a heard "stand up" or "get up" or "come here" along with spoken instruction as a physical trainer may offer -- hands off guidance. This could be in additionor instead of the helping hands peers.
+>
+> There may be some other inspirations (including external developments) held in agenthub not yet applied here. And some may not have been captured here at all yet.
+>
+> Moreover, as a stronger model, this has been your first run-through on the project, what are your thoughts? What directions would you propose?
+
+- docs/49, D-077, D-078.
+- **The sibling** (its issue #66, PR #67): `rl/coach.py`. A coach's voice heard through two ears (words as
+  syllables over 8 frequency bands, head shadow, noise, the time difference between the ears), and a helper's hands
+  that lift the trunk, fade as helped episodes succeed, and may quit part-way.
+  - Plain MLP, half-kneel, 800 iterations, one seed each, rise without help: no support 48%; hands fading early
+    47%, with 11 of 64 runs ended by an overloaded line against 34, and the helper fully withdrawn in training; hands
+    fading late 22% (the policy leaned on them); voice cues 38%, unused.
+  - Not achieved: obeying a spoken command. Asked to wait for "get up", the policy ends up never rising, twice.
+- **This repo, for the sibling:** ear sites on the head of both models (`export_mjcf.EARS`) and their position
+  sensors on the stand-in.
+- **Fundamental:** `tools/regress.py` and `sim/baseline.json`, a regression gate (models current, 14 scenes, and
+  with `--more` the get-up and two-robot jitter counts). Its first run found that `Rig.reset()` left the drum locks
+  off after the weight-shift and one-foot scenes, so later scenes in one process ran without locks. Fixed; no
+  outcome changed, energies of the step, walk and chair move by up to about 1%. `getup.py --jitter-test` now reads
+  the committed parameter file.
+- **Ideas:** docs/49 has the table (applied: the helper that may give out, impulse and unassisted success as the two
+  signals, a fading lift; queued as hub tasks: balance measures for the critic and a two-stage get-up, one policy
+  with skills chosen by word).
+- **Thoughts and directions:** docs/49's last section. First a one-drive bench rig (hub task for the owner,
+  `bench-rig-one-drive-decision`), then closing the stand-in to tendon gate, then a body revision study.
+- Skills: `tendon-sim` (the regression gate; ears, voice and hands), `project-loop` (the gate before a commit, the
+  stand-in as a contract with the sibling).

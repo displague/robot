@@ -151,6 +151,8 @@ def use_motor_case(spec):
 
 use_motor_case(MOTOR_SET)   # at import too: export_standin and wmax_options call winch_params without build()
 HIP_ROLL_60 = True   # hip roll on the 60 mm pulley with tackle 3 (D-028, docs/15); False restores the 50 mm, tackle 2 of docs/14
+EARS = {"L": (0.075, 0.0, 0.09), "R": (-0.075, 0.0, 0.09)}   # m in the head's frame: two microphones 0.15 m apart
+                                                              # (docs/42, docs/49); forward is -y, +x the robot's left
 TACKLE_OVERRIDE = {}  # "joint.axis" -> strands at the joint, over JOINTS (e.g. {"ankle.pitch": 6}; docs/27)
 CHAIR_GEOMS = {"chair_seat": (0.23, 0.20, 0.30), "chair_arm.L": (0.03, 0.17, 0.10),   # half sizes, m; placed by
                "chair_arm.R": (0.03, 0.17, 0.10), "chair_back": (0.23, 0.02, 0.25)}     # sim_tendon.Rig.set_chair
@@ -335,6 +337,10 @@ def mjcf(links, data):
                 out.append(winch_body_xml(pad, name, p, pos))
         for c in children.get(l["name"], []):
             out.extend(body(c, indent + 1))
+        if l["name"] == "head":
+            for side, e in EARS.items():
+                out.append('%s  <site name="ear.%s" pos="%.4f %.4f %.4f" size="0.012" rgba="0.2 0.5 0.9 1"/>\n'
+                           % ((pad, side) + e))
         if (ITEMS or HELPER) and l["name"] in GRIP_HANDS:
             g = sub(l["tail"], l["head"])
             out.append('%s  <site name="grip.%s" pos="%.4f %.4f %.4f" size="0.008"/>\n' % ((pad, l["name"]) + tuple(g)))

@@ -61,6 +61,7 @@ The docs (design notes and experiments, one per topic) are indexed with a summar
 | `tools/getup.py`, `sim/getup_params.json`, `docs/img/getup.gif` | Getting up from a half-kneel on the full model: the start, the scripted rise and step, the get-up's helper holding the upper arms, and its jittered and fading parameter search (docs/46) |
 | `tools/role_flip.py` | The role flip's statics: could a second robot carry docs/46's helper forces, posture searched per sample, joints against their ratings, CoP in its feet (docs/47) |
 | `tools/duo.py`, `tools/duo_video.py`, `sim/duo_params.json`, `docs/img/duo.gif` | Two robots in one model: the second attached under a prefix, a rig each on the shared data, robot B's posture solver and balance under load, the handover from the scripted helper, and the joint search with a curriculum on the takeover (docs/48) |
+| `tools/regress.py`, `sim/baseline.json` | The regression gate: the generated models are current, every gauntlet scene's outcome, flags and energy against the baseline, and with `--more` the get-up and two-robot jitter counts (docs/49) |
 | `tools/rise_train.py`, `sim/rise_params.json`, `docs/img/rise35.gif` | Training the chair rise's parameters on the full model by cross-entropy search, with the helper faded as curriculum; the trained sets; the 0.35 m rise with no helper (docs/45) |
 | `docs/decisions.md` | Decision log (what we chose and why; revisit when a test disagrees) |
 | `docs/prompt-log.md` | Every prompt that produced a set of work, verbatim, with what it produced |

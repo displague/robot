@@ -385,6 +385,38 @@ against the unassisted rise window (the elbows run 1.42x their rating there) and
 - `--pose t` prints one sample's pose.
 - Lesson: the arm's wrist and elbow drives (0.66 and 3.8 N m) cannot carry a lift; contact near the elbow can.
 
+## The regression gate (docs/49, D-078)
+
+`python tools/regress.py` answers "did this change move anything?" in about 2 minutes on 12 processes. Run it
+before every commit that touches `sim_tendon.py`, an exporter, `cad/skeleton.json` or a drive constant.
+
+- It checks that `sim/robot.xml` and `sim/robot_standin.xml` are what the exporters write today, then runs each
+  gauntlet scene in its own process and compares outcome, flags and energy (within 2%) with `sim/baseline.json`.
+- `--more` adds the get-up with the scripted helper and with a robot helper, as counts of 24 jittered runs
+  (within 2 runs of the baseline; about 15 minutes).
+- `--only walk,sit45` runs some scenes. `--update` rewrites the baseline: only after a change that is meant to move
+  it, and say what moved in the commit and the doc.
+- A scene must not depend on what ran before it. `Rig.reset()` restores every switch a scene may flip
+  (`lock_enabled`, the balance loop's memories, the lock friction). When a scene adds a new switch on the rig,
+  reset it there too, and check with a fresh rig against a used one (docs/49 has the method).
+- `getup.py --jitter-test sim/getup_params.json:firm` and `duo.py --jitter-test sim/duo_params.json:standup` read
+  the committed parameter files directly (with `GETUP_GRIP=elbow`).
+
+## Ears, a coach's voice and a helper's hands in training (docs/49, D-077)
+
+- Both models have two ear sites on the head (`export_mjcf.EARS`, 0.15 m apart); the stand-in also has `ear.L_pos`
+  and `ear.R_pos` sensors.
+- The sibling's `rl/coach.py` renders a coach's words to those ears as band energies (`--coach voice`) and runs a
+  fading helper as a lift on the trunk (`--help-cap 0.6`). Both are for the stand-in's `getup` task:
+  `python -m ai_embedded_dynamic_diversity.rl.cli train --task getup --getup-start curriculum --arch mlp
+  --coach voice --coach-wait 0.5,12 --help-cap 0.6`.
+- `rl.getup_eval <policy> [--guide 0] [--wait 0.5,12] [--mute]` is the unassisted test: never with the hands, with
+  the voice as trained unless overridden.
+- What worked (docs/49): `--help-cap 0.6 --help-free 0.5 --help-fade-at 0.35`. What did not: a late fade (the policy
+  leans on the helper), spoken cues (unused), and waiting for the spoken command (0%). The sibling's
+  `skills/grounded-rl/SKILL.md` has the rules.
+- If `EARS` moves, re-export the stand-in; policies trained with the voice depend on the ear spacing.
+
 ## Two robots in one model (docs/48, D-075, D-076)
 
 - `duo.Duo()` builds the pair: robot A as before (no prefix, so `getup.py` and `helper.py` run on it unchanged) and

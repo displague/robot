@@ -25,7 +25,12 @@ description: How work is recorded in the robot repo (prompt log, one commit per 
    learned control (`rl/`). Work there in a new worktree from master and follow its
    `skills/dev-loop/SKILL.md` (issue, PR, squash merge; merges and releases are permitted). Its venv has
    MuJoCo and CUDA torch: `PYTHONPATH=src ROBOT_REPO=../robot ../ai-embedded-dynamic-diversity/.venv/Scripts/python.exe`.
-8. **Agent Hub** (https://ah.meyu.us/, workspace `robot`): next steps are hub tasks; claim before
+   Stand-in changes (`tools/export_standin.py`) are a contract with the sibling: add sensors and spec keys, do not
+   rename or reorder joints, and run the sibling's `tests/test_rl_*.py` against the new export before committing.
+8. **Before a commit that touches the simulation** (`sim_tendon.py`, an exporter, the skeleton, a drive constant):
+   `python tools/regress.py` (D-078). If it reports a move that was not meant, fix it; if it was meant, `--update`
+   and say what moved.
+9. **Agent Hub** (https://ah.meyu.us/, workspace `robot`): next steps are hub tasks; claim before
    working, finish with an honest result (what passed, what did not, commits). Findings are records
    tagged `project:robot`.
 

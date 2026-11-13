@@ -1,0 +1,112 @@
+{
+ "gauntlet": {
+  "arm": {
+   "energy_j": 241.4,
+   "flags": "hand.L_pitch above continuous rating; hand.L_pitch line safety factor 3.1 < 4",
+   "outcome": "STANDS",
+   "pelvis_m": 0.932,
+   "t_s": 7.5
+  },
+  "gust": {
+   "energy_j": 74.2,
+   "flags": "none",
+   "outcome": "STANDS",
+   "pelvis_m": 0.914,
+   "t_s": 15.0
+  },
+  "lean15": {
+   "energy_j": 54.2,
+   "flags": "none",
+   "outcome": "STANDS",
+   "pelvis_m": 0.927,
+   "t_s": 7.5
+  },
+  "onefoot": {
+   "energy_j": 562.0,
+   "flags": "hand.R_roll above continuous rating; hand.R_roll line safety factor 3.6 < 4",
+   "outcome": "STANDS",
+   "pelvis_m": 0.917,
+   "t_s": 21.5
+  },
+  "push10": {
+   "energy_j": 19.3,
+   "flags": "none",
+   "outcome": "STANDS",
+   "pelvis_m": 0.926,
+   "t_s": 4.7
+  },
+  "push20": {
+   "energy_j": 28.7,
+   "flags": "none",
+   "outcome": "STANDS",
+   "pelvis_m": 0.926,
+   "t_s": 4.7
+  },
+  "push30": {
+   "energy_j": 34.1,
+   "flags": "none",
+   "outcome": "STANDS",
+   "pelvis_m": 0.926,
+   "t_s": 4.7
+  },
+  "push40": {
+   "energy_j": 43.6,
+   "flags": "none",
+   "outcome": "STANDS",
+   "pelvis_m": 0.927,
+   "t_s": 4.7
+  },
+  "shift": {
+   "energy_j": 43.2,
+   "flags": "hand.R_roll above continuous rating",
+   "outcome": "STANDS",
+   "pelvis_m": 0.922,
+   "t_s": 6.5
+  },
+  "sit45": {
+   "energy_j": 835.7,
+   "flags": "forearm.L_pitch above continuous rating",
+   "outcome": "STANDS",
+   "pelvis_m": 0.927,
+   "t_s": 20.7
+  },
+  "squat": {
+   "energy_j": 25.2,
+   "flags": "none",
+   "outcome": "STANDS",
+   "pelvis_m": 0.896,
+   "t_s": 6.5
+  },
+  "stand": {
+   "energy_j": 12.3,
+   "flags": "none",
+   "outcome": "STANDS",
+   "pelvis_m": 0.926,
+   "t_s": 4.0
+  },
+  "step": {
+   "energy_j": 532.8,
+   "flags": "foot.L_pitch line safety factor 4.0 < 4",
+   "outcome": "STANDS",
+   "pelvis_m": 0.919,
+   "t_s": 46.3
+  },
+  "walk": {
+   "energy_j": 1129.6,
+   "flags": "foot.L_pitch line safety factor 4.0 < 4",
+   "outcome": "STANDS",
+   "pelvis_m": 0.919,
+   "t_s": 90.2
+  }
+ },
+ "more": {
+  "duo_standup": {
+   "count": 19,
+   "of": 24
+  },
+  "getup_firm": {
+   "count": 24,
+   "of": 24
+  }
+ }
+}

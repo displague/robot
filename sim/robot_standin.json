@@ -7,6 +7,10 @@
   "foot.R"
  ],
  "imu_site": "imu",
+ "ears": [
+  "ear.L",
+  "ear.R"
+ ],
  "outer_loop": {
   "kq": 0.5,
   "ki": 2.0,
@@ -769,6 +773,6 @@
    "hi": 0.3490658503988659
   }
  ],
- "sensors": "pelvis_quat 4, pelvis_gyro 3, pelvis_acc 3, <foot>_touch per foot, <body>_impact per impact body, <dof>_tau per DOF (actuator torque), <dof>_stop per DOF (joint-stop force), com_vel 3 (whole-body CoM velocity)",
+ "sensors": "pelvis_quat 4, pelvis_gyro 3, pelvis_acc 3, <foot>_touch per foot, <body>_impact per impact body, <dof>_tau per DOF (actuator torque), <dof>_stop per DOF (joint-stop force), com_vel 3 (whole-body CoM velocity), ear.L_pos and ear.R_pos 3 each (the ears' world positions)",
  "notes": "kp: line loop stiffness, both runs taut; kv: motor back-EMF + line damping; torque_max: clutch slip at the joint; line force for a joint torque tau: pretension + |tau| / (2 moment_arm) while |tau| < linear_torque, else |tau| / moment_arm"
 }

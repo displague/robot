@@ -960,3 +960,45 @@ Why: P-073, docs/48. Each rule came from a run that failed:
 Alternative: a helper that steps back as the other rises (it cannot step while loaded yet); a stronger spine drive
 or a 2:1 tackle on it, at mass in the trunk.
 Reverses if: the helper can step under load, or the spine's drive is upsized.
+
+## D-077 (2026-11-13) A coach speaks to the learned policy through two ears; sound is band energies, and the ears are on the stand-in
+
+Why: P-074, docs/49. The owner asked for a hands-off form of support in the sibling's training stages: a heard
+"stand up", "get up" or "come here" and spoken instruction, as a physical trainer gives, with or instead of the
+helping hands.
+- **Words, not a command vector.** The coach's words reach the policy as sound at two ears, so the same channel
+  later carries anything else that makes sound (the robot's own contacts, another robot), and direction comes with it.
+- **Band energies at the control rate.** A word is a sequence of syllables, each a pattern over 8 frequency bands;
+  each ear gets spreading, the head's shadow, ambient noise and the robot's own drive noise, and the time difference
+  between the ears is one more channel, and an echo of the last second eight more. No waveform is synthesised: at 50 Hz a policy could not use one, and a
+  microphone front end on an ESP32 would deliver band energies anyway.
+- **The ears belong to the body.** `export_mjcf.EARS` puts two sites on the head of both models, 0.15 m apart, with position
+  sensors. The sibling's `rl/coach.py` renders to them, and falls back to head height above the root on a body
+  without ears.
+- **Both supports are withdrawn.** The cues are given on a share of episodes, and the hands fade and may quit
+  part-way (the owner's point of 2026-11-11, hub record `marques-withdrawal-laws-response-20261111`). The test is
+  `rl.getup_eval`: never with the hands, and with the voice reduced to the command or muted.
+
+Alternative: a one-hot command in the observation (simpler, but it is not hearing, and it carries no direction);
+waveforms through a learned front end; SoundSpaces room acoustics (docs/42), once a room matters.
+Reverses if: real microphones on a printed head show the band model misleads (the drive noise is the likely place).
+The first test already went against the memoryless policy: it did not learn to wait for the word (docs/49), so
+the next policy that listens is recurrent.
+
+## D-078 (2026-11-13) A reset restores every switch a scene flipped; changes are judged by tools/regress.py against sim/baseline.json
+
+Why: P-074, docs/49. Building a baseline showed that one gauntlet scene gave different numbers alone and after
+others (the 0.45 m chair: 835.7 J alone, 841.5 J in the full gauntlet, with a different flagged forearm). The
+weight-shift and one-foot scenes turn the drum locks off, and `Rig.reset()` did not turn them on again, so every
+later scene in the same process ran without locks.
+- `Rig.reset()` now restores `lock_enabled`, the balance loop's memories and the lock friction. A caller that wants
+  locks off sets it after `reset()`.
+- `tools/regress.py` runs each scene in its own process against `sim/baseline.json` (outcome, flags, energy within
+  2%), checks the generated models are current, and with `--more` the get-up and two-robot jitter counts.
+- Published numbers from before today that came from a full gauntlet run may differ by up to about 1% in energy for
+  the step, the walk and the chair. None changed its outcome.
+
+Alternative: keep comparing printed tables by eye (what P-073 did); a pytest suite (heavier than this repo needs
+while one command covers it).
+Reverses if: the gauntlet grows past what one command can run in a few minutes; then it moves to CI on a runner
+with MuJoCo.

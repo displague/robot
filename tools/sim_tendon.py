@@ -382,7 +382,14 @@ class Rig:
             d.eq_active[w["eq_lock"]] = 0
         self._felt_f = (0.0, None)       # the felt weight in the hands, filtered (kg, where)
         self.origin = np.zeros(2)        # planner: where scenes place the chair and stools from (the start: zero)
-        if not self.prefix:              # the wind, the chair and the stools are the first rig's
+        # nothing a scene switched may outlast it (docs/49): the shift and one-foot scenes turn the drum locks off,
+        # and every scene after them in one process then ran without locks. Callers that want them off set it
+        # after reset()
+        self.lock_enabled = True
+        self._e_prev, self._ss_i = None, None
+        for w in self.w:
+            m.dof_frictionloss[w["gdof"]] = 0.0
+        if not self.prefix:            # the wind, the chair and the stools are the first rig's
             self.set_wind(WIND)
             self.set_chair(None)
             for k in range(len([1 for b in range(m.nbody) if m.body(b).name.startswith("stool.")])):

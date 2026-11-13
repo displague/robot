@@ -42,7 +42,8 @@ from export_urdf import expand, sub, WORLD_AXIS, FOOT_BOX, FOOT_OFFSET     # noq
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 IMPACT_BODIES = ("head", "spine", "pelvis")   # touch sensors for falls: the shell parts that take impacts
-KV_SCALE = 0.1           # of the back-EMF damping: the motor's damping acts on the gear, behind the line spring
+EARS = em.EARS            # two ear sites on the head, as on the tendon model
+KV_SCALE = 0.1          # of the back-EMF damping: the motor's damping acts on the gear, behind the line spring
 TIMECONST = 0.03         # s: first-order lag of the servo's target (the gear's travel and the inner loop)
 CTRL_MARGIN = 0.5        # rad beyond the joint range the servo target may go (the outer loop's trim)
 JOINT_ARMATURE = 0.01     # kg m^2 at the joint: the motor's inertia sits behind the line spring in the real
@@ -99,6 +100,10 @@ def standin(links, data):
             out.append('%s  <site name="%s_sole" type="box" size="%.4f %.4f 0.006" pos="%.4f %.4f %.4f"/>\n'
                        % (pad, l["name"], FOOT_BOX[0] / 2, FOOT_BOX[1] / 2, FOOT_OFFSET[0], FOOT_OFFSET[1],
                           FOOT_OFFSET[2] - FOOT_BOX[2] / 2))
+        if l["name"] == "head":
+            for side, e in EARS.items():
+                out.append('%s  <site name="ear.%s" pos="%.4f %.4f %.4f" size="0.012" rgba="0.2 0.5 0.9 1"/>\n'
+                           % ((pad, side) + e))
         if l["name"] in IMPACT_BODIES:
             # an impact sensor around the printed shell: a touch site a little larger than the shell
             kind, dim = em.SHELL[l["base"]]
@@ -136,7 +141,9 @@ def standin(links, data):
                + ['    <actuatorfrc name="%s_tau" actuator="%s"/>\n' % (d["name"], d["name"]) for d in dofs]
                + ['    <jointlimitfrc name="%s_stop" joint="%s"/>\n' % (d["name"], d["name"]) for d in dofs]
                # the whole body's CoM velocity: the drums' stillness gate (docs/30) reads it, as the tendon model's
-               + ['    <subtreelinvel name="com_vel" body="pelvis"/>\n'])
+               + ['    <subtreelinvel name="com_vel" body="pelvis"/>\n']
+               # the ears' world positions, for a training loop that renders sound to them (docs/49)
+               + ['    <framepos name="ear.%s_pos" objtype="site" objname="ear.%s"/>\n' % (e, e) for e in EARS])
     out = ['<mujoco model="tendon_humanoid_standin">\n',
            '  <compiler angle="radian"/>\n',
            '  <option timestep="0.005" gravity="0 0 -9.81" integrator="implicitfast"/>\n',
@@ -182,9 +189,9 @@ def main():
     with open(os.path.join(ROOT, "sim", "robot_standin.xml"), "w") as f:
         f.write(xml)
     spec = dict(model="sim/robot_standin.xml", source="tools/export_standin.py", timestep=0.005,
-                feet=feet, imu_site="imu", outer_loop=outer_loop(dofs), locks=locks(dofs), impact_bodies=list(IMPACT_BODIES), dofs=dofs,
+                feet=feet, imu_site="imu", ears=["ear.%s" % e for e in EARS], outer_loop=outer_loop(dofs), locks=locks(dofs), impact_bodies=list(IMPACT_BODIES), dofs=dofs,
                 sensors="pelvis_quat 4, pelvis_gyro 3, pelvis_acc 3, <foot>_touch per foot, <body>_impact per "
-                        "impact body, <dof>_tau per DOF (actuator torque), <dof>_stop per DOF (joint-stop force), com_vel 3 (whole-body CoM velocity)",
+                        "impact body, <dof>_tau per DOF (actuator torque), <dof>_stop per DOF (joint-stop force), com_vel 3 (whole-body CoM velocity), ear.L_pos and ear.R_pos 3 each (the ears' world positions)",
                 notes="kp: line loop stiffness, both runs taut; kv: motor back-EMF + line damping; torque_max: "
                       "clutch slip at the joint; line force for a joint torque tau: pretension + |tau| / (2 "
                       "moment_arm) while |tau| < linear_torque, else |tau| / moment_arm")
