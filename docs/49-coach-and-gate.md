@@ -1,6 +1,6 @@
 ---
 title: "49 - A coach's voice and fading hands in training; ears on the model; a regression gate (P-074, D-077, D-078)"
-summary: "The sibling's get-up stages gain a coach (its PR #67): a voice heard through two ears and a helper's hands that fade and may quit. A helper that fades early leaves the unassisted rise as good as training alone (47% against 48%) with a third as many overloaded lines; one that fades late leaves a policy that needs it (22%). Spoken cues went unused, and obeying a spoken command was not learned. Both models get ears. A new regression gate (tools/regress.py) found that Rig.reset() left the drum locks off after two scenes; fixed. Ends with a view of the project and six proposed directions"
+summary: "The sibling's get-up stages gain a coach (its PR #67): a voice heard through two ears and a helper's hands that fade and may quit. Over three seeds a helper that fades early is withdrawn in training every time and leaves the unassisted rise a little below training alone (46% against 52%); one that fades late leaves a policy that needs it (22%, one seed). Spoken cues went unused, and obeying a spoken command was not learned. Both models get ears. A new regression gate (tools/regress.py) found that Rig.reset() left the drum locks off after two scenes; fixed. Ends with a view of the project and six proposed directions"
 section: "Learned control"
 ---
 
@@ -12,11 +12,12 @@ support: spoken instruction heard through two ears, as a trainer gives hands off
 hands. It also asked which ideas in the Agent Hub and outside are not applied yet, and for a view of the project.
 
 Short answers:
-- **The helping hands work in training if they leave early.** Fading from 35% helped success, with half the episodes
-  unhelped, the helper withdrew itself completely and the policy rises unaided 47% of the time (48% with no support),
-  with 11 of 64 runs ended by an overloaded line against 34. Fading late, the policy learned to lean: 22%.
+- **The helping hands can be withdrawn if they leave early, but they do not beat training alone.** Fading from 35%
+  helped success, with half the episodes unhelped, the helper withdrew itself completely on three seeds of three.
+  The policy then rises unaided 46% of the time, against 52% with no support. Fading late, the policy learned to
+  lean: 22% (one seed).
 - **The voice is built and heard, and not yet obeyed.** Cues during the rise went unused. Asked to wait for "get
-  up", the policy learned never to rise, twice. One seed per arm.
+  up", the policy learned never to rise, twice. These arms are one seed each.
 - **Both models have ears now**, and the stand-in reports where they are.
 - **Fundamental:** a regression gate, and through it a reset fault: every scene run after the weight-shift scene in
   one process ran without drum locks. Fixed; no outcome changed.
@@ -74,8 +75,9 @@ The test is the sibling's `rl.getup_eval`: 64 half-kneel starts, the policy's me
 
 ### What it measured
 
-Plain MLP, half-kneel curriculum, 800 iterations (39 M steps, about 21 minutes), seed 0, one run each. The
-half-kneel's two seeds differ by 6 points at 1,500 iterations, so smaller differences here mean nothing.
+Plain MLP, half-kneel curriculum, 800 iterations (39 M steps, about 21 minutes). Every arm ran on seed 0. The
+no-support and early-fade arms then ran on seeds 1 and 2 as well, before the release (P-075): the first table is
+seed 0, the second all three.
 
 | Unassisted success during training (left), and the helper's level (right) |
 | --- |
@@ -88,6 +90,16 @@ half-kneel's two seeds differ by 6 points at 1,500 iterations, so smaller differ
 | Hands, late fade (at 60%, a quarter unhelped) | 22% | 2% | 41 | Full help for 610 of 800 iterations. Helped episodes rose 53%, unhelped 15% |
 | Voice, cues on every episode | 38% (42% muted) | 2% | 26 | The policy does not use the voice |
 | Voice and hands, late fade | 14% | 0% | 43 | Fallen starts unlocked, and their failures brought the help back to full. Each start now has its own level |
+
+The two arms that matter, on three seeds (0, 1, 2):
+
+| Arm | Rise and stand 1 s | Still standing at 10 s | Ended by a line over its rating (of 64) | The helper |
+| --- | --- | --- | --- | --- |
+| No support | 48, 53, 53%: **52%** | 19, 5, 16%: 13% | 34, 17, 25: 25 | |
+| Hands, early fade | 47, 47, 44%: **46%** | 25, 13, 3%: 14% | 11, 22, 17: 17 | Withdrawn in training on every seed (by iteration 632, 621, 736) |
+
+Seed 0 alone said the early fade cost nothing and cut overloaded lines to a third. The other two seeds did not bear
+that out.
 
 Waiting for the word (rising early is a false start; about one episode in six is never told):
 
@@ -110,9 +122,10 @@ time difference), 4,000 words each:
 What it shows:
 1. **Help that stays becomes the skill.** With the late fade, the policy rose 53% of the time with the hands and 22%
    without. This is the dependence D-069's withdrawal laws were written against, measured.
-2. **Help that leaves early costs nothing and may teach restraint.** The early fade matches the unsupported rise
-   rate, stays standing a little more often, and ends a third as many runs by overloading a line. The helper is gone
-   before training ends, so withdrawal is met in training and in the test. On the tendon model the same law was not
+2. **Help that leaves early can be withdrawn, at a small cost and no gain.** Over three seeds the early fade rises
+   46% against 52% (lower on every seed), is still standing as often, and ends fewer runs by overloading a line (17
+   against 25 of 64, on two seeds of three). The helper is gone before training ends on every seed, so withdrawal
+   is met in training and in the test. Its use is for starts that are not learned alone. On the tendon model the same law was not
    met with a scripted get-up (docs/46): there nothing learns.
 3. **Spoken cues were not used.** Without a wait the voice tells the policy nothing it needs, and the extra noisy
    inputs cost some rise rate at equal steps.
@@ -197,7 +210,8 @@ recoverable. That is rarer than the results themselves.
 3. **Scripted skills do not add up.** Each one took a session and a parameter search, and yields one parameter set
    for one scene. The learned route is the one that scales, and it is stuck at the gate: a learned stand passes 9
    or 10 scenes of the tendon gate, and the learned get-up exists only on the stand-in.
-4. **Single seeds.** Several learned results, today's included, rest on one seed each.
+4. **Single seeds.** Several learned results rest on one seed each. Today's own first reading of the early fade
+   (one seed) was too kind; two more seeds corrected it.
 
 **Proposed directions, in the order I would take them:**
 
@@ -213,7 +227,7 @@ recoverable. That is rarer than the results themselves.
 ## Not yet
 
 - **Obeying a spoken command.** 0% in both attempts.
-- **Seeds.** One per arm.
+- **Seeds.** Three for the no-support and early-fade arms; one for the others.
 - **Fallen starts.** 0% in every arm, with or without the helper.
 - **The tendon gate with ears.** The sibling's gate computes its observation from the rig; it does not render the
   voice, so a policy trained with it cannot be judged on the full model yet.
@@ -226,7 +240,7 @@ recoverable. That is rarer than the results themselves.
 
 - **Obeying the word:** a recurrent policy (`--arch gru`), a reward that does not pay more for kneeling than for a
   failed rise, and a start where staying down is not an option (standing, with "sit" and "stand").
-- **Two more seeds** of the no-support and early-fade arms, then the early fade on fallen starts.
+- **The early fade on fallen starts** (sibling issue #69), where training alone gets 0%.
 - **Hub tasks filed:** `balance-critic-capture-point`, `voice-cued-skill-cloning`, and for the owner
   `bench-rig-one-drive-decision`.
 - **The directions above**, in their order.

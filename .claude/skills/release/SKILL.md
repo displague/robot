@@ -13,6 +13,8 @@ capability in simulation, a printable preset set), patch for fixes.
 ## Steps
 
 1. Main is clean and pushed; the docs, decisions and prompt log describe the state.
+   `python tools/regress.py --more` reports nothing moved (D-078). A learned result quoted in the notes has at
+   least three seeds, or the notes say it is one (v0.7.0's first reading of one seed was wrong).
 2. Visuals current: re-render changed parts (`cad-generators` skill), re-record changed scenes
    (`tendon-sim` skill), commit them.
 3. `git tag -a vX.Y.Z -m "<title>" -m "<one-paragraph state>"`, then `git push origin vX.Y.Z`.

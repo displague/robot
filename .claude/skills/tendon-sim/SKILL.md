@@ -412,7 +412,8 @@ before every commit that touches `sim_tendon.py`, an exporter, `cad/skeleton.jso
   --coach voice --coach-wait 0.5,12 --help-cap 0.6`.
 - `rl.getup_eval <policy> [--guide 0] [--wait 0.5,12] [--mute]` is the unassisted test: never with the hands, with
   the voice as trained unless overridden.
-- What worked (docs/49): `--help-cap 0.6 --help-free 0.5 --help-fade-at 0.35`. What did not: a late fade (the policy
+- What withdraws (docs/49): `--help-cap 0.6 --help-free 0.5 --help-fade-at 0.35` (three seeds: 46% unaided against
+  52% with no support, so no gain on the half-kneel). What did not: a late fade (the policy
   leans on the helper), spoken cues (unused), and waiting for the spoken command (0%). The sibling's
   `skills/grounded-rl/SKILL.md` has the rules.
 - If `EARS` moves, re-export the stand-in; policies trained with the voice depend on the ear spacing.

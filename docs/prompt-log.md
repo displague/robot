@@ -1156,3 +1156,22 @@ because its reference list cannot be changed after creation. docs/references.md 
   `bench-rig-one-drive-decision`), then closing the stand-in to tendon gate, then a body revision study.
 - Skills: `tendon-sim` (the regression gate; ears, voice and hands), `project-loop` (the gate before a commit, the
   stand-in as a contract with the sibling).
+
+
+## P-075 (2026-11-13) Try agenthub again; release across both projects, presenting the detailed analysis
+
+> Try agenthub again.
+>
+> Release across both projects when ready, to their standards, presenting the detailed analysis.
+
+- **The hub** still refuses this session ("Connector access could not be verified ... Sign out and sign in again"),
+  so the two P-074 records (`coach-voice-hands-p074`, `directions-after-first-run-p074`) are not filed. Their
+  content is docs/49.
+- **Ready meant more seeds.** The no-support and early-fade arms ran on seeds 1 and 2. They corrected P-074's
+  reading: the early-fade helper is withdrawn in training on every seed, and leaves 46% unaided rise against 52%
+  with no support (seed 0 alone had said 47% against 48%, with a third as many overloaded lines). docs/49 and the
+  sibling's docs now carry the three-seed table.
+- **Sibling v0.5.0** (its PR #71): the coach, the three-seed table, a clip of the unaided get-up, issues #68 to #70.
+  Champion unchanged.
+- **Robot v0.7.0:** everything since v0.6.0 (docs/42 to docs/49, D-069 to D-078). `regress.py --more` reports
+  nothing moved; 65 STLs built fresh at the tag.

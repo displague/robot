@@ -3,6 +3,33 @@
 Each tag has a GitHub release (github.com/displague/robot/releases) with notes, visuals and assets:
 the generated STLs, the MuJoCo models and the recordings. How to make one: `.claude/skills/release/SKILL.md`.
 
+## v0.7.0 (2026-11-13) — A helper, a second robot, ears, and a regression gate
+
+**State:** the robot is helped, and helps. A scripted helper holds its wrists on the 0.35 m chair (docs/44, D-070) and
+its upper arms on a get-up from a half-kneel, the first on the tendon model (docs/46, D-073). The chair rise's
+parameters are trained by search under jitter, and the low-seat set is the default below 0.42 m, so the whole chair
+grid stands (docs/45, D-071, D-072). Two robots share one model, and one takes the other's arms at the stand-up
+(docs/47, docs/48, D-074 to D-076). Both models have ears, and the sibling's v0.5.0 trains its get-up with a coach:
+a voice through those ears and a helper's hands that fade (docs/49, D-077). `tools/regress.py` is a regression gate;
+it found and fixed a reset that left the drum locks off (D-078). Also: senses as a research topic (docs/42) and the
+training rounds plan (docs/43, D-069).
+
+**Results:** gauntlet 14 of 14, each scene now the same alone or in sequence (chair 835.7 J either way); 0.35 m chair
+23 of 24 under 2% jitter; get-up from a half-kneel with the scripted helper 24 of 24, every arm line under 0.9x;
+with a yielding helper capped at 60 N a side 16 of 24; two robots, the helper robot taking over at the stand-up, 19
+of 24 (7 of 24 with it standing by). In the sibling, three seeds: unaided rise 46% after an early-fade helper against
+52% with none; a spoken command is not obeyed.
+
+**Known gaps:** the get-up needs the helper (not at 30 N a side, not withdrawn); the scripted hands still catch the
+kneel and carry the rise for the robot helper; an earlier takeover fails more often (10, 4, 0 of 24); the robots end
+chest to chest; the helper robot's spine has no margin (clutch at 1.03 of its rating); the voice is unused and not
+obeyed; nothing is printed and no number here has met hardware.
+
+**Assets:** robot-v0.7.0-stl.zip, robot.xml, robot_standin.xml/.json, baseline.json, getup_params.json,
+duo_params.json, rise_params.json, duo.gif and .mp4, getup.gif, rise35.gif, helper35.gif, coach-arms.png.
+
+**Decisions:** D-069 to D-078. **Prompts:** P-066 to P-075.
+
 ## v0.6.0 (2026-11-09) — Chained skills: a bag carried through a walk and a chair
 
 **State:** skills run back to back in random orders with no reset (docs/38, D-062): pick a bag up from a stool, walk,
