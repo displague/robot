@@ -373,3 +373,14 @@ against the unassisted rise window (the elbows run 1.42x their rating there) and
   - lift only what the feet leave, below standing height, or it hangs the robot;
   - shift the weight before lifting a foot, and lower the foot until it carries weight;
   - a script run under multiprocessing spawn must be a file, not stdin.
+
+## The role flip's statics (docs/47, D-074)
+
+- `python tools/role_flip.py --record --set firm` samples docs/46's helper (positions and forces).
+- `python tools/role_flip.py --set firm [--scale 0.5] [--contact elbow] [--evals 800]` searches a second robot's
+  posture per sample.
+  - It compares each pitch joint's static torque with its continuous rating (`sim/robot_standin.json`: line
+    continuous force x moment arm), and checks the CoP in its feet and the friction.
+  - It runs in about 5 minutes per scale and needs no scipy.
+- `--pose t` prints one sample's pose.
+- Lesson: the arm's wrist and elbow drives (0.66 and 3.8 N m) cannot carry a lift; contact near the elbow can.

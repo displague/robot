@@ -60,6 +60,7 @@ SHIFT = dict(ankle=D(-20), knee=D(25), back_hip=D(20), spine=D(25))   # the weig
 SHIFT_T = 2.5          # s at most; it ends once the back foot carries under SHIFT_LOAD of the weight
 SHIFT_LOAD = 0.25
 SHIFT_FWD = 0.20       # m: the helper's anchor draws forward this far over the shift
+SAMPLE_DT = 0.1        # s: the helper's hand positions and forces are sampled this often (Lifter.samples)
 Z_TOP = 0.0            # m: the anchor's ceiling above the standing grip height
 LIFT_SLACK = 10.0      # N per hand: the lift allowed beyond the weight the feet leave uncarried
 HOLD_S = 3.0           # s standing at the end
@@ -260,6 +261,7 @@ class Lifter(helper.Helper):
         self.path = None
         self.t_up = None
         self.fwd = 0.0
+        self.samples, self._sample_t = [], 0.0
         if GRIP == "elbow":             # under the arms: it holds each upper arm at the elbow, off the elbow's line
             m = rig.model
             self.eq = {s: mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_EQUALITY, "helper.%s.elbow" % s) for s in "LR"}
@@ -343,6 +345,11 @@ class Lifter(helper.Helper):
             self.log["peak"] = max(self.log["peak"], fn)
         if on:
             self.log["t_on"] += dt
+            if d.time >= self._sample_t:            # the helper's side, for a robot taking its place (docs/47)
+                self._sample_t = d.time + SAMPLE_DT
+                self.samples.append(dict(t=float(d.time), phase=phase,
+                                         x={s: self.x[s].tolist() for s in self.hands if self.attached(s)},
+                                         f={s: self.force(s).tolist() for s in self.hands if self.attached(s)}))
 
 
 def standing_grip_z(r, arm):

@@ -910,3 +910,18 @@ Alternative: the wrists, with a stronger elbow drive; or a helper that only stea
 rise impossible.
 Reverses if: the elbows get a drive that carries the lift, or a learned dynamic get-up needs no lift and only
 steadying.
+
+## D-074 (2026-11-13) A robot helper cradles the other's upper arms; it does not lift with its hands
+
+Why: P-072, docs/47. Statics along docs/46's get-up show a second robot of the same build cannot carry the helper's
+forces in its hands. Its wrists run at 5 to 17x their rating and its elbows at 3 to 8x, even at a quarter of the
+force: the arm's far drives are an order of magnitude weaker than its legs and spine. Carried near its own elbows
+(cradling the other's upper arms on its forearms), 74 of 94 samples are within every rating, with its CoP inside its
+feet. So:
+- the role flip's helper cradles;
+- the two-robot simulation joins the robots elbow to elbow;
+- the get-up is reshaped so the catch at the lean and the last of the stand-up do not need a robot helper.
+
+Alternative: stronger wrist and elbow drives (W-mid at the wrist, W-max at the elbow), at mass and cost in the arm; or
+a helper that only steadies, which leaves the get-up without its lift (docs/46).
+Reverses if: the arm's drives are upsized, or a learned get-up needs only steadying.

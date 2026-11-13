@@ -1090,3 +1090,18 @@ because its reference list cannot be changed after creation. docs/references.md 
   - Weaning with the robot's side retuned reaches a yielding helper capped at 60 N a side (16 of 24), not 30 N. So
     withdrawal is not met: the slow rise needs the lift (docs/32).
   - Recording: docs/img/getup.gif. Parameters: `sim/getup_params.json`.
+
+## P-072 (2026-11-13) Role flip
+
+> Role flip
+
+(The owner also installed scipy mid-way: `! pip3 install scipy`. The statics here do not need it.)
+
+- docs/47, the first pass, statics only: `tools/role_flip.py`.
+  - It records docs/46's get-up helper every 0.1 s (`getup.Lifter.samples`).
+  - Per sample, it searches a second robot's posture to carry those forces, checking its joints against their
+    ratings and its CoP inside its feet.
+- Holding by its hands, a robot helper cannot (wrists 5 to 17x, elbows 3 to 8x, even at a quarter of the force).
+- Cradling near its elbows (D-074), 74 of 94 samples fit every rating. The exceptions are the catch at the lean
+  (spine 2.5x) and the stand-up (grips 5 cm out of reach).
+- The hub task `nurturer-role-flip` waits on round 2. This pass is recorded in docs/47 and the prompt log.

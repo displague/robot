@@ -162,6 +162,9 @@ channel waits for `relaxed-control-variability`.
   - Faded with the robot's side retuned, it needs a yielding helper of about 60 N a side. Withdrawn, the scripted rise
     cannot stand.
 
+- **The role flip, statics** (docs/47, D-074, P-072): a second robot can carry most of the get-up's helper forces if
+  it cradles near its elbows; not with its hands.
+
 ## Not yet
 
 - No network is trained: round 1's first slice trained the hand-written rise's parameters (docs/45). The helper is scripted and works with the hand-written controller only.
