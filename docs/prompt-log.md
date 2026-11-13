@@ -1072,3 +1072,21 @@ because its reference list cannot be changed after creation. docs/references.md 
   - All 8 chair scenes stand, and the default gauntlet is unchanged at 14 of 14.
   - Recording: docs/img/rise35.gif.
 - The chair teacher demos were re-recorded: 8 of 8 episodes. The sibling's loader reads them.
+
+## P-071 (2026-11-12) Keep on: the helper on getting up from a half-kneel
+
+> keep on
+
+- Hub task `helper-instructor-getup`. `tools/getup.py` adds:
+  - the half-kneel start on the tendon model (`kneel`);
+  - a scripted get-up: lean, rise, weight shift, step through, touchdown, stand up;
+  - the get-up's helper, `Lifter` (D-073);
+  - a jittered parameter search with an optional fade curriculum (`--train`, `--reps`, `--fade`), and
+    `--jitter-test`.
+- `export_mjcf.HELPER` adds an elbow site per arm and the `helper.X.elbow` equalities. `helper.Helper` gains `ref`.
+- docs/46:
+  - The tendon model gets up from a half-kneel for the first time: 24 of 24 under 2% jitter, with the helper holding
+    the upper arms and every arm line within its rating. Held by the wrists, the elbows ran at 2.5x.
+  - Weaning with the robot's side retuned reaches a yielding helper capped at 60 N a side (16 of 24), not 30 N. So
+    withdrawal is not met: the slow rise needs the lift (docs/32).
+  - Recording: docs/img/getup.gif. Parameters: `sim/getup_params.json`.

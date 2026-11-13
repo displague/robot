@@ -94,6 +94,7 @@ class Helper:
         self.on_reach, self.cap, self.drunk = on_reach, float(cap), float(drunk)
         self.rng = np.random.default_rng(seed)
         self.arms_hold = arms_hold
+        self.ref = None
         self.eq = {s: mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_EQUALITY, "helper." + s) for s in "LR"}
         self.mid = {s: m.body_mocapid[mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_BODY, "helper." + s)] for s in "LR"}
         self.grip = {s: mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_SITE, "wrist.hand." + s) for s in "LR"}
@@ -116,8 +117,11 @@ class Helper:
         return 0.5 * G_FIRM * (G_SOFT / G_FIRM) ** g, B_FIRM * (B_SOFT / B_FIRM) ** g
 
     def behind(self):
-        """How far the CoM is behind the soles' centre, less MARGIN (m; +: the robot would sit back down)."""
+        """How far the CoM is behind the soles' centre, less MARGIN (m; +: the robot would sit back down). `ref`, if
+        set, replaces the soles' centre with its own measure (getup.py: the front sole)."""
         r = self.r
+        if self.ref is not None:
+            return float(self.ref(r)) - MARGIN
         so = r.soles()
         return float(r.data.subtree_com[r.pelvis][1] - 0.5 * (so[0][0][1] + so[1][0][1])) - MARGIN
 

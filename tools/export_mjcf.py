@@ -340,6 +340,8 @@ def mjcf(links, data):
             out.append('%s  <site name="grip.%s" pos="%.4f %.4f %.4f" size="0.008"/>\n' % ((pad, l["name"]) + tuple(g)))
             if HELPER:      # the helper holds the wrist (the hand's joint), so the small wrist drive carries none of it
                 out.append('%s  <site name="wrist.%s" pos="0 0 0" size="0.008"/>\n' % (pad, l["name"]))
+        if HELPER and l["name"].startswith("forearm."):   # the elbow, where a helper may hold the upper arm (docs/46)
+            out.append('%s  <site name="elbow.%s" pos="0 0 0" size="0.008"/>\n' % (pad, l["name"][-1]))
         if l["name"] in BAGS:
             # the bag swings from the grip at the link's tail; it does not collide (the legs pass through it)
             g = sub(l["tail"], l["head"])
@@ -404,6 +406,8 @@ def mjcf(links, data):
                        'mass="0.001" rgba="0.95 0.55 0.2 0.6"/>\n    </body>\n' % (side, 3 if side == "L" else 4, side))
             equalities.append('    <connect name="helper.%s" site1="wrist.%s" site2="helper.%s.grip" active="false" '
                               'solref="0.02 1"/>\n' % (side, hand, side))
+            equalities.append('    <connect name="helper.%s.elbow" site1="elbow.%s" site2="helper.%s.grip" '
+                              'active="false" solref="0.02 1"/>\n' % (side, side, side))
     out.append('  </worldbody>\n  <tendon>\n')
     out.extend(tendons)
     out.append('  </tendon>\n  <equality>\n')

@@ -157,6 +157,11 @@ channel waits for `relaxed-control-variability`.
   - Retrained under 2% jitter with every seat scored, the low-seat set is the default below 0.42 m (D-072, P-070). So
     the whole chair grid stands, and the chair demos are 8 of 8.
 
+- **The helper on getting up** (docs/46, D-073, P-071):
+  - The tendon model gets up from a half-kneel with a helper holding it under the arms: 24 of 24 under jitter.
+  - Faded with the robot's side retuned, it needs a yielding helper of about 60 N a side. Withdrawn, the scripted rise
+    cannot stand.
+
 ## Not yet
 
 - No network is trained: round 1's first slice trained the hand-written rise's parameters (docs/45). The helper is scripted and works with the hand-written controller only.

@@ -357,3 +357,19 @@ against the unassisted rise window (the elbows run 1.42x their rating there) and
   default for seats under 0.42 m: `sim_tendon.SIT_LOW` and `SIT_LOW_BELOW` (D-072). A trainer that sets the `SIT_*`
   globals itself must set `st.SIT_LOW = None`, or the schedule overrides its parameters on the low seats.
   - Don't use `cat > file` without a heredoc in a backgrounded Bash call: it waits on stdin forever.
+
+## Getting up with the helper (docs/46, D-073)
+
+- `python tools/getup.py --settle` checks the half-kneel start (`getup.kneel(r)` homes gears and drums at a pose
+  and drops the body onto the floor).
+- `GETUP_GRIP=elbow python tools/getup.py --train A --reps 2 [--fade] [--init best.json] --out sim/out/getup_x`
+  searches `GPARAMS`, the script's 17 parameters.
+  - `--fade` walks the helper through `FADE`.
+  - `best.json` keeps `best`, `last`, `mean` and `levels`. Use `last` once the best score saturates at 10.
+  - `--jitter-test file:key --n 24` checks a set; `getup.gapply(params)` applies one.
+- The get-up's helper is `getup.Lifter`, not `helper.Helper`. Keepers are in `sim/getup_params.json`.
+- Lessons:
+  - hold under the arms (wrists overload the elbows);
+  - lift only what the feet leave, below standing height, or it hangs the robot;
+  - shift the weight before lifting a foot, and lower the foot until it carries weight;
+  - a script run under multiprocessing spawn must be a file, not stdin.

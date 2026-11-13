@@ -885,3 +885,28 @@ This meets D-071's condition for adopting a trained set.
 Alternative: one set for every seat, which the search did not find (the low seats want a momentum rise, the 0.50 m
 seat the old one). Or keep the defaults and leave the 0.35 m seat to the helper.
 Reverses if: a single set holds the whole grid under jitter, or a learned policy replaces the scripted rise.
+
+## D-073 (2026-11-12) The get-up's helper lifts under the arms, only what the feet leave, and below standing height
+
+Why: P-071, docs/46. Every version of the get-up helper that held the wrists ran the elbow lines at 2.3 to 3.0x their
+rating, at every arm angle tried, as the stand-in's learned get-up did (docs/32). Holding each upper arm at the elbow
+brings the worst arm line to 0.9x. The get-up's helper (`getup.Lifter`) therefore:
+- holds under the arms (`GETUP_GRIP=elbow`);
+- moves toward an anchor by a stiffness (its give), capped;
+- lifts no more than the weight the soles leave uncarried, plus about 30 N a side;
+- keeps its anchor below the standing grip height (15 to 21 cm below, searched), since otherwise it hangs the robot
+  off its feet;
+- eases its stiffness to zero over the stand-up before letting go.
+
+The chair's helper (D-070) keeps the wrists: there the arms carry only a pull along themselves, within the law.
+
+The overload law is judged as in D-070, against the chair's unassisted elbow peak (1.42x) plus 10%, since a get-up
+has no unassisted run to measure.
+
+The withdrawal law is not met: the scripted get-up still needs about 60 N a side (impulse about 620 N s), because a
+slow rise from a half-kneel is geometrically impossible on this ankle (docs/32).
+
+Alternative: the wrists, with a stronger elbow drive; or a helper that only steadies (no lift), which leaves the slow
+rise impossible.
+Reverses if: the elbows get a drive that carries the lift, or a learned dynamic get-up needs no lift and only
+steadying.

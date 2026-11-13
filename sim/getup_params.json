@@ -1,0 +1,59 @@
+{
+ "note": "docs/46, D-073: the scripted get-up from a half-kneel (tools/getup.py), the helper holding the upper arms (GETUP_GRIP=elbow). Angles in degrees. Apply with getup.gapply(params).",
+ "firm": {
+  "source": "sim/out/getup_A5, last generation (jittered search, Phase A firm helper)",
+  "helper": {
+   "give": 0.0,
+   "hands": "LR",
+   "cap": 150.0
+  },
+  "jitter": "24 of 24 stand under 2% jitter",
+  "params": {
+   "ARM": -96.86580158829435,
+   "SPINE_LEAN": 8.460945438107881,
+   "RISE_T": 4.307429326429965,
+   "LIFT": 0.581207530527279,
+   "LIFT_FWD": 0.1944165636639238,
+   "SHIFT.ankle": -17.935989578841017,
+   "SHIFT.knee": 22.865300922580747,
+   "SHIFT.back_hip": 12.055315342404299,
+   "SHIFT.spine": 33.69731810707196,
+   "SHIFT_FWD": 0.1820918346801176,
+   "SWING.0": 71.88501687152802,
+   "SWING.1": -16.487710961591773,
+   "SWING_T": 0.9274673730259956,
+   "PLANT_T": 0.5790527406929586,
+   "UP_T": 1.219224501382031,
+   "LIFT_SLACK": 30.078784843851885,
+   "Z_TOP": -0.20758970455464973
+  }
+ },
+ "faded": {
+  "source": "sim/out/getup_fade level 3 (the fade curriculum's last passed level)",
+  "helper": {
+   "give": 0.75,
+   "hands": "LR",
+   "cap": 60.0
+  },
+  "jitter": "16 of 24 stand under 2% jitter with that helper; 0 of 12 with the firm one",
+  "params": {
+   "ARM": -102.17660871214412,
+   "SPINE_LEAN": 8.726238165571763,
+   "RISE_T": 3.9473206753071497,
+   "LIFT": 0.4946412351307432,
+   "LIFT_FWD": 0.2066139698436088,
+   "SHIFT.ankle": -17.95590673886263,
+   "SHIFT.knee": 18.842276549130098,
+   "SHIFT.back_hip": 12.859637420493431,
+   "SHIFT.spine": 35.386679189644454,
+   "SHIFT_FWD": 0.1181555886469911,
+   "SWING.0": 61.219980330216906,
+   "SWING.1": -7.162188255626859,
+   "SWING_T": 0.8549053090399059,
+   "PLANT_T": 0.6066849698798127,
+   "UP_T": 1.076707954306735,
+   "LIFT_SLACK": 32.37235108316837,
+   "Z_TOP": -0.15362807647070822
+  }
+ }
+}

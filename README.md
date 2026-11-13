@@ -58,6 +58,7 @@ The docs (design notes and experiments, one per topic) are indexed with a summar
 | `tools/rise_static.py` | Whether the robot can rise slowly on one leg: the lowest pelvis height with the CoM over a flat foot, by geometry and within the knee, hip and ankle drives, per ankle dorsiflexion (docs/32) |
 | `tools/record_teacher.py` | Demonstrations from the hand-written controller on the tendon model, in the stand-in's observation layout: the gauntlet and pushes, `--set chair`, `--set chain`, each with the carried weight (docs/43) |
 | `tools/helper.py`, `docs/img/helper35.gif` | The nurturing helper v0: two hands that hold the robot's wrists and give in proportion to the pull, on the 0.35 m chair rise, per phase and faded (docs/44); `--drunk`, the drunken sailor (docs/45) |
+| `tools/getup.py`, `sim/getup_params.json`, `docs/img/getup.gif` | Getting up from a half-kneel on the full model: the start, the scripted rise and step, the get-up's helper holding the upper arms, and its jittered and fading parameter search (docs/46) |
 | `tools/rise_train.py`, `sim/rise_params.json`, `docs/img/rise35.gif` | Training the chair rise's parameters on the full model by cross-entropy search, with the helper faded as curriculum; the trained sets; the 0.35 m rise with no helper (docs/45) |
 | `docs/decisions.md` | Decision log (what we chose and why; revisit when a test disagrees) |
 | `docs/prompt-log.md` | Every prompt that produced a set of work, verbatim, with what it produced |
