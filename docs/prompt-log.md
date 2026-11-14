@@ -1176,3 +1176,13 @@ because its reference list cannot be changed after creation. docs/references.md 
   Champion unchanged.
 - **Robot v0.7.0:** everything since v0.6.0 (docs/42 to docs/49, D-069 to D-078). `regress.py --more` reports
   nothing moved; 65 STLs built fresh at the tag.
+
+## P-076 (2026-11-14) Is binocular vision in use yet?
+
+> do we have binocular vision in use yet?
+
+- **No.** Neither model has a camera or eye site, and no policy or controller gets an image. The skeleton names
+  eye pan, tilt and eyelid joints with no axis, so they are not built or simulated.
+- Planned only: docs/42's proposal 2 (two head cameras, 60 mm baseline, depth first) and round 2 of docs/43.
+  The first step there is still open: measure what a depth render costs per step.
+- The sibling's `sim/embodiments.py` lists "vision" as a sensor name on its abstract bodies; nothing renders it.
